@@ -90,5 +90,5 @@ gradle*
 # Logs
 # =========================
 *.log
-logs/
+logs/s
 logs/

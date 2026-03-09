@@ -1,6 +1,6 @@
 package com.platform.sosangongin.domains.user;
 
-import com.platform.sosangongin.domains.common.BaseLongIdEntity;
+import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,12 @@ import java.time.LocalDateTime;
 @Table(name = "phone_verifications")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PhoneVerification extends BaseLongIdEntity {
+public class PhoneVerification extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;

@@ -1,6 +1,6 @@
 package com.platform.sosangongin.domains.employment;
 
-import com.platform.sosangongin.domains.common.BaseLongIdEntity;
+import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.role.BusinessRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "employment_roles")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EmploymentRole extends BaseLongIdEntity {
+public class EmploymentRole extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employment_id", nullable = false)

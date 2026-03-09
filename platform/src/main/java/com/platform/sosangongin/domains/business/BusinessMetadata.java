@@ -23,15 +23,8 @@ public class BusinessMetadata extends BaseEntity {
     @JoinColumn(name = "business_id")
     private Business business;
 
-    @Column(name = "pay_day")
-    private Integer payDay;
 
-    @Column(name = "start_of_week")
-    private String startOfWeek;
-
-    public BusinessMetadata(Business business, Integer payDay, String startOfWeek) {
+    public BusinessMetadata(Business business) {
         this.business = business;
-        this.payDay = payDay;
-        this.startOfWeek = startOfWeek;
     }
 }

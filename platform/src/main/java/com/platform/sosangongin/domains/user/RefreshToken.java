@@ -1,6 +1,6 @@
 package com.platform.sosangongin.domains.user;
 
-import com.platform.sosangongin.domains.common.BaseLongIdEntity;
+import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,11 @@ import java.time.LocalDateTime;
 @Table(name = "refresh_tokens")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken extends BaseLongIdEntity {
+public class RefreshToken extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

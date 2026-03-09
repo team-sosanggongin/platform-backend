@@ -1,6 +1,6 @@
 package com.platform.sosangongin.domains.user;
 
-import com.platform.sosangongin.domains.common.BaseLongIdEntity;
+import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_social_auths")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserSocialAuth extends BaseLongIdEntity {
+public class UserSocialAuth extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,12 +1,12 @@
 package com.platform.sosangongin.domains.user;
 
-import com.platform.sosangongin.domains.common.BaseUuidEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -14,7 +14,11 @@ import java.time.LocalDateTime;
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseUuidEntity {
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "phone_number", unique = true, nullable = false, length = 20)
     private String phoneNumber;
