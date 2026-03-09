@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: platform-service
+  profiles:
+    active: local # 기본 활성화 프로파일
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:localdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stage
+  # datasource 설정 필요 (예: MySQL, PostgreSQL 등)
+  # jpa 설정 필요
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  # datasource 설정 필요
+  # jpa 설정 필요
