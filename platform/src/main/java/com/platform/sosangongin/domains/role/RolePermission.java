@@ -2,10 +2,10 @@ package com.platform.sosangongin.domains.role;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "role_permissions")
 @Getter
@@ -14,18 +14,14 @@ public class RolePermission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Long permissionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private BusinessRole role;
+    @Column(name = "permission_name")
+    private String permissionName;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "perm_domain", nullable = false))
     private PermissionDomain permDomain;
 
-    public RolePermission(BusinessRole role, PermissionDomain permDomain) {
-        this.role = role;
-        this.permDomain = permDomain;
-    }
 }

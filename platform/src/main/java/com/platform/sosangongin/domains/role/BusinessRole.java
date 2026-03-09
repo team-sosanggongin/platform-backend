@@ -3,10 +3,12 @@ package com.platform.sosangongin.domains.role;
 import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.Set;
+
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "business_roles")
 @Getter
@@ -24,8 +26,7 @@ public class BusinessRole extends BaseEntity {
     @Column(name = "role_name", nullable = false)
     private String roleName;
 
-    public BusinessRole(Business business, String roleName) {
-        this.business = business;
-        this.roleName = roleName;
-    }
+    @OneToMany(mappedBy = "permissionId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RolePermission> rolePermissionSet;
+
 }

@@ -1,13 +1,13 @@
 package com.platform.sosangongin.domains.user;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_users_phone_number", columnList = "phone_number")
@@ -32,9 +32,9 @@ public class User {
     @Column(nullable = false, length = 50)
     private String name;
 
-    public User(String phoneNumber, String name) {
+    protected User(String phoneNumber, String userName) {
         this.phoneNumber = phoneNumber;
-        this.name = name;
+        this.name = userName;
     }
 
     public void verifyPhone() {

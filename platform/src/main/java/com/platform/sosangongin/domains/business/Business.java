@@ -3,12 +3,12 @@ package com.platform.sosangongin.domains.business;
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "businesses")
 @Getter
@@ -33,11 +33,4 @@ public class Business extends SoftDeletedBaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private BusinessStatus status;
-
-    public Business(User owner, String bizName, BusinessType bizType, BusinessStatus status) {
-        this.owner = owner;
-        this.bizName = bizName;
-        this.bizType = bizType;
-        this.status = status;
-    }
 }

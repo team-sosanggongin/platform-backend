@@ -3,10 +3,10 @@ package com.platform.sosangongin.domains.employment;
 import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.role.BusinessRole;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "employment_roles")
 @Getter
@@ -25,8 +25,4 @@ public class EmploymentRole extends BaseEntity {
     @JoinColumn(name = "role_id", nullable = false)
     private BusinessRole role;
 
-    public EmploymentRole(Employment employment, BusinessRole role) {
-        this.employment = employment;
-        this.role = role;
-    }
 }
