@@ -19,7 +19,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:test-id}
 ---
 spring:
   config:
