@@ -5,6 +5,9 @@ import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -26,7 +29,7 @@ public class BusinessRole extends BaseEntity {
     @Column(name = "role_name", nullable = false)
     private String roleName;
 
-    @OneToMany(mappedBy = "permissionId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RolePermission> rolePermissionSet;
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RolePermission> rolePermissionSet = new HashSet<>();
 
 }

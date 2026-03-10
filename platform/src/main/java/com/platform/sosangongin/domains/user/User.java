@@ -24,7 +24,7 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "is_phone_verified", nullable = false)
-    private boolean isPhoneVerified = false;
+    private boolean isPhoneVerified;
 
     @Column(name = "phone_verified_at")
     private LocalDateTime phoneVerifiedAt;

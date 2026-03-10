@@ -14,14 +14,14 @@ public class RolePermission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long permissionId;
+    private Long id;
 
-    @Column(name = "permission_name")
-    private String permissionName;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private BusinessRole businessRole;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "perm_domain", nullable = false))
-    private PermissionDomain permDomain;
+    @ManyToOne
+    @JoinColumn(name = "permission_id")
+    private Permission permission;
 
 }
