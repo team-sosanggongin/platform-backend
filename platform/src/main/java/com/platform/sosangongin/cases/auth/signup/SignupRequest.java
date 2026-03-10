@@ -1,4 +1,6 @@
 package com.platform.sosangongin.cases.auth.signup;
 
-public class SignupRequest {
+import com.platform.sosangongin.cases.CommonRequestTemplate;
+
+public class SignupRequest extends CommonRequestTemplate {
 }

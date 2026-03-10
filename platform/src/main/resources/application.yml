@@ -19,9 +19,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  oauth:
-    kakao:
-      client-id: ${KAKAO_CLIENT_ID:test-id}
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:test-id}
 ---
 spring:
   config:
@@ -37,23 +37,23 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
-  oauth:
-    kakao:
-      client-id: ${KAKAO_CLIENT_ID:test-id}
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:test-id}
 ---
 spring:
   config:
     activate:
       on-profile: stage
-  oauth:
-    kakao:
-      client-id: ${KAKAO_CLIENT_ID:test-id}
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:test-id}
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  oauth:
-    kakao:
-      client-id: ${KAKAO_CLIENT_ID:test-id}
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:test-id}
