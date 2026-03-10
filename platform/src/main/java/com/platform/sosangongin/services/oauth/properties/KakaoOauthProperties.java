@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "oauth.kakao")
 @Getter
 @Setter
-public class KakaoProperties {
+public class KakaoOauthProperties {
 
     private String clientId;
 

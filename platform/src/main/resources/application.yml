@@ -37,19 +37,23 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
-
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:test-id}
 ---
 spring:
   config:
     activate:
       on-profile: stage
-  # datasource 설정 필요 (예: MySQL, PostgreSQL 등)
-  # jpa 설정 필요
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:test-id}
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  # datasource 설정 필요
-  # jpa 설정 필요
+  oauth:
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:test-id}
