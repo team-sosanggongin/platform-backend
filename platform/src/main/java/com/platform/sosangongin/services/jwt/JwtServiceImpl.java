@@ -80,4 +80,14 @@ public class JwtServiceImpl implements JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    @Override
+    public UUID getUserIdFromToken(String token) {
+        Claims claims = parseClaims(token);
+        String userIdStr = claims.getSubject();
+        if (userIdStr == null) {
+            userIdStr = claims.get("userId", String.class);
+        }
+        return UUID.fromString(userIdStr);
+    }
 }

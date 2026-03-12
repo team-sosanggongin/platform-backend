@@ -11,4 +11,5 @@ public interface JwtService {
     String createToken(UUID userId, UUID businessId, List<BusinessRole> roles);
     String createRefreshToken(UUID userId);
     Claims parseClaims(String token);
+    UUID getUserIdFromToken(String token);
 }
