@@ -21,9 +21,6 @@ public class PhoneVerification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @Column(name = "phone_number", nullable = false)
-    private String phoneNumber;
-
     @Column(nullable = false, length = 6)
     private String code;
 
@@ -38,8 +35,7 @@ public class PhoneVerification extends BaseEntity {
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
 
-    public PhoneVerification(String phoneNumber, String code, LocalDateTime expiredAt) {
-        this.phoneNumber = phoneNumber;
+    public PhoneVerification(String code, LocalDateTime expiredAt) {
         this.code = code;
         this.status = VerificationStatus.PENDING;
         this.expiredAt = expiredAt;
@@ -63,7 +59,7 @@ public class PhoneVerification extends BaseEntity {
             this.status = VerificationStatus.EXPIRED;
             return true;
         }
-        return true;
+        return false;
     }
 
     public void verified() {

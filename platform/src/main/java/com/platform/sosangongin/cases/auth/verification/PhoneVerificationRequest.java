@@ -9,6 +9,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class PhoneVerificationRequest extends CommonRequestTemplate {
+    private final boolean isPhoneVerificationRequest;
     private final String userId;
     private final String code;
 }
