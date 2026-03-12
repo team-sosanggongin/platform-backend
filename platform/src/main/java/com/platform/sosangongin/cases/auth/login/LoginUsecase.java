@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.auth.login;
 
 import com.platform.sosangongin.domains.token.RefreshToken;
+import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
 import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
@@ -86,13 +87,13 @@ public class LoginUsecase {
     private LoginResult createTokensAndReturn(User user) {
         // 기존 Refresh Token 삭제 (단일 로그인 정책 등 필요에 따라 조정 가능)
         // TODO :: 토큰이 있는 상태에서 로그인하는 것에 대한 정책 정의
-        refreshTokenRepository.deleteAllByUser(user);
+        this.refreshTokenRepository.deleteAllByUser(user);
 
         // Access Token 발급
-        String accessToken = jwtService.createToken(user.getId());
+        String accessToken = this.jwtService.createToken(user.getId());
 
         // Refresh Token 발급
-        String refreshTokenStr = jwtService.createRefreshToken(user.getId());
+        String refreshTokenStr = this.jwtService.createRefreshToken(user.getId());
 
         // Refresh Token DB 저장
         // TODO: UserAgent 등 추가 정보 수집 가능 시 매핑
@@ -100,9 +101,9 @@ public class LoginUsecase {
                 user,
                 refreshTokenStr,
                 null, // UserAgent
-                LocalDateTime.now().plus(jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS)
+                LocalDateTime.now().plus(this.jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS)
         );
-        refreshTokenRepository.save(refreshToken);
+        this.refreshTokenRepository.save(refreshToken);
 
         return LoginResult.builder()
                 .httpStatus(HttpStatus.OK)

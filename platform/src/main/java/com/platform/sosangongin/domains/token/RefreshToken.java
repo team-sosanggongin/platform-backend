@@ -3,12 +3,12 @@ package com.platform.sosangongin.domains.token;
 import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "refresh_tokens")
 @Getter

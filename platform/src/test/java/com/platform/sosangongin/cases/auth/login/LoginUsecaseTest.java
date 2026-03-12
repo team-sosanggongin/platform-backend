@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.auth.login;
 
 import com.platform.sosangongin.domains.token.RefreshToken;
+import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.oauth.AuthResponse;
