@@ -1,5 +1,12 @@
 package com.platform.sosangongin.cases.auth.signup;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@AllArgsConstructor
+@Component
 public class SignupUseCase {
 
      /**
@@ -10,8 +17,9 @@ public class SignupUseCase {
       * 이후, User 테이블에 User 정보를 넣고, 전화번호 인증 필요 상태로 변경한다
       *
      **/
-
      public SignupResult signup(SignupRequest req){
+
+
 
         return null;
 

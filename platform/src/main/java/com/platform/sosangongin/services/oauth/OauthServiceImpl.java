@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class OauthServiceImpl implements OauthService{
 
     @Override
-    public String buildAuthorizeUrl(String provider) {
+    public String buildAuthorizeUrl(SocialProvider provider) {
         return "";
     }
 

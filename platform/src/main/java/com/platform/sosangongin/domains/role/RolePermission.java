@@ -4,6 +4,7 @@ import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @AllArgsConstructor
 @Builder
 @Entity
@@ -23,5 +24,8 @@ public class RolePermission extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "permission_id")
     private Permission permission;
+
+    @Column(name = "description")
+    private String description;
 
 }

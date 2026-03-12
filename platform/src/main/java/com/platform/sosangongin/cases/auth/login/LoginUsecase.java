@@ -20,13 +20,6 @@ public class LoginUsecase {
     private final UserSocialAuthRepository userSocialAuthRepository;
     private final UserRepository userRepository;
 
-    /**
-     * 사용자에게 Provider에 맞는 Callback URL을 반환한다.
-     */
-    public String login(String provider) {
-        return this.oauthService.buildAuthorizeUrl(provider);
-    }
-
     @Transactional
     public LoginResult loginAfterSocialEvent(LoginRequest loginRequest) {
         AuthResponse authRes = this.oauthService.getAuth(loginRequest.getProvider(), loginRequest.getCode());

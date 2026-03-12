@@ -10,7 +10,7 @@ import java.util.UUID;
 @Profile("test")
 public class TestOauthServiceImpl implements OauthService{
     @Override
-    public String buildAuthorizeUrl(String provider) {
+    public String buildAuthorizeUrl(SocialProvider provider) {
         return "";
     }
 
