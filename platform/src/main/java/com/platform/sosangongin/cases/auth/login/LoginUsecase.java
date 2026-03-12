@@ -1,6 +1,9 @@
 package com.platform.sosangongin.cases.auth.login;
 
+import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.services.jwt.JwtProperties;
+import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.oauth.AuthResponse;
 import com.platform.sosangongin.services.oauth.OauthService;
 import jakarta.transaction.Transactional;
@@ -9,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Slf4j
@@ -19,11 +24,14 @@ public class LoginUsecase {
     private final OauthService oauthService;
     private final UserSocialAuthRepository userSocialAuthRepository;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProperties jwtProperties;
 
     @Transactional
     public LoginResult loginAfterSocialEvent(LoginRequest loginRequest) {
         AuthResponse authRes = this.oauthService.getAuth(loginRequest.getProvider(), loginRequest.getCode());
-        UserSocialAuth authData = this.userSocialAuthRepository.findByProviderAndProviderId(authRes.provider(), authRes.uniqueId());
+        UserSocialAuth authData = this.userSocialAuthRepository.findByProviderAndProviderUserId(authRes.provider(), authRes.uniqueId());
 
         if (authData == null) {
             log.info("this user {} is not existing", authRes.uniqueIdWithProvider());
@@ -41,9 +49,9 @@ public class LoginUsecase {
                 this.userRepository.save(newUser);
 
                 UserSocialAuth providerAuthHistory = UserSocialAuth.builder()
-                        .providerId(authRes.uniqueId())
-                        .provider(authRes.provider())
                         .user(newUser)
+                        .provider(authRes.provider())
+                        .providerUserId(authRes.uniqueId())
                         .build();
 
                 this.userSocialAuthRepository.save(providerAuthHistory);
@@ -55,24 +63,51 @@ public class LoginUsecase {
             } else {
                 log.info("this user {} is existing", authRes.uniqueIdWithProvider());
                 // 이미 존재하는 고객이나, 해당 provider로는 최초로 접근한 경우
+                User existingUser = userOptional.get();
                 UserSocialAuth providerAuthHistory = UserSocialAuth.builder()
-                        .providerId(authRes.uniqueId())
+                        .user(existingUser)
                         .provider(authRes.provider())
-                        .user(userOptional.get())
+                        .providerUserId(authRes.uniqueId())
                         .build();
 
                 this.userSocialAuthRepository.save(providerAuthHistory);
-                return LoginResult.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .build();
+
+                return createTokensAndReturn(existingUser);
             }
 
         }
 
         log.info("this user already is registered with the system");
+        User user = authData.getUser();
+
+        return createTokensAndReturn(user);
+    }
+
+    private LoginResult createTokensAndReturn(User user) {
+        // 기존 Refresh Token 삭제 (단일 로그인 정책 등 필요에 따라 조정 가능)
+        // TODO :: 토큰이 있는 상태에서 로그인하는 것에 대한 정책 정의
+        refreshTokenRepository.deleteAllByUser(user);
+
+        // Access Token 발급
+        String accessToken = jwtService.createToken(user.getId());
+
+        // Refresh Token 발급
+        String refreshTokenStr = jwtService.createRefreshToken(user.getId());
+
+        // Refresh Token DB 저장
+        // TODO: UserAgent 등 추가 정보 수집 가능 시 매핑
+        RefreshToken refreshToken = new RefreshToken(
+                user,
+                refreshTokenStr,
+                null, // UserAgent
+                LocalDateTime.now().plus(jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS)
+        );
+        refreshTokenRepository.save(refreshToken);
+
         return LoginResult.builder()
                 .httpStatus(HttpStatus.OK)
+                .accessToken(accessToken)
+                .refreshToken(refreshTokenStr)
                 .build();
-
     }
 }

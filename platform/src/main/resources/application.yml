@@ -28,6 +28,11 @@ management:
     tags:
       application: ${spring.application.name}
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY:sosangongin-platform-backend-secret-key-must-be-long-enough}
+  expiration-time: ${JWT_EXPIRATION_TIME:900000}
+  refresh-token-expiration-time: ${JWT_REFRESH_EXPIRATION_TIME:1209600000}
+
 ---
 spring:
   config:

@@ -4,12 +4,11 @@ import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "user_social_auths")
 @Getter
-@ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSocialAuth extends BaseEntity {
 
@@ -17,7 +16,7 @@ public class UserSocialAuth extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -26,11 +25,5 @@ public class UserSocialAuth extends BaseEntity {
     private SocialProvider provider;
 
     @Column(name = "provider_user_id", unique = true, nullable = false)
-    private String providerId;
-
-    public UserSocialAuth(User user, SocialProvider provider, String providerId) {
-        this.user = user;
-        this.provider = provider;
-        this.providerId = providerId;
-    }
+    private String providerUserId;
 }

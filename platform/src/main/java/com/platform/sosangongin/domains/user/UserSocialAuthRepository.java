@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface UserSocialAuthRepository extends JpaRepository<UserSocialAuth, Long> {
-    UserSocialAuth findByProviderAndProviderId(SocialProvider provider, String providerId);
+    UserSocialAuth findByProviderAndProviderUserId(SocialProvider provider, String providerUserId);
     List<UserSocialAuth> findByUser(User user);
 }

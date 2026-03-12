@@ -29,7 +29,7 @@ public class BusinessRole extends BaseEntity {
     @Column(name = "role_name", nullable = false)
     private String roleName;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     private Set<RolePermission> rolePermissionSet = new HashSet<>();
 
 }
