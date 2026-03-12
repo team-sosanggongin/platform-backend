@@ -32,8 +32,25 @@ public class LoginUsecase {
             if (userOptional.isEmpty()) {
                 log.info("this user {} is not present in the db", authRes.uniqueIdWithProvider());
                 // 최초 로그인이기 때문에 유저 회원가입 프로세스로 유도해야 함.
+
+                User newUser = User.builder()
+                        .name(authRes.userName())
+                        .phoneNumber(authRes.phoneNumber())
+                        .build();
+
+                this.userRepository.save(newUser);
+
+                UserSocialAuth providerAuthHistory = UserSocialAuth.builder()
+                        .providerId(authRes.uniqueId())
+                        .provider(authRes.provider())
+                        .user(newUser)
+                        .build();
+
+                this.userSocialAuthRepository.save(providerAuthHistory);
+
                 return LoginResult.builder()
                         .httpStatus(HttpStatus.NOT_FOUND)
+                        .message("phone number verification required")
                         .build();
             } else {
                 log.info("this user {} is existing", authRes.uniqueIdWithProvider());

@@ -1,5 +1,6 @@
 package com.platform.sosangongin.domains.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ class PhoneVerificationRepositoryTest {
         phoneVerificationRepository.save(verification);
 
         // when
-        boolean result = verification.verify("123456", LocalDateTime.now());
+        boolean result = verification.verify("123456");
 
         // then
         assertThat(result).isTrue();
@@ -58,7 +59,7 @@ class PhoneVerificationRepositoryTest {
         phoneVerificationRepository.save(verification);
 
         // when
-        boolean result = verification.verify("654321", LocalDateTime.now());
+        boolean result = verification.verify("654321");
 
         // then
         assertThat(result).isFalse();
@@ -74,10 +75,10 @@ class PhoneVerificationRepositoryTest {
         phoneVerificationRepository.save(verification);
 
         // when
-        boolean result = verification.verify("123456", LocalDateTime.now());
+        boolean isExpired = verification.isExpired(LocalDateTime.now());
 
         // then
-        assertThat(result).isFalse();
+        Assertions.assertTrue(isExpired);
         assertThat(verification.getStatus()).isEqualTo(VerificationStatus.EXPIRED);
     }
 }

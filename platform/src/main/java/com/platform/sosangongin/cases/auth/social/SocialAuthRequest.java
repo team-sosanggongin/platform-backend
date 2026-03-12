@@ -11,4 +11,7 @@ public class SocialAuthRequest extends CommonRequestTemplate {
     public SocialAuthRequest(String provider) {
         this.provider = SocialProvider.valueOf(provider.toUpperCase());
     }
+    public SocialAuthRequest(SocialProvider provider) {
+        this.provider = provider;
+    }
 }

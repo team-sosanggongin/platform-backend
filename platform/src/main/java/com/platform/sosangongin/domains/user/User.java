@@ -32,7 +32,7 @@ public class User {
     @Column(nullable = false, length = 50)
     private String name;
 
-    protected User(String phoneNumber, String userName) {
+    public User(String phoneNumber, String userName) {
         this.phoneNumber = phoneNumber;
         this.name = userName;
     }

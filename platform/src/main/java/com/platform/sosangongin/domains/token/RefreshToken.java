@@ -1,6 +1,7 @@
-package com.platform.sosangongin.domains.user;
+package com.platform.sosangongin.domains.token;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
+import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

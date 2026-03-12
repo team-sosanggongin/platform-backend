@@ -2,12 +2,12 @@ package com.platform.sosangongin.domains.user;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "phone_verifications")
 @Getter
@@ -18,6 +18,9 @@ public class PhoneVerification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
@@ -26,10 +29,14 @@ public class PhoneVerification extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Setter
     private VerificationStatus status;
 
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
+
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
 
     public PhoneVerification(String phoneNumber, String code, LocalDateTime expiredAt) {
         this.phoneNumber = phoneNumber;
@@ -38,13 +45,8 @@ public class PhoneVerification extends BaseEntity {
         this.expiredAt = expiredAt;
     }
 
-    public boolean verify(String code, LocalDateTime requestTime) {
+    public boolean verify(String code) {
         if (this.status != VerificationStatus.PENDING) {
-            return false;
-        }
-
-        if (requestTime.isAfter(this.expiredAt)) {
-            this.status = VerificationStatus.EXPIRED;
             return false;
         }
 
@@ -54,5 +56,18 @@ public class PhoneVerification extends BaseEntity {
         }
 
         return false;
+    }
+
+    public boolean isExpired(LocalDateTime now) {
+        if(this.expiredAt.isBefore(now)) {
+            this.status = VerificationStatus.EXPIRED;
+            return true;
+        }
+        return true;
+    }
+
+    public void verified() {
+        this.verifiedAt = LocalDateTime.now();
+        this.status = VerificationStatus.VERIFIED;
     }
 }
