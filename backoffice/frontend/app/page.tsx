@@ -1,11 +1,16 @@
+import Link from 'next/link';
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Hello World from Backoffice Frontend!
-        </p>
-      </div>
-    </main>
-  )
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+      <h1 className="text-3xl font-bold text-gray-800">백오피스</h1>
+      <p className="mt-2 text-gray-500">관리자 페이지에 오신 것을 환영합니다.</p>
+      <Link
+        href="/login"
+        className="mt-6 rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700"
+      >
+        로그인
+      </Link>
+    </div>
+  );
 }
