@@ -33,4 +33,15 @@ public class Business extends SoftDeletedBaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private BusinessStatus status;
+
+    /**
+     * @throws IllegalStateException 해당 엔티티의 Owner 정보가 없을 경우
+     */
+    public boolean isRealOwner(UUID inviterId) throws IllegalStateException{
+        if(this.owner == null){
+            this.status = BusinessStatus.ILLEGAL_STATE;
+            throw new IllegalStateException("this business "+this.id+" do not have owner and this violate date integrity");
+        }
+        return this.owner.getId().equals(inviterId);
+    }
 }
