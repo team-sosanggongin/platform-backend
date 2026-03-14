@@ -34,6 +34,9 @@ public class Business extends SoftDeletedBaseEntity {
     @Column(name = "status", nullable = false)
     private BusinessStatus status;
 
+    @OneToOne(mappedBy = "business", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private BusinessMetadata metadata;
+
     /**
      * @throws IllegalStateException 해당 엔티티의 Owner 정보가 없을 경우
      */
@@ -43,5 +46,10 @@ public class Business extends SoftDeletedBaseEntity {
             throw new IllegalStateException("this business "+this.id+" do not have owner and this violate date integrity");
         }
         return this.owner.getId().equals(inviterId);
+    }
+    
+    // 연관관계 편의 메서드
+    public void setMetadata(BusinessMetadata metadata) {
+        this.metadata = metadata;
     }
 }
