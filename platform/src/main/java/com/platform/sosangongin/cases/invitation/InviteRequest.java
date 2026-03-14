@@ -2,7 +2,9 @@ package com.platform.sosangongin.cases.invitation;
 
 import com.platform.sosangongin.cases.CommonRequestTemplate;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
+@Builder
 @ToString
 public class InviteRequest extends CommonRequestTemplate {
     private final UUID inviterId;
