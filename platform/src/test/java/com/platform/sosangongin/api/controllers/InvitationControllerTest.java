@@ -6,6 +6,9 @@ import com.platform.sosangongin.api.controllers.dto.InviteApiRequest;
 import com.platform.sosangongin.cases.invitation.InviteRequest;
 import com.platform.sosangongin.cases.invitation.InviteResult;
 import com.platform.sosangongin.cases.invitation.UserInvitationUsecase;
+import com.platform.sosangongin.config.SecurityConfig;
+import com.platform.sosangongin.config.WebMvcConfig;
+import com.platform.sosangongin.services.jwt.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -21,12 +25,13 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(InvitationController.class)
-@Import(CommonResultResponseAdvice.class)
+@WebMvcTest(controllers = InvitationController.class)
+@Import({SecurityConfig.class, WebMvcConfig.class, CommonResultResponseAdvice.class})
 class InvitationControllerTest {
 
     @Autowired
@@ -38,12 +43,17 @@ class InvitationControllerTest {
     @MockBean
     private UserInvitationUsecase userInvitationUsecase;
 
+    @MockBean
+    private JwtService jwtService; // SecurityConfig 의존성
+
     @Test
     @DisplayName("POST /api/v1/invitations - 성공")
     void inviteUser() throws Exception {
         // given
+        UUID userId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
+
         InviteApiRequest request = new InviteApiRequest();
-        request.setInviterId(UUID.randomUUID());
         request.setBranchId(UUID.randomUUID());
         request.setTargetUserPhoneNumber("010-1234-5678");
         request.setRoleIds(List.of(1L, 2L));
@@ -56,6 +66,7 @@ class InvitationControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/invitations")
+                        .with(authentication(authentication))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -65,8 +76,10 @@ class InvitationControllerTest {
     @DisplayName("POST /api/v1/invitations - 실패 (권한 없음, 400)")
     void inviteUser_Fail_BadRequest() throws Exception {
         // given
+        UUID userId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
+
         InviteApiRequest request = new InviteApiRequest();
-        request.setInviterId(UUID.randomUUID());
         request.setBranchId(UUID.randomUUID());
         request.setTargetUserPhoneNumber("010-1234-5678");
         request.setRoleIds(List.of(1L));
@@ -80,6 +93,7 @@ class InvitationControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/invitations")
+                        .with(authentication(authentication))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())

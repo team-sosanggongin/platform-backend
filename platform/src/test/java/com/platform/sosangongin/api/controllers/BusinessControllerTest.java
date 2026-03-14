@@ -10,6 +10,9 @@ import com.platform.sosangongin.cases.search.BusinessDto;
 import com.platform.sosangongin.cases.search.SearchBusinessRequest;
 import com.platform.sosangongin.cases.search.SearchBusinessResult;
 import com.platform.sosangongin.cases.search.SearchBusinessUsecase;
+import com.platform.sosangongin.config.SecurityConfig;
+import com.platform.sosangongin.config.WebMvcConfig;
+import com.platform.sosangongin.services.jwt.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -27,13 +31,14 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BusinessController.class)
-@Import(CommonResultResponseAdvice.class)
+@WebMvcTest(controllers = BusinessController.class)
+@Import({SecurityConfig.class, WebMvcConfig.class, CommonResultResponseAdvice.class})
 class BusinessControllerTest {
 
     @Autowired
@@ -48,15 +53,19 @@ class BusinessControllerTest {
     @MockBean
     private JoinBusinessUsecase joinBusinessUsecase;
 
+    @MockBean
+    private JwtService jwtService; // SecurityConfig 의존성
+
     @Test
     @DisplayName("GET /api/v1/businesses/search - 성공")
     void searchBusinesses() throws Exception {
         // given
+        UUID userId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
+
         BusinessDto dto = BusinessDto.builder()
                 .businessId(UUID.randomUUID())
                 .bizName("테스트 사업체")
-                .bizType("REGISTERED")
-                .status("ACTIVE")
                 .build();
                 
         SearchBusinessResult expectedResult = SearchBusinessResult.builder()
@@ -68,12 +77,10 @@ class BusinessControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/v1/businesses/search")
-                        .param("keyword", "테스트")
-                        .param("page", "0")
-                        .param("size", "10"))
+                        .with(authentication(authentication))
+                        .param("keyword", "테스트"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.businesses.content[0].bizName").value("테스트 사업체"))
-                .andExpect(jsonPath("$.businesses.content[0].bizType").value("REGISTERED"));
+                .andExpect(jsonPath("$.businesses.content[0].bizName").value("테스트 사업체"));
     }
 
     @Test
@@ -82,9 +89,9 @@ class BusinessControllerTest {
         // given
         UUID businessId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
         
         JoinBusinessApiRequest request = new JoinBusinessApiRequest();
-        request.setUserId(userId);
         
         JoinBusinessResult expectedResult = JoinBusinessResult.builder()
                 .httpStatus(HttpStatus.OK)
@@ -95,6 +102,7 @@ class BusinessControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/businesses/{businessId}/join-requests", businessId)
+                        .with(authentication(authentication))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

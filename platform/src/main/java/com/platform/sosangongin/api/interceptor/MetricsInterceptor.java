@@ -4,10 +4,12 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@Profile("stg | prod") // stg 또는 prod 프로파일에서만 빈으로 등록
 public class MetricsInterceptor implements HandlerInterceptor {
 
     private final Counter successCounter;

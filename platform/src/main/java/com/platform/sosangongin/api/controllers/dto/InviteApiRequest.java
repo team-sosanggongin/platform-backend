@@ -12,12 +12,11 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class InviteApiRequest {
-    private UUID inviterId;
     private UUID branchId;
     private String targetUserPhoneNumber;
     private List<Long> roleIds;
 
-    public InviteRequest toUseCaseRequest() {
+    public InviteRequest toUseCaseRequest(UUID inviterId) {
         return new InviteRequest(inviterId, branchId, targetUserPhoneNumber, roleIds);
     }
 }

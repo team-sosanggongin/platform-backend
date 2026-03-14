@@ -5,7 +5,6 @@ import com.platform.sosangongin.api.advices.CommonResultResponseAdvice;
 import com.platform.sosangongin.api.controllers.dto.LoginApiRequest;
 import com.platform.sosangongin.api.controllers.dto.PhoneVerificationApiRequest;
 import com.platform.sosangongin.api.controllers.dto.RefreshTokenApiRequest;
-import com.platform.sosangongin.api.controllers.dto.SocialAuthApiRequest;
 import com.platform.sosangongin.cases.auth.login.LoginRequest;
 import com.platform.sosangongin.cases.auth.login.LoginResult;
 import com.platform.sosangongin.cases.auth.login.LoginUsecase;
@@ -18,7 +17,9 @@ import com.platform.sosangongin.cases.auth.token.RefreshTokenUsecase;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationRequest;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationResult;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecase;
+import com.platform.sosangongin.config.SecurityConfig;
 import com.platform.sosangongin.domains.user.SocialProvider;
+import com.platform.sosangongin.services.jwt.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@Import(CommonResultResponseAdvice.class)
+@Import({CommonResultResponseAdvice.class, SecurityConfig.class})
 class AuthControllerTest {
 
     @Autowired
@@ -57,6 +58,9 @@ class AuthControllerTest {
 
     @MockBean
     private PhoneVerificationUsecase phoneVerificationUsecase;
+
+    @MockBean
+    private JwtService jwtService; // SecurityConfig 의존성
 
     @Test
     @DisplayName("GET /api/v1/auth/social/redirect - 성공")
