@@ -35,6 +35,8 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 }
 
 tasks.test {
