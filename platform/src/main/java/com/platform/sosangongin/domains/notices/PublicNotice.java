@@ -26,10 +26,13 @@ public class PublicNotice extends SoftDeletedBaseEntity {
     private String authorName;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private NoticeStatus status = NoticeStatus.DRAFT;
 
+    @Builder.Default
     private boolean isPinned = false;
 
+    @Builder.Default
     private Long viewCount = 0L;
 
     // 공지 시작 및 예약 시간
