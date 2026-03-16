@@ -5,6 +5,7 @@ import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.errors.InvalidTokenException;
+import com.platform.sosangongin.errors.InvalidTokenUsage;
 import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
@@ -36,14 +37,14 @@ public class RefreshTokenUsecase {
 
         UUID userId = this.jwtService.getUserIdFromToken(requestToken);
 
-        User user = this.userRepository.findById(userId).orElseThrow(()->new InvalidTokenException("user not found", requestToken));
+        User user = this.userRepository.findById(userId).orElseThrow(()->new InvalidTokenException("user not found", requestToken, InvalidTokenUsage.INVALID_CLAIMS));
 
         RefreshToken latestRefreshToken = this.refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)
-                .orElseThrow(()->new InvalidTokenException("No refresh token found", userId, requestToken));
+                .orElseThrow(()->new InvalidTokenException("No refresh token found", userId, requestToken, InvalidTokenUsage.INVALID_STATE));
 
         if(!latestRefreshToken.isTokenValueEquals(requestToken)){
             this.refreshTokenRepository.deleteAllByUser(user);
-            throw new InvalidTokenException("received request token is not the latest one, this could mean refresh token is reused", userId, requestToken);
+            throw new InvalidTokenException("received request token is not the latest one, this could mean refresh token is reused", userId, requestToken, InvalidTokenUsage.INVALID_STATE);
         }
 
         if (latestRefreshToken.isBefore(this.timeGeneratorService.now())) {

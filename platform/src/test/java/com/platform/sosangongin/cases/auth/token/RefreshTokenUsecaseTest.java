@@ -5,6 +5,7 @@ import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.errors.InvalidTokenException;
+import com.platform.sosangongin.errors.InvalidTokenUsage;
 import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
@@ -87,7 +88,7 @@ class RefreshTokenUsecaseTest {
         // given
         String invalidToken = "not-a-jwt";
         RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(invalidToken).build();
-        given(jwtService.getUserIdFromToken(invalidToken)).willThrow(new InvalidTokenException("",invalidToken));
+        given(jwtService.getUserIdFromToken(invalidToken)).willThrow(new InvalidTokenException("",invalidToken, InvalidTokenUsage.INVALID_FORMAT));
 
         // when
         InvalidTokenException invalidTokenException = Assertions.assertThrows(InvalidTokenException.class, () -> refreshTokenUsecase.reissue(request));

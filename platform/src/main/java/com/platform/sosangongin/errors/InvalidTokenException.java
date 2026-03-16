@@ -10,16 +10,19 @@ import java.util.UUID;
 public class InvalidTokenException extends RuntimeException{
     private final UUID userId;
     private final String originalRefreshToken;
+    private final InvalidTokenUsage usage;
 
-    public InvalidTokenException(String message, UUID userId, String originalRefreshToken) {
+    public InvalidTokenException(String message, UUID userId, String originalRefreshToken, InvalidTokenUsage usage) {
         super(message);
         this.userId = userId;
         this.originalRefreshToken = originalRefreshToken;
+        this.usage = usage;
     }
 
-    public InvalidTokenException(String message, String originalRefreshToken) {
+    public InvalidTokenException(String message, String originalRefreshToken, InvalidTokenUsage usage) {
         super(message);
         this.originalRefreshToken = originalRefreshToken;
+        this.usage = usage;
         this.userId = null;
     }
 }
