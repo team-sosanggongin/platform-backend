@@ -76,10 +76,11 @@ class PhoneVerificationUsecaseTest {
         given(phoneVerificationRepository.findTopByUserOrderByCreatedAtDesc(user)).willReturn(Optional.empty());
 
         // when
+
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(result.getMessage()).contains("history is not present");
     }
 
@@ -107,7 +108,7 @@ class PhoneVerificationUsecaseTest {
 
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("expired");
+        assertThat(result.getMessage()).contains("Expired code");
         assertThat(verification.getStatus()).isEqualTo(VerificationStatus.EXPIRED);
     }
 
@@ -135,7 +136,7 @@ class PhoneVerificationUsecaseTest {
 
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("code is invalid");
+        assertThat(result.getMessage()).contains("Invalid code");
     }
 
     @Test
@@ -161,6 +162,6 @@ class PhoneVerificationUsecaseTest {
 
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("illegal state");
+        assertThat(result.getMessage()).contains("verification state is illegal");
     }
 }

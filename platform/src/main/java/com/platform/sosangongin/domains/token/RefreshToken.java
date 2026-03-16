@@ -38,4 +38,12 @@ public class RefreshToken extends BaseEntity {
         this.userAgent = userAgent;
         this.expiresAt = expiresAt;
     }
+
+    public boolean isTokenValueEquals(String requestToken) {
+        return this.tokenValue.contentEquals(requestToken);
+    }
+
+    public boolean isBefore(LocalDateTime now) {
+        return this.expiresAt.isBefore(now);
+    }
 }

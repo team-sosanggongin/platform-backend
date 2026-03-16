@@ -1,6 +1,7 @@
 package com.platform.sosangongin.services.jwt;
 
 import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.errors.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -82,12 +83,16 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public UUID getUserIdFromToken(String token) {
-        Claims claims = parseClaims(token);
-        String userIdStr = claims.getSubject();
-        if (userIdStr == null) {
-            userIdStr = claims.get("userId", String.class);
+    public UUID getUserIdFromToken(String token) throws InvalidTokenException{
+        try {
+            Claims claims = parseClaims(token);
+            String userIdStr = claims.getSubject();
+            if (userIdStr == null) {
+                userIdStr = claims.get("userId", String.class);
+            }
+            return UUID.fromString(userIdStr);
+        }catch (Exception e){
+            throw new InvalidTokenException(e.getMessage(), token);
         }
-        return UUID.fromString(userIdStr);
     }
 }

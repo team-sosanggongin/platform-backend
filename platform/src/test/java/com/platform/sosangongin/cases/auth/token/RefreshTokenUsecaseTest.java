@@ -4,15 +4,19 @@ import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
+import com.platform.sosangongin.errors.InvalidTokenException;
 import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
+import com.platform.sosangongin.services.times.TimeGeneratorService;
 import io.jsonwebtoken.security.SignatureException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -36,6 +40,9 @@ class RefreshTokenUsecaseTest {
     private JwtService jwtService;
     @Mock
     private JwtProperties jwtProperties;
+
+    @Mock
+    TimeGeneratorService timeGeneratorService;
 
     @InjectMocks
     private RefreshTokenUsecase refreshTokenUsecase;
@@ -62,7 +69,7 @@ class RefreshTokenUsecaseTest {
         given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(storedToken));
         given(jwtService.createToken(any(UUID.class))).willReturn("new-access-token");
         given(jwtService.createRefreshToken(any(UUID.class))).willReturn("new-refresh-token");
-
+        given(this.timeGeneratorService.now()).willReturn(LocalDateTime.now());
         // when
         RefreshTokenResult result = refreshTokenUsecase.reissue(request);
 
@@ -80,14 +87,13 @@ class RefreshTokenUsecaseTest {
         // given
         String invalidToken = "not-a-jwt";
         RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(invalidToken).build();
-        given(jwtService.getUserIdFromToken(invalidToken)).willThrow(new SignatureException(""));
+        given(jwtService.getUserIdFromToken(invalidToken)).willThrow(new InvalidTokenException("",invalidToken));
 
         // when
-        RefreshTokenResult result = refreshTokenUsecase.reissue(request);
+        InvalidTokenException invalidTokenException = Assertions.assertThrows(InvalidTokenException.class, () -> refreshTokenUsecase.reissue(request));
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Invalid refresh token");
+        assertThat(invalidTokenException.getOriginalRefreshToken()).contains(invalidToken);
     }
 
     @Test
@@ -113,11 +119,10 @@ class RefreshTokenUsecaseTest {
         given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(latestToken));
 
         // when
-        RefreshTokenResult result = refreshTokenUsecase.reissue(request);
+        InvalidTokenException invalidTokenException = Assertions.assertThrows(InvalidTokenException.class, () -> refreshTokenUsecase.reissue(request));
+        Assertions.assertEquals(requestToken, invalidTokenException.getOriginalRefreshToken());
 
-        // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(result.getMessage()).contains("Reuse detected");
+
         verify(refreshTokenRepository).deleteAllByUser(user); // 모든 토큰 삭제
     }
 
@@ -141,6 +146,7 @@ class RefreshTokenUsecaseTest {
         given(jwtService.getUserIdFromToken(expiredToken)).willReturn(userId);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(storedToken));
+        given(this.timeGeneratorService.now()).willReturn(LocalDateTime.now());
 
         // when
         RefreshTokenResult result = refreshTokenUsecase.reissue(request);
