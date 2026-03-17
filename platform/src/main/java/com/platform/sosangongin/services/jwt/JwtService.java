@@ -1,6 +1,7 @@
 package com.platform.sosangongin.services.jwt;
 
 import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.errors.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 
 import java.util.List;
@@ -11,5 +12,5 @@ public interface JwtService {
     String createToken(UUID userId, UUID businessId, List<BusinessRole> roles);
     String createRefreshToken(UUID userId);
     Claims parseClaims(String token);
-    UUID getUserIdFromToken(String token);
+    UUID getUserIdFromToken(String token) throws InvalidTokenException;
 }

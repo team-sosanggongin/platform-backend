@@ -3,12 +3,15 @@ package com.platform.sosangongin.cases.auth.login;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.oauth.AuthResponse;
 import com.platform.sosangongin.services.oauth.OauthService;
+import com.platform.sosangongin.services.times.TimeGeneratorService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Transactional
@@ -49,8 +56,14 @@ class LoginUsecaseTest {
     @MockBean
     private JwtService mockJwtService;
 
+    @MockBean
+    private JwtProperties jwtProperties;
+
+    @MockBean
+    private TimeGeneratorService timeGeneratorService;
+
     @Test
-    @DisplayName("최초 가입 시, 유저 정보만 생성되고 토큰 없이 404를 반환한다.")
+    @DisplayName("최초 가입 시, 유저 정보만 생성되고 토큰 없이 200을 반환한다.")
     void firstSignup_ShouldCreateUserAndReturnNotFound_WithoutTokens() {
         // given
         LoginRequest request = new LoginRequest("mockCode", KAKAO);
@@ -61,7 +74,7 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getAccessToken()).isNull();
         assertThat(result.getRefreshToken()).isNull();
         assertThat(userRepository.findByPhoneNumber("010-1234-5678")).isPresent();
@@ -96,14 +109,12 @@ class LoginUsecaseTest {
 
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isEqualTo("fake-access-token");
-        assertThat(result.getRefreshToken()).isEqualTo("fake-refresh-token");
+        assertThat(result.getAccessToken()).isEqualTo(null);
+        assertThat(result.getRefreshToken()).isEqualTo(null);
 
-        // DB에 RefreshToken이 저장되었는지 확인
+        // 전화번호 인증이 끝나지 않았기 때문에, 토큰은 생성되지 않음
         Optional<RefreshToken> savedRefreshToken = refreshTokenRepository.findAll().stream().findFirst();
-        assertThat(savedRefreshToken).isPresent();
-        assertThat(savedRefreshToken.get().getTokenValue()).isEqualTo("fake-refresh-token");
-        assertThat(savedRefreshToken.get().getUser().getId()).isEqualTo(user.getId());
+        assertThat(savedRefreshToken).isEmpty();
     }
 
     @Test
@@ -128,10 +139,69 @@ class LoginUsecaseTest {
 
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isEqualTo("new-access-token");
-        assertThat(result.getRefreshToken()).isEqualTo("new-refresh-token");
+        assertThat(result.getAccessToken()).isNull();
+        assertThat(result.getRefreshToken()).isNull();
 
         // 새로운 소셜 정보가 저장되었는지 확인
         Assertions.assertNotNull(userSocialAuthRepository.findByProviderAndProviderUserId(KAKAO, "new-social-id"));
+    }
+
+    @Test
+    @DisplayName("로그인 성공 및 폰 인증 완료 유저: 액세스/리프레시 토큰이 정상 발급되어야 함")
+    void login_Success_With_Verified_Phone() {
+        // given
+        String code = "auth_code";
+        SocialProvider provider = KAKAO;
+        LoginRequest request = new LoginRequest(code, provider);
+        UUID userId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.of(2026, 3, 16, 15, 30);
+
+        // 1. 소셜 인증 성공
+        AuthResponse authRes = new AuthResponse(provider, "social_123", "홍길동", "01012345678");
+        given(mockOauthService.getAuth(provider, code)).willReturn(authRes);
+
+        // 2. DB에 유저가 존재하고, 폰 인증 상태가 true임
+        User verifiedUser = User.builder()
+                .id(userId)
+                .name("홍길동")
+                .phoneNumber("01012345678")
+                .isPhoneVerified(true) // 핵심 조건: 인증 완료
+                .build();
+
+        this.userRepository.saveAndFlush(verifiedUser);
+
+        UserSocialAuth socialAuth = UserSocialAuth.builder()
+                .user(verifiedUser)
+                .provider(provider)
+                .providerUserId("social_123")
+                .build();
+
+        userSocialAuthRepository.saveAndFlush(socialAuth);
+
+        // 3. 토큰 발급 및 시간 설정 Mocking
+        String mockAccessToken = "mock.access.token";
+        String mockRefreshToken = "mock.refresh.token";
+        long expirationMillis = 3600000L; // 1시간
+
+        given(mockJwtService.createToken(any())).willReturn(mockAccessToken);
+        given(mockJwtService.createRefreshToken(any())).willReturn(mockRefreshToken);
+        given(this.timeGeneratorService.now()).willReturn(now);
+        given(this.jwtProperties.getRefreshTokenExpirationTime()).willReturn(expirationMillis);
+
+        // when
+        LoginResult result = loginUsecase.loginAfterSocialEvent(request);
+
+        // then
+        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
+        assertThat(result.getAccessToken()).isEqualTo(mockAccessToken);   // 토큰 발급 확인
+        assertThat(result.getRefreshToken()).isEqualTo(mockRefreshToken); // 토큰 발급 확인
+        assertThat(result.getUserId()).isNull(); // 성공 시에는 보통 userId를 따로 주지 않음 (토큰에 포함됨)
+        assertThat(result.getNextUrl()).isNull(); // 다음 스텝 URL이 없어야 함
+
+        // 4. 보안 및 저장 로직 검증
+        // 기존 토큰 삭제 여부 확인
+        List<RefreshToken> all = refreshTokenRepository.findAll();
+        assertThat(all.size()).isEqualTo(1);
+
     }
 }

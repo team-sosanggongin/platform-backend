@@ -66,4 +66,8 @@ public class PhoneVerification extends BaseEntity {
         this.verifiedAt = LocalDateTime.now();
         this.status = VerificationStatus.VERIFIED;
     }
+
+    public boolean isVerifiable() {
+        return this.status.equals(VerificationStatus.PENDING);
+    }
 }
