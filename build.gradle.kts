@@ -23,3 +23,27 @@ subprojects {
         useJUnitPlatform()
     }
 }
+
+// build.gradle.kts
+
+tasks.register<TerraformTask>("tfPlanStg") {
+    group = "terraform"
+    description = "Run terraform plan for staging"
+    command = "plan"
+    env = "stg"
+}
+
+tasks.register<TerraformTask>("tfApplyStg") {
+    group = "terraform"
+    description = "Run terraform apply for staging"
+    command = "apply"
+    env = "stg"
+}
+
+tasks.register<TerraformTask>("tfLocalPlan") {
+    group = "terraform"
+    description = "Run terraform plan on LocalStack"
+    command = "plan"
+    env = "stg"
+    isLocal = true
+}
