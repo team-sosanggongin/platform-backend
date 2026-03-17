@@ -7,13 +7,6 @@ resource "aws_apigatewayv2_api" "main" {
   protocol_type = "HTTP"
 }
 
-# VPC Link: API Gateway가 VPC 내부 서브넷으로 들어오기 위한 통로
-resource "aws_apigatewayv2_vpc_link" "main" {
-  name               = "${var.project_name}-${var.env}-vpc-link"
-  security_group_ids = [aws_security_group.api_gateway.id]
-  subnet_ids         = [aws_subnet.public_api_a.id] # Single-AZ 정책에 맞춰 a존만 연결
-}
-
 # API Gateway용 보안 그룹 (이후 ECS 보안 그룹에서 이 SG만 허용하도록 설정)
 resource "aws_security_group" "api_gateway" {
   name        = "${var.project_name}-${var.env}-apigw-sg"
@@ -27,6 +20,13 @@ resource "aws_security_group" "api_gateway" {
   }
 
   tags = { Name = "${var.project_name}-${var.env}-apigw-sg" }
+}
+
+# VPC Link: API Gateway가 VPC 내부 서브넷으로 들어오기 위한 통로
+resource "aws_apigatewayv2_vpc_link" "main" {
+  name               = "${var.project_name}-${var.env}-vpc-link"
+  security_group_ids = [aws_security_group.api_gateway.id]
+  subnet_ids         = [aws_subnet.public_api_a.id] # Single-AZ 정책에 맞춰 a존만 연결
 }
 
 # ==========================================

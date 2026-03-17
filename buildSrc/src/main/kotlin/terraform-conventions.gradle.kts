@@ -8,6 +8,13 @@ tasks.register<TerraformTask>("tfPlanStg") {
     env = "stg"
 }
 
+tasks.register<TerraformTask>("tfInit") {
+    group = "terraform"
+    description = "Run terraform init"
+    command = "init"
+    env = "local"
+}
+
 tasks.register<TerraformTask>("tfApplyStg") {
     group = "terraform"
     description = "Run terraform apply for staging"
@@ -15,10 +22,9 @@ tasks.register<TerraformTask>("tfApplyStg") {
     env = "stg"
 }
 
-tasks.register<TerraformTask>("tfLocalPlan") {
+tasks.register<TerraformTask>("tfDestroyStg") {
     group = "terraform"
-    description = "Run terraform plan on LocalStack"
-    command = "plan"
+    description = "Run terraform destroy for staging"
+    command = "destroy"
     env = "stg"
-    isLocal = true
 }

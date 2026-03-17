@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=ec2,s3,iam,apigatewayv2
+      - DEBUG=1
