@@ -14,7 +14,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security") // Spring Security 추가
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client") // OAuth2 Client 추가
     
     // Swagger (OpenAPI)
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
@@ -36,7 +37,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test") // Security Test 추가
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.test {
