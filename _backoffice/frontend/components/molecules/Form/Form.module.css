@@ -1,0 +1,11 @@
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional: Add spacing between form elements if needed, 
+   but since Input already has margin-bottom, we might not need much here. */
+.form > *:not(:last-child) {
+  margin-bottom: 4px; /* Small additional spacing adjustment if desired */
+}

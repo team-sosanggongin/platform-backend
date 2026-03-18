@@ -1,0 +1,41 @@
+.tableWrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #eee;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #eee;
+}
+
+.td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.tr:hover {
+  background-color: #fcfcfc;
+  cursor: pointer;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem !important;
+  color: #999;
+}

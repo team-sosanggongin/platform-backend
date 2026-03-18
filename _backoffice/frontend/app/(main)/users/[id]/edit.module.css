@@ -1,0 +1,111 @@
+.container {
+  padding: 2.5rem 2rem;
+  width: 70%;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  margin-bottom: 1.5rem;
+}
+
+.backLink {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backLink:hover {
+  color: #007bff;
+}
+
+.formCard {
+  padding: 0 !important;
+  text-align: left !important;
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #eee;
+  background-color: #ffffff;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.cardBody {
+  padding: 1rem 2rem 2.5rem 2rem;
+}
+
+.formRow {
+  display: flex;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.formRow:last-child {
+  border-bottom: none;
+}
+
+.rowLabel {
+  width: 180px;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.rowContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.readValue {
+  font-size: 1rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelButton {
+  background-color: #ffffff !important;
+  color: #666 !important;
+  border: 1px solid #ddd !important;
+  width: 120px !important;
+}
+
+.cancelButton:hover {
+  background-color: #f8f9fa !important;
+  border-color: #ccc !important;
+}
+
+.saveButton {
+  width: 140px !important;
+}
+
+/* Custom override for atomic components inside the row to match the clean look */
+.rowContent :global(.inputGroup),
+.rowContent :global(.selectGroup) {
+  margin-bottom: 0 !important;
+  width: 100%;
+}
+
+.rowContent input,
+.rowContent select {
+  max-width: 400px;
+}
