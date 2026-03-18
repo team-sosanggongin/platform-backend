@@ -1,5 +1,5 @@
 rootProject.name = "platform-backend"
 
-include("platform")
-include("backoffice:backend")
-include("backoffice:frontend")
+include("_platform")
+include("_backoffice:backend")
+include("_backoffice:frontend")
