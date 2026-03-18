@@ -80,3 +80,19 @@ resource "aws_security_group" "admin_api_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+//ECS ENDPOINT 보안그룹 설정 -> 백오피스, rest API에서 INGRESS 요청에 대한 OKAY
+resource "aws_security_group" "vpc_endpoint_sg" {
+  name   = "${var.project_name}-${var.env}-vpce-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [
+      aws_security_group.user_api_sg.id,
+      aws_security_group.admin_api_sg.id
+    ]
+  }
+}
