@@ -1,6 +1,7 @@
 package com.platform.sosangongin.domains.role;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
+import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import lombok.*;
 @Table(name = "role_permissions")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RolePermission extends BaseEntity {
+public class RolePermission extends SoftDeletedBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,13 +20,10 @@ public class RolePermission extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private BusinessRole businessRole;
+    private Role role;
 
     @ManyToOne
     @JoinColumn(name = "permission_id")
     private Permission permission;
-
-    @Column(name = "description")
-    private String description;
 
 }

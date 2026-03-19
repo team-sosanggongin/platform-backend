@@ -1,6 +1,9 @@
 package com.platform.sosangongin.cases.auth.verification;
 
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.domains.user.verification.PhoneVerification;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationRepository;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationStatus;
 import com.platform.sosangongin.errors.EntityNotFoundException;
 import com.platform.sosangongin.errors.EntityType;
 import com.platform.sosangongin.services.randoms.RandomCharGeneratorService;
@@ -54,7 +57,7 @@ public class PhoneVerificationUsecase {
         }
 
         if (verification.isExpired(timeGeneratorService.now())) {
-            verification.setStatus(VerificationStatus.EXPIRED);
+            verification.setStatus(PhoneVerificationStatus.EXPIRED);
             return errorResult(HttpStatus.BAD_REQUEST, "Expired code");
         }
 
@@ -75,7 +78,7 @@ public class PhoneVerificationUsecase {
         PhoneVerification phoneVerification = PhoneVerification.builder()
                 .code(randomNumber)
                 .expiredAt(timeGeneratorService.after(5, ChronoUnit.MINUTES))
-                .status(VerificationStatus.PENDING)
+                .status(PhoneVerificationStatus.PENDING)
                 .user(user)
                 .build();
 

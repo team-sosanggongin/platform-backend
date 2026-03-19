@@ -5,7 +5,7 @@ import com.platform.sosangongin.domains.business.BusinessRepository;
 import com.platform.sosangongin.domains.invitation.Invitation;
 import com.platform.sosangongin.domains.invitation.InvitationRepository;
 import com.platform.sosangongin.domains.invitation.InvitationStatus;
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import com.platform.sosangongin.domains.role.BusinessRoleRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
@@ -108,9 +108,9 @@ public class UserInvitationUsecase {
                 .expiresAt(LocalDateTime.now().plusDays(3))
                 .build();
 
-        List<BusinessRole> businessRoles = this.businessRoleRepository.findAllById(roleIds);
+        List<Role> roles = this.businessRoleRepository.findAllById(roleIds);
 
-        invitation.addRoles(businessRoles);
+        invitation.addRoles(roles);
 
         this.invitationRepository.save(invitation);
 

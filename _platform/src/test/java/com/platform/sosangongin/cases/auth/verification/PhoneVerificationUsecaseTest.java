@@ -1,6 +1,9 @@
 package com.platform.sosangongin.cases.auth.verification;
 
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.domains.user.verification.PhoneVerification;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationRepository;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationStatus;
 import com.platform.sosangongin.services.randoms.RandomCharGeneratorService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +50,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
                 .code(code)
-                .status(VerificationStatus.PENDING)
+                .status(PhoneVerificationStatus.PENDING)
                 .expiredAt(LocalDateTime.now().plusMinutes(5))
                 .build();
 
@@ -61,7 +64,7 @@ class PhoneVerificationUsecaseTest {
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(user.isPhoneVerified()).isTrue();
-        assertThat(verification.getStatus()).isEqualTo(VerificationStatus.VERIFIED);
+        assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.VERIFIED);
     }
 
     @Test
@@ -95,7 +98,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
                 .code("12345")
-                .status(VerificationStatus.PENDING)
+                .status(PhoneVerificationStatus.PENDING)
                 .expiredAt(LocalDateTime.now().minusMinutes(1)) // 만료됨
                 .build();
 
@@ -109,7 +112,7 @@ class PhoneVerificationUsecaseTest {
         // then
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(result.getMessage()).contains("Expired code");
-        assertThat(verification.getStatus()).isEqualTo(VerificationStatus.EXPIRED);
+        assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.EXPIRED);
     }
 
     @Test
@@ -123,7 +126,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
                 .code("12345")
-                .status(VerificationStatus.PENDING)
+                .status(PhoneVerificationStatus.PENDING)
                 .expiredAt(LocalDateTime.now().plusMinutes(5))
                 .build();
 
@@ -150,7 +153,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
                 .code("12345")
-                .status(VerificationStatus.VERIFIED) // 이미 완료됨
+                .status(PhoneVerificationStatus.VERIFIED) // 이미 완료됨
                 .expiredAt(LocalDateTime.now().plusMinutes(5))
                 .build();
 

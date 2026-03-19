@@ -1,6 +1,6 @@
 package com.platform.sosangongin.services.jwt;
 
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import com.platform.sosangongin.errors.InvalidTokenException;
 import com.platform.sosangongin.errors.InvalidTokenUsage;
 import io.jsonwebtoken.Claims;
@@ -41,12 +41,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String createToken(UUID userId, UUID businessId, List<BusinessRole> roles) {
+    public String createToken(UUID userId, UUID businessId, List<Role> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getExpirationTime());
 
         List<String> roleNames = roles.stream()
-                .map(BusinessRole::getRoleName)
+                .map(Role::getRoleName)
                 .collect(Collectors.toList());
 
         return Jwts.builder()

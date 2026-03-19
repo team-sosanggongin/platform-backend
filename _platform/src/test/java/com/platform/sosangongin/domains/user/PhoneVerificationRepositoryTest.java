@@ -1,5 +1,8 @@
 package com.platform.sosangongin.domains.user;
 
+import com.platform.sosangongin.domains.user.verification.PhoneVerification;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationRepository;
+import com.platform.sosangongin.domains.user.verification.PhoneVerificationStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +33,7 @@ class PhoneVerificationRepositoryTest {
         // then
         assertThat(savedVerification.getId()).isNotNull();
         assertThat(savedVerification.getCode()).isEqualTo(code);
-        assertThat(savedVerification.getStatus()).isEqualTo(VerificationStatus.PENDING);
+        assertThat(savedVerification.getStatus()).isEqualTo(PhoneVerificationStatus.PENDING);
         assertThat(savedVerification.getExpiredAt()).isEqualTo(expiredAt);
     }
 
@@ -46,7 +49,7 @@ class PhoneVerificationRepositoryTest {
 
         // then
         assertThat(result).isTrue();
-        assertThat(verification.getStatus()).isEqualTo(VerificationStatus.VERIFIED);
+        assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.VERIFIED);
     }
 
     @Test
@@ -61,7 +64,7 @@ class PhoneVerificationRepositoryTest {
 
         // then
         assertThat(result).isFalse();
-        assertThat(verification.getStatus()).isEqualTo(VerificationStatus.PENDING);
+        assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.PENDING);
     }
 
     @Test
@@ -77,6 +80,6 @@ class PhoneVerificationRepositoryTest {
 
         // then
         Assertions.assertTrue(isExpired);
-        assertThat(verification.getStatus()).isEqualTo(VerificationStatus.EXPIRED);
+        assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.EXPIRED);
     }
 }

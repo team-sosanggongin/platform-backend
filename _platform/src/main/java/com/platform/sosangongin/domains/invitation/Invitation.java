@@ -2,7 +2,7 @@ package com.platform.sosangongin.domains.invitation;
 
 import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -84,17 +84,17 @@ public class Invitation extends SoftDeletedBaseEntity {
     /**
      * 다중 역할 추가 메서드
      */
-    public void addRole(BusinessRole role) {
+    public void addRole(Role role) {
         InvitationRole invitationRole = InvitationRole.builder()
                 .invitation(this)
-                .businessRole(role)
+                .role(role)
                 .build();
         this.invitationRoles.add(invitationRole);
     }
 
-    public void addRoles(List<BusinessRole> roles){
+    public void addRoles(List<Role> roles){
         List<InvitationRole> invitationRoles = roles.stream().map(next -> InvitationRole.builder()
-                        .businessRole(next)
+                        .role(next)
                         .invitation(this)
                         .build())
                 .toList();

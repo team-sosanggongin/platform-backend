@@ -1,6 +1,6 @@
 package com.platform.sosangongin.services.jwt;
 
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,9 +34,9 @@ class JwtServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         UUID businessId = UUID.randomUUID();
-        BusinessRole role = mock(BusinessRole.class);
+        Role role = mock(Role.class);
         when(role.getRoleName()).thenReturn("ADMIN");
-        List<BusinessRole> roles = Collections.singletonList(role);
+        List<Role> roles = Collections.singletonList(role);
 
         // when
         String token = jwtService.createToken(userId, businessId, roles);
