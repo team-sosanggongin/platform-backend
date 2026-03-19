@@ -3,6 +3,7 @@ package com.platform.sosangongin.cases.auth.login;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import com.platform.sosangongin.domains.user.social.UserSocialAuth;
 import com.platform.sosangongin.domains.user.social.UserSocialAuthRepository;
 import com.platform.sosangongin.services.jwt.JwtProperties;
@@ -67,7 +68,7 @@ class LoginUsecaseTest {
     @DisplayName("최초 가입 시, 유저 정보만 생성되고 토큰 없이 200을 반환한다.")
     void firstSignup_ShouldCreateUserAndReturnNotFound_WithoutTokens() {
         // given
-        LoginRequest request = new LoginRequest("mockCode", KAKAO);
+        LoginRequest request = getLoginRequest("mockCode", KAKAO);
         when(mockOauthService.getAuth(eq(KAKAO), anyString()))
                 .thenReturn(new AuthResponse(KAKAO, "uniqueId", "userName", "010-1234-5678"));
 
@@ -98,12 +99,12 @@ class LoginUsecaseTest {
                 .build();
         userSocialAuthRepository.save(socialAuth);
 
-        LoginRequest request = new LoginRequest("code", KAKAO);
+        LoginRequest request = getLoginRequest("code", KAKAO);
         when(mockOauthService.getAuth(eq(KAKAO), anyString()))
                 .thenReturn(new AuthResponse(KAKAO, "existing-id", "Existing User", "010-1111-2222"));
 
-        when(mockJwtService.createToken(any(UUID.class))).thenReturn("fake-access-token");
-        when(mockJwtService.createRefreshToken(any(UUID.class))).thenReturn("fake-refresh-token");
+        when(mockJwtService.createToken(any(UUID.class), any())).thenReturn("fake-access-token");
+        when(mockJwtService.createRefreshToken(any(UUID.class), any())).thenReturn("fake-refresh-token");
 
         // when
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
@@ -128,12 +129,12 @@ class LoginUsecaseTest {
                 .build();
         userRepository.save(user);
 
-        LoginRequest request = new LoginRequest("code", KAKAO);
+        LoginRequest request = getLoginRequest("code", KAKAO);
         when(mockOauthService.getAuth(eq(KAKAO), anyString()))
                 .thenReturn(new AuthResponse(KAKAO, "new-social-id", "Existing User", "010-3333-4444"));
 
-        when(mockJwtService.createToken(any(UUID.class))).thenReturn("new-access-token");
-        when(mockJwtService.createRefreshToken(any(UUID.class))).thenReturn("new-refresh-token");
+        when(mockJwtService.createToken(any(UUID.class), any())).thenReturn("new-access-token");
+        when(mockJwtService.createRefreshToken(any(UUID.class), any())).thenReturn("new-refresh-token");
 
         // when
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
@@ -153,7 +154,7 @@ class LoginUsecaseTest {
         // given
         String code = "auth_code";
         SocialProvider provider = KAKAO;
-        LoginRequest request = new LoginRequest(code, provider);
+        LoginRequest request = getLoginRequest(code, provider);
         UUID userId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.of(2026, 3, 16, 15, 30);
 
@@ -184,8 +185,8 @@ class LoginUsecaseTest {
         String mockRefreshToken = "mock.refresh.token";
         long expirationMillis = 3600000L; // 1시간
 
-        given(mockJwtService.createToken(any())).willReturn(mockAccessToken);
-        given(mockJwtService.createRefreshToken(any())).willReturn(mockRefreshToken);
+        given(mockJwtService.createToken(any(), any())).willReturn(mockAccessToken);
+        given(mockJwtService.createRefreshToken(any(), any())).willReturn(mockRefreshToken);
         given(this.timeGeneratorService.now()).willReturn(now);
         given(this.jwtProperties.getRefreshTokenExpirationTime()).willReturn(expirationMillis);
 
@@ -204,5 +205,10 @@ class LoginUsecaseTest {
         List<RefreshToken> all = refreshTokenRepository.findAll();
         assertThat(all.size()).isEqualTo(1);
 
+    }
+
+    private static LoginRequest getLoginRequest(String code, SocialProvider provider) {
+        LoginRequest request = new LoginRequest(code, provider, new UserAgentDto());
+        return request;
     }
 }

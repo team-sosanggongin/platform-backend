@@ -1,6 +1,7 @@
 package com.platform.sosangongin.services.jwt;
 
 import com.platform.sosangongin.domains.role.Role;
+import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class JwtServiceTest {
         List<Role> roles = Collections.singletonList(role);
 
         // when
-        String token = jwtService.createToken(userId, businessId, roles);
+        String token = jwtService.createToken(userId, new UserAgentDto(), businessId, roles);
         Claims claims = jwtService.parseClaims(token);
 
         // then
@@ -54,7 +55,7 @@ class JwtServiceTest {
     void parseExpiredToken_ThrowsException() {
         // given
         jwtProperties.setExpirationTime(-1L); // 만료 시간을 과거로 설정
-        String token = jwtService.createToken(UUID.randomUUID(), UUID.randomUUID(), Collections.emptyList());
+        String token = jwtService.createToken(UUID.randomUUID(),new UserAgentDto(), UUID.randomUUID(), Collections.emptyList());
 
         // when & then
         assertThatThrownBy(() -> jwtService.parseClaims(token))

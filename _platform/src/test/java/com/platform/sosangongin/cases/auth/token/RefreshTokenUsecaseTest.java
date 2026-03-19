@@ -68,8 +68,8 @@ class RefreshTokenUsecaseTest {
         given(jwtService.getUserIdFromToken(oldRefreshToken)).willReturn(userId);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(storedToken));
-        given(jwtService.createToken(any(UUID.class))).willReturn("new-access-token");
-        given(jwtService.createRefreshToken(any(UUID.class))).willReturn("new-refresh-token");
+        given(jwtService.createToken(any(UUID.class), any())).willReturn("new-access-token");
+        given(jwtService.createRefreshToken(any(UUID.class), any())).willReturn("new-refresh-token");
         given(this.timeGeneratorService.now()).willReturn(LocalDateTime.now());
         // when
         RefreshTokenResult result = refreshTokenUsecase.reissue(request);

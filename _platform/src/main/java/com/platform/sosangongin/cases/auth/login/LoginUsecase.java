@@ -3,6 +3,8 @@ package com.platform.sosangongin.cases.auth.login;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
+import com.platform.sosangongin.domains.user.agents.UserAgent;
+import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import com.platform.sosangongin.domains.user.social.UserSocialAuth;
 import com.platform.sosangongin.domains.user.social.UserSocialAuthRepository;
 import com.platform.sosangongin.services.jwt.JwtProperties;
@@ -47,23 +49,23 @@ public class LoginUsecase {
             log.debug("Registered social user login attempt: {}", user.getId());
 
             return user.isPhoneVerified()
-                    ? createTokensAndReturn(user)
+                    ? createTokensAndReturn(user, loginRequest.getUserAgentDto())
                     : redirectForVerification(user.getId(), "Phone verification is needed");
         }
 
         // 2. 계정 연동 혹은 신규 가입
         return userRepository.findByPhoneNumber(authRes.phoneNumber())
-                .map(existingUser -> handleAccountLinking(existingUser, authRes))
+                .map(existingUser -> handleAccountLinking(existingUser, loginRequest.getUserAgentDto(), authRes))
                 .orElseGet(() -> handleNewUserRegistration(authRes));
     }
 
-    private LoginResult handleAccountLinking(User user, AuthResponse authRes) {
+    private LoginResult handleAccountLinking(User user, UserAgentDto userAgentDto, AuthResponse authRes) {
         log.info("Linking existing user {} with new provider {}", user.getId(), authRes.provider());
         saveSocialAuth(user, authRes);
 
         // 연동 후에도 번호 인증 여부에 따라 토큰 발급 결정
         return user.isPhoneVerified()
-                ? createTokensAndReturn(user)
+                ? createTokensAndReturn(user, userAgentDto)
                 : redirectForVerification(user.getId(), "Account linked, but verification needed");
     }
 
@@ -104,11 +106,11 @@ public class LoginUsecase {
         userSocialAuthRepository.save(auth);
     }
 
-    private LoginResult createTokensAndReturn(User user) {
+    private LoginResult createTokensAndReturn(User user, UserAgentDto userAgentDto) {
         refreshTokenRepository.deleteAllByUser(user);
 
-        String accessToken = jwtService.createToken(user.getId());
-        String refreshTokenStr = jwtService.createRefreshToken(user.getId());
+        String accessToken = jwtService.createToken(user.getId(), userAgentDto);
+        String refreshTokenStr = jwtService.createRefreshToken(user.getId(), userAgentDto);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
