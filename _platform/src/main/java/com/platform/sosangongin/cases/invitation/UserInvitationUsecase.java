@@ -6,7 +6,7 @@ import com.platform.sosangongin.domains.invitation.Invitation;
 import com.platform.sosangongin.domains.invitation.InvitationRepository;
 import com.platform.sosangongin.domains.invitation.InvitationStatus;
 import com.platform.sosangongin.domains.role.Role;
-import com.platform.sosangongin.domains.role.BusinessRoleRepository;
+import com.platform.sosangongin.domains.role.RoleRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.services.external.SmsPushService;
@@ -38,7 +38,7 @@ public class UserInvitationUsecase {
     private final BusinessRepository businessRepository;
     private final RandomCharGeneratorService randomCharGeneratorService;
     private final InvitationRepository invitationRepository;
-    private final BusinessRoleRepository businessRoleRepository;
+    private final RoleRepository roleRepository;
     private final SmsPushService smsPushService;
     private final MessageTemplate messageTemplate;
     /**
@@ -108,7 +108,7 @@ public class UserInvitationUsecase {
                 .expiresAt(LocalDateTime.now().plusDays(3))
                 .build();
 
-        List<Role> roles = this.businessRoleRepository.findAllById(roleIds);
+        List<Role> roles = this.roleRepository.findAllById(roleIds);
 
         invitation.addRoles(roles);
 

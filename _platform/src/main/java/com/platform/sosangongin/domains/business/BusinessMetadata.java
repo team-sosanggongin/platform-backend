@@ -16,7 +16,7 @@ public class BusinessMetadata extends BaseEntity {
 
     @Id
     @Column(name = "business_id")
-    private UUID id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

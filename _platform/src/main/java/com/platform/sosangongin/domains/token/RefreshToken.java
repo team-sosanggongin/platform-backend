@@ -2,6 +2,7 @@ package com.platform.sosangongin.domains.token;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.user.User;
+import com.platform.sosangongin.domains.user.agents.UserAgent;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,13 +27,14 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "token_value", nullable = false, columnDefinition = "TEXT")
     private String tokenValue;
 
-    @Column(name = "user_agent", columnDefinition = "TEXT")
-    private String userAgent;
+    @JoinColumn(name = "user_agent_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAgent userAgent;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    public RefreshToken(User user, String tokenValue, String userAgent, LocalDateTime expiresAt) {
+    public RefreshToken(User user, String tokenValue, UserAgent userAgent, LocalDateTime expiresAt) {
         this.user = user;
         this.tokenValue = tokenValue;
         this.userAgent = userAgent;

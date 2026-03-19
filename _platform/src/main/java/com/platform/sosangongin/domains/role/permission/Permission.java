@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.role;
+package com.platform.sosangongin.domains.role.permission;
 
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import jakarta.persistence.*;
