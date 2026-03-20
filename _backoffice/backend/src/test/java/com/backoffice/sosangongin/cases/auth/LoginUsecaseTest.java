@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +33,12 @@ class LoginUsecaseTest {
 
     private AccountBackoffice testAccount;
     private MockHttpSession session;
+    private MockHttpServletRequest request;
 
     @BeforeEach
     void setup() {
         session = new MockHttpSession();
+        request = new MockHttpServletRequest();
         testAccount = AccountBackoffice.builder()
                 .userId(UUID.randomUUID())
                 .loginId("testuser")
@@ -54,7 +57,7 @@ class LoginUsecaseTest {
         accountRepository.save(testAccount);
 
         // when
-        loginUsecase.login("testuser", "password123", session);
+        loginUsecase.login("testuser", "password123", request, session);
 
         // then
         UUID accountId = (UUID) session.getAttribute("ACCOUNT_ID");
@@ -70,7 +73,7 @@ class LoginUsecaseTest {
     void login_fail_wrongPassword_throwsExceptionAndIncrementsAttempts() {
         // when & then
         assertThrows(IllegalArgumentException.class,
-                () -> loginUsecase.login("testuser", "wrongpassword", session));
+                () -> loginUsecase.login("testuser", "wrongpassword", request, session));
 
         AccountBackoffice freshAccount = accountRepository.findById(testAccount.getId()).get();
         assertEquals(1, freshAccount.getFailedLoginAttempts());
@@ -82,12 +85,12 @@ class LoginUsecaseTest {
         // given
         for (int i = 0; i < 4; i++) {
             assertThrows(IllegalArgumentException.class,
-                    () -> loginUsecase.login("testuser", "wrongpassword", session));
+                    () -> loginUsecase.login("testuser", "wrongpassword", request, session));
         }
 
         // when: 5번째 실패
         assertThrows(IllegalArgumentException.class,
-                () -> loginUsecase.login("testuser", "wrongpassword", session));
+                () -> loginUsecase.login("testuser", "wrongpassword", request, session));
 
         // then
         AccountBackoffice lockedAccount = accountRepository.findById(testAccount.getId()).get();
@@ -105,6 +108,6 @@ class LoginUsecaseTest {
 
         // when & then
         assertThrows(IllegalStateException.class,
-                () -> loginUsecase.login("testuser", "password123", session));
+                () -> loginUsecase.login("testuser", "password123", request, session));
     }
 }

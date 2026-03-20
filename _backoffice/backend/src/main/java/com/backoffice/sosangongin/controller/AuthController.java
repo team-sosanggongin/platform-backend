@@ -1,8 +1,8 @@
 package com.backoffice.sosangongin.controller;
 
-import com.backoffice.sosangongin.domains.account.AccountBackofficeRepository;
 import com.backoffice.sosangongin.cases.auth.LoginRequest;
 import com.backoffice.sosangongin.cases.auth.LoginUsecase;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final LoginUsecase loginUsecase;
-    private final AccountBackofficeRepository accountBackofficeRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpSession session){
-        loginUsecase.login(request.getLoginId(), request.getPassword(), session);
+    public ResponseEntity<Void> login(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest, HttpSession session){
+        loginUsecase.login(request.getLoginId(), request.getPassword(), httpServletRequest, session);
         return ResponseEntity.ok().build();
     }
 
