@@ -19,7 +19,7 @@ public class AccountBackoffice extends SoftDeletedBaseEntity {
     private UUID id;
 
     @Column(name = "user_id", nullable = false)
-    private UUID userId;    // _Platform 의 users 테이블 참조
+    private UUID userId;    // _platform 의 users 테이블 참조
 
     @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
