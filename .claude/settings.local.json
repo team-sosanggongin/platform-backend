@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} basename {})",
+      "Bash(./gradlew :_platform:compileJava)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.services.fcm.FcmPushServiceImplTest\")"
+    ]
+  }
+}

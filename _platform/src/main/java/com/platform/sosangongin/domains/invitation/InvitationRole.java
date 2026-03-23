@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(name = "invitation_roles", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_invitation_role", columnNames = {"invitation_id", "role_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

@@ -17,11 +17,11 @@ public class Permission extends SoftDeletedBaseEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "permission_name")
+    @Column(name = "permission_name", unique = true)
     private String permissionName;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "perm_domain", nullable = false))
+    @AttributeOverride(name = "value", column = @Column(name = "perm_domain", nullable = false, unique = true))
     private PermissionDomain permDomain;
 
     @Column
