@@ -6,10 +6,14 @@ import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+// TODO: soft delete된 레코드가 존재하는 상태에서 같은 (user_id, business_id) 재고용 시
+//       uk_employment_user_business 제약조건 충돌 가능. hard delete 또는 unique 조건에 deletedAt 포함 필요.
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "employments")
+@Table(name = "employments", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_employment_user_business", columnNames = {"business_id", "user_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Employment extends SoftDeletedBaseEntity {

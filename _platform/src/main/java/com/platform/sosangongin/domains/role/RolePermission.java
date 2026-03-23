@@ -8,7 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "role_permissions")
+@Table(name = "role_permissions", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_role_permission", columnNames = {"role_id", "permission_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RolePermission extends BaseEntity {

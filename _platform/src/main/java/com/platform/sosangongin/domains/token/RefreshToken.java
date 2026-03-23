@@ -23,7 +23,7 @@ public class RefreshToken extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "token_value", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "token_value", nullable = false, unique = true, columnDefinition = "TEXT")
     private String tokenValue;
 
     @Column(name = "user_agent", columnDefinition = "TEXT")

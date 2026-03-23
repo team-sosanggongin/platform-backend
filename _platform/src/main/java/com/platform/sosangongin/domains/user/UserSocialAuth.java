@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "user_social_auths")
+@Table(name = "user_social_auths", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_social_auth_provider_user", columnNames = {"provider", "user_id"})
+})
 @Getter
 @Builder
 @AllArgsConstructor

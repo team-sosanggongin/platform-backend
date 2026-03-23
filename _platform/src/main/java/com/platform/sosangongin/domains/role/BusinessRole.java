@@ -13,7 +13,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "business_roles")
+@Table(name = "business_roles", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_business_role_name", columnNames = {"business_id", "role_name"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BusinessRole extends BaseEntity {
