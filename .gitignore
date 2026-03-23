@@ -171,3 +171,30 @@ logs/
 # =========================
 
 **/.vercel/
+
+# =========================
+# Terraform
+# =========================
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+*.tfplan
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# =========================
+# Licenses / Generated docs
+# =========================
+LICENSE.txt
+
+# =========================
+# Firebase
+# =========================
+**/firebase-service-account*.json
+**/google-services.json
+**/GoogleService-Info.plist
