@@ -40,7 +40,8 @@ public class Role extends BaseEntity {
     @Column(name = "is_active")
     private boolean isActive;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private Set<RolePermission> rolePermissionSet = new HashSet<>();
 
 }
