@@ -13,8 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "roles")
-@Getter
+@Table(name = "roles", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_business_role_name", columnNames = {"business_id", "role_name"})
+})@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role extends BaseEntity {
 
