@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import com.platform.sosangongin.domains.common.ClientPlatform;
 import lombok.*;
 
 @Getter
@@ -25,7 +26,7 @@ public class VersionInfo {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "agent_type")
-    private AgentType agentType;
+    private ClientPlatform agentType;
 
 
 }
