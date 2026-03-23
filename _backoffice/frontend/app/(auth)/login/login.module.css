@@ -1,0 +1,11 @@
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.cardWrapper {
+  width: 100%;
+  max-width: 400px;
+}
