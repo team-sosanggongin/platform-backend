@@ -1,0 +1,63 @@
+.dashboard {
+  padding: 2rem;
+  width: 70%;
+  margin: 0 auto;
+}
+
+.welcome {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.statCard {
+  text-align: left !important;
+  padding: 1.5rem !important;
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #333;
+}
+
+.statTrend {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.up {
+  color: #28a745;
+}
+
+.down {
+  color: #d93025;
+}

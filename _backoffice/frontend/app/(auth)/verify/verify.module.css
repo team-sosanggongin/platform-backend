@@ -1,0 +1,37 @@
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #d93025;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.resend {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #007bff;
+  cursor: pointer;
+  text-align: center;
+}
+
+.resend:hover {
+  text-decoration: underline;
+}
+
+.cardWrapper {
+  width: 100%;
+  max-width: 400px;
+}
