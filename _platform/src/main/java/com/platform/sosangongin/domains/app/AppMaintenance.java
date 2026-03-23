@@ -33,9 +33,8 @@ public class AppMaintenance extends BaseEntity {
     private LocalDateTime endedAt;
 
     public boolean isActive(LocalDateTime now) {
-        return status == MaintenanceStatus.IN_PROGRESS
-                || (status == MaintenanceStatus.SCHEDULED
-                    && !now.isBefore(startedAt) && now.isBefore(endedAt));
+        return (status == MaintenanceStatus.SCHEDULED || status == MaintenanceStatus.IN_PROGRESS)
+                && !now.isBefore(startedAt) && now.isBefore(endedAt);
     }
 
     public void start() {
