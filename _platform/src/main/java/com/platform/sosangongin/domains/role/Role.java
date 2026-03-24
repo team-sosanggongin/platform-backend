@@ -30,7 +30,7 @@ public class Role extends BaseEntity {
     @Column(name = "role_description")
     private String description;
 
-    @Column(name = "is_recommended", columnDefinition = "데이터에 의거, 관리자에 의해 생성 및 추천되는 롤")
+    @Column(name = "is_recommended")
     private boolean isRecommended;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,9 +39,4 @@ public class Role extends BaseEntity {
 
     @Column(name = "is_active")
     private boolean isActive;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    private Set<RolePermission> rolePermissionSet = new HashSet<>();
-
 }
