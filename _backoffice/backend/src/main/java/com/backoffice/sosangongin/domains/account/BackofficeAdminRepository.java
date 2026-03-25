@@ -7,6 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AccountBackofficeRepository extends JpaRepository<AccountBackoffice, UUID> {
-    Optional<AccountBackoffice> findByLoginId(String loginId);
+public interface BackofficeAdminRepository extends JpaRepository<BackofficeAdmin, UUID> {
+    Optional<BackofficeAdmin> findByLoginId(String loginId);
 }

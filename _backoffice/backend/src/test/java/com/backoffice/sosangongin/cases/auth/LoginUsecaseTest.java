@@ -1,7 +1,7 @@
 package com.backoffice.sosangongin.cases.auth;
 
-import com.backoffice.sosangongin.domains.account.AccountBackoffice;
-import com.backoffice.sosangongin.domains.account.AccountBackofficeRepository;
+import com.backoffice.sosangongin.domains.account.BackofficeAdmin;
+import com.backoffice.sosangongin.domains.account.BackofficeAdminRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.mock.web.MockHttpSession;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,12 +24,12 @@ class LoginUsecaseTest {
     private LoginUsecase loginUsecase;
 
     @Autowired
-    private AccountBackofficeRepository accountRepository;
+    private BackofficeAdminRepository adminRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private AccountBackoffice testAccount;
+    private BackofficeAdmin testAccount;
     private MockHttpSession session;
     private MockHttpServletRequest request;
 
@@ -39,33 +37,54 @@ class LoginUsecaseTest {
     void setup() {
         session = new MockHttpSession();
         request = new MockHttpServletRequest();
-        testAccount = AccountBackoffice.builder()
-                .userId(UUID.randomUUID())
+        testAccount = BackofficeAdmin.builder()
                 .loginId("testuser")
+                .name("테스트관리자")
                 .password(passwordEncoder.encode("password123"))
                 .failedLoginAttempts(0)
                 .isLocked(false)
+                .isPasswordExpired(false)
                 .build();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
     }
 
     @Test
     @DisplayName("로그인 성공: 세션에 ACCOUNT_ID가 저장되고, 실패 횟수가 초기화된다")
     void login_success_setsSessionAndResetsAttempts() {
         // given
-        testAccount.incrementFailedLoginAttempts(); // 실패 횟수를 1로 만듦
-        accountRepository.save(testAccount);
+        testAccount.incrementFailedLoginAttempts();
+        adminRepository.save(testAccount);
 
         // when
-        loginUsecase.login("testuser", "password123", request, session);
+        LoginResult result = loginUsecase.login("testuser", "password123", request, session);
 
         // then
-        UUID accountId = (UUID) session.getAttribute("ACCOUNT_ID");
-        assertNotNull(accountId);
-        assertEquals(testAccount.getId(), accountId);
+        assertNotNull(session.getAttribute("ACCOUNT_ID"));
+        assertEquals(testAccount.getId(), session.getAttribute("ACCOUNT_ID"));
+        assertFalse(result.isPasswordExpired());
 
-        AccountBackoffice freshAccount = accountRepository.findById(testAccount.getId()).get();
+        BackofficeAdmin freshAccount = adminRepository.findById(testAccount.getId()).get();
         assertEquals(0, freshAccount.getFailedLoginAttempts());
+    }
+
+    @Test
+    @DisplayName("로그인 성공 (비밀번호 만료): passwordExpired가 true로 반환된다")
+    void login_success_passwordExpired_returnsTrue() {
+        // given
+        BackofficeAdmin expiredAccount = BackofficeAdmin.builder()
+                .loginId("expireduser")
+                .name("만료관리자")
+                .password(passwordEncoder.encode("password123"))
+                .isPasswordExpired(true)
+                .build();
+        adminRepository.save(expiredAccount);
+
+        // when
+        LoginResult result = loginUsecase.login("expireduser", "password123", request, session);
+
+        // then
+        assertNotNull(session.getAttribute("ACCOUNT_ID"));
+        assertTrue(result.isPasswordExpired());
     }
 
     @Test
@@ -75,7 +94,7 @@ class LoginUsecaseTest {
         assertThrows(IllegalArgumentException.class,
                 () -> loginUsecase.login("testuser", "wrongpassword", request, session));
 
-        AccountBackoffice freshAccount = accountRepository.findById(testAccount.getId()).get();
+        BackofficeAdmin freshAccount = adminRepository.findById(testAccount.getId()).get();
         assertEquals(1, freshAccount.getFailedLoginAttempts());
     }
 
@@ -93,7 +112,7 @@ class LoginUsecaseTest {
                 () -> loginUsecase.login("testuser", "wrongpassword", request, session));
 
         // then
-        AccountBackoffice lockedAccount = accountRepository.findById(testAccount.getId()).get();
+        BackofficeAdmin lockedAccount = adminRepository.findById(testAccount.getId()).get();
         assertTrue(lockedAccount.isLocked());
         assertEquals(5, lockedAccount.getFailedLoginAttempts());
         assertNotNull(lockedAccount.getLockedAt());
@@ -104,7 +123,7 @@ class LoginUsecaseTest {
     void login_fail_lockedAccount_throwsIllegalStateException() {
         // given
         testAccount.lockAccount();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
 
         // when & then
         assertThrows(IllegalStateException.class,

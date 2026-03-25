@@ -1,8 +1,8 @@
 package com.backoffice.sosangongin.controller;
 
 import com.backoffice.sosangongin.cases.auth.LoginRequest;
-import com.backoffice.sosangongin.domains.account.AccountBackoffice;
-import com.backoffice.sosangongin.domains.account.AccountBackofficeRepository;
+import com.backoffice.sosangongin.domains.account.BackofficeAdmin;
+import com.backoffice.sosangongin.domains.account.BackofficeAdminRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,22 +33,23 @@ class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AccountBackofficeRepository accountRepository;
+    private BackofficeAdminRepository adminRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private AccountBackoffice testAccount;
+    private BackofficeAdmin testAccount;
 
     @BeforeEach
     void setup() {
-        accountRepository.deleteAll();
-        testAccount = AccountBackoffice.builder()
-                .userId(UUID.randomUUID())
+        adminRepository.deleteAll();
+        testAccount = BackofficeAdmin.builder()
                 .loginId("testuser")
+                .name("테스트관리자")
                 .password(passwordEncoder.encode("password123"))
+                .isPasswordExpired(false)
                 .build();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
     }
 
     @Test
@@ -80,7 +79,7 @@ class AuthControllerTest {
     void login_fail_lockedAccount() throws Exception {
         // given
         testAccount.lockAccount();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
         LoginRequest request = new LoginRequest("testuser", "password123");
 
         // when & then
@@ -101,7 +100,7 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
 
         // when: 실패 횟수 검증
-        AccountBackoffice accountAfterFailure = accountRepository.findById(testAccount.getId()).get();
+        BackofficeAdmin accountAfterFailure = adminRepository.findById(testAccount.getId()).get();
         assertEquals(1, accountAfterFailure.getFailedLoginAttempts());
 
         // then: 로그인 성공
@@ -112,7 +111,7 @@ class AuthControllerTest {
                 .andExpect(status().isOk());
 
         // then: 실패 횟수 초기화 검증
-        AccountBackoffice accountAfterSuccess = accountRepository.findById(testAccount.getId()).get();
+        BackofficeAdmin accountAfterSuccess = adminRepository.findById(testAccount.getId()).get();
         assertEquals(0, accountAfterSuccess.getFailedLoginAttempts());
     }
 }

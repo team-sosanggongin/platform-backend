@@ -1,8 +1,8 @@
 package com.backoffice.sosangongin.domains.loginHistory;
 
 import com.backoffice.sosangongin.cases.auth.LoginUsecase;
-import com.backoffice.sosangongin.domains.account.AccountBackoffice;
-import com.backoffice.sosangongin.domains.account.AccountBackofficeRepository;
+import com.backoffice.sosangongin.domains.account.BackofficeAdmin;
+import com.backoffice.sosangongin.domains.account.BackofficeAdminRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +27,7 @@ public class LoginHistoryIntegrationTest {
     private LoginUsecase loginUsecase;
 
     @Autowired
-    private AccountBackofficeRepository accountRepository;
+    private BackofficeAdminRepository adminRepository;
 
     @Autowired
     private AdminLoginHistoryRepository adminLoginHistoryRepository;
@@ -36,7 +35,7 @@ public class LoginHistoryIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private AccountBackoffice testAccount;
+    private BackofficeAdmin testAccount;
     private MockHttpSession session;
     private MockHttpServletRequest request;
 
@@ -47,16 +46,16 @@ public class LoginHistoryIntegrationTest {
         request.setRemoteAddr("127.0.0.1");
         request.addHeader("User-Agent", "Test-Agent");
 
-        // 기존 데이터 정리
         adminLoginHistoryRepository.deleteAll();
-        accountRepository.deleteAll();
+        adminRepository.deleteAll();
 
-        testAccount = AccountBackoffice.builder()
-                .userId(UUID.randomUUID())
+        testAccount = BackofficeAdmin.builder()
                 .loginId("history_test_user")
+                .name("이력테스트관리자")
                 .password(passwordEncoder.encode("password123"))
+                .isPasswordExpired(false)
                 .build();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
     }
 
     @Test
@@ -98,7 +97,7 @@ public class LoginHistoryIntegrationTest {
     void recordHistory_onLockedAccountLoginAttempt() {
         // given
         testAccount.lockAccount();
-        accountRepository.save(testAccount);
+        adminRepository.save(testAccount);
 
         // when
         assertThrows(IllegalStateException.class, () -> {
