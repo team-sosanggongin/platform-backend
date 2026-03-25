@@ -1,7 +1,5 @@
-package com.platform.sosangongin.cases.search;
+package com.platform.sosangongin.domains.business;
 
-import com.platform.sosangongin.domains.business.Business;
-import com.platform.sosangongin.domains.business.BusinessMetadata;
 import lombok.Builder;
 import lombok.Getter;
 

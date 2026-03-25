@@ -6,7 +6,7 @@ import com.platform.sosangongin.api.controllers.dto.JoinBusinessApiRequest;
 import com.platform.sosangongin.cases.registration.JoinBusinessRequest;
 import com.platform.sosangongin.cases.registration.JoinBusinessResult;
 import com.platform.sosangongin.cases.registration.JoinBusinessUsecase;
-import com.platform.sosangongin.cases.search.BusinessDto;
+import com.platform.sosangongin.domains.business.BusinessDto;
 import com.platform.sosangongin.cases.search.SearchBusinessRequest;
 import com.platform.sosangongin.cases.search.SearchBusinessResult;
 import com.platform.sosangongin.cases.search.SearchBusinessUsecase;

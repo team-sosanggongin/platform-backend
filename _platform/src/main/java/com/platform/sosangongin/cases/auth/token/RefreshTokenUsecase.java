@@ -58,8 +58,8 @@ public class RefreshTokenUsecase {
 
         this.refreshTokenRepository.delete(latestRefreshToken);
 
-        String newAccessToken = jwtService.createToken(user.getId());
-        String newRefreshTokenStr = jwtService.createRefreshToken(user.getId());
+        String newAccessToken = jwtService.createToken(user.getId(), request.getUserAgentDto());
+        String newRefreshTokenStr = jwtService.createRefreshToken(user.getId(), request.getUserAgentDto());
 
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .user(user)

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs -I {} basename {})"
+      "Bash(xargs -I {} basename {})",
+      "Bash(./gradlew :_platform:compileJava)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.services.fcm.FcmPushServiceImplTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.CheckAppStatusUsecaseTest\" --tests \"com.platform.sosangongin.api.controllers.AppControllerTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.NoticeControllerTest\")"
     ]
   }
 }

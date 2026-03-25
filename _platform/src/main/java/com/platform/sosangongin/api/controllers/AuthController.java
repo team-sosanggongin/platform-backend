@@ -5,6 +5,7 @@ import com.platform.sosangongin.cases.auth.login.LoginUsecase;
 import com.platform.sosangongin.cases.auth.social.SocialAuthRedirectCase;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenUsecase;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecase;
+import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,13 @@ public class AuthController {
     @Operation(summary = "소셜 로그인 콜백 처리", description = "소셜 로그인 후 받은 코드로 로그인을 수행합니다.")
     @PostMapping("/login")
     public LoginApiResponse login(@RequestBody LoginApiRequest request) {
-        return new LoginApiResponse(loginUsecase.loginAfterSocialEvent(request.toUseCaseRequest()));
+        return new LoginApiResponse(loginUsecase.loginAfterSocialEvent(request.toUseCaseRequest(new UserAgentDto())));
     }
 
     @Operation(summary = "토큰 재발급", description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.")
     @PostMapping("/refresh")
     public RefreshTokenApiResponse refresh(@RequestBody RefreshTokenApiRequest request) {
-        return new RefreshTokenApiResponse(refreshTokenUsecase.reissue(request.toUseCaseRequest()));
+        return new RefreshTokenApiResponse(refreshTokenUsecase.reissue(request.toUseCaseRequest(new UserAgentDto())));
     }
 
     @Operation(summary = "휴대전화 인증 요청", description = "사용자의 휴대전화 인증을 요청하거나, 인증 코드를 검증합니다.")

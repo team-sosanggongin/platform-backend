@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client") // OAuth2 Client 추가
+    implementation("org.springframework.boot:spring-boot-starter-webflux") // WebClient (OAuth2 토큰/유저정보 요청용)
     
     // Swagger (OpenAPI)
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
@@ -24,6 +25,9 @@ dependencies {
     // Prometheus & Actuator
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // Firebase Admin SDK
+    implementation("com.google.firebase:firebase-admin:9.2.0")
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
