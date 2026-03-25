@@ -1,0 +1,38 @@
+.row {
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  width: 160px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  padding-top: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 38px;
+}
+
+.value {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 500;
+  line-height: 1.5;
+}

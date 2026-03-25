@@ -25,3 +25,20 @@ variable "subnet_cidrs" {
     db_c    = string
   })
 }
+
+# variables.tf
+
+variable "container_cpu" {
+  description = "ECS Task CPU units (256, 512, 1024 ...)"
+  type        = number
+}
+
+variable "container_memory" {
+  description = "ECS Task Memory in MiB (512, 1024, 2048 ...)"
+  type        = number
+}
+
+variable "service_desired_count" {
+  description = "Number of tasks to run"
+  type        = number
+}

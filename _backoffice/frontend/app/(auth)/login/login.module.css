@@ -1,11 +1,81 @@
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 24px;
-  color: #333;
-}
-
 .cardWrapper {
   width: 100%;
   max-width: 400px;
+  padding: 2.5rem 2rem !important;
+  text-align: left !important;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.logoMark {
+  width: 28px;
+  height: 28px;
+  background-color: #3b82f6;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoMark svg {
+  width: 14px;
+  height: 14px;
+  fill: white;
+}
+
+.logoText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.errorMsg {
+  font-size: 0.8rem;
+  color: #ef4444;
+  font-weight: 500;
+  margin-bottom: 8px;
+  margin-top: -4px;
+  line-height: 1.5;
+}
+
+.attemptsBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  margin-top: -4px;
+}
+
+.attemptDot {
+  width: 20px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.attemptFailed {
+  background-color: #ef4444;
 }

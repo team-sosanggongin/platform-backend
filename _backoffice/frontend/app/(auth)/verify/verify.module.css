@@ -1,37 +1,49 @@
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 24px;
-}
-
-.timer {
-  font-size: 18px;
-  font-weight: bold;
-  color: #d93025;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.resend {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #007bff;
-  cursor: pointer;
-  text-align: center;
-}
-
-.resend:hover {
-  text-decoration: underline;
-}
-
 .cardWrapper {
   width: 100%;
   max-width: 400px;
+  padding: 2.5rem 2rem !important;
+  text-align: left !important;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+}
+
+.timer {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  background-color: #fff1f2;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.resend {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: #3b82f6;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.resend:hover {
+  color: #2563eb;
+  text-decoration: underline;
 }

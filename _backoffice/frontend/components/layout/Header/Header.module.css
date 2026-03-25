@@ -1,35 +1,53 @@
 .header {
   width: 100%;
-  padding: 1rem 2rem;
-  background-color: #000000;
-  border-bottom: 1px solid #eaeaea;
+  height: 56px;
+  padding: 0 2rem;
+  background-color: #0f172a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
+  flex-shrink: 0;
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #f9f9f9;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
   text-decoration: none;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #3b82f6;
+  border-radius: 50%;
 }
 
 .nav {
   display: flex;
+  align-items: center;
   gap: 1.5rem;
 }
 
 .navLink {
-  color: #fbfbfb;
+  color: #94a3b8;
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s;
 }
 
 .navLink:hover {
-  color: #3a99fe;
+  color: #f8fafc;
 }

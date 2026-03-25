@@ -5,26 +5,22 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '../../molecules/Navbar/Navbar';
 import { ConfirmModal } from '../../molecules/ConfirmModal/ConfirmModal';
-import { NavigationItem } from '../../types';
 import styles from './Header.module.css';
+import {NavigationItem} from "@/types";
 
 const menuItems: NavigationItem[] = [
   {
     label: '사용자 관리',
     subItems: [
-      { label: '사용자 목록', href: '/users' },
-      { label: '권한 설정', href: '/roles' },
+      { label: '사용자 목록', href: '/backoffice/users' },
+      { label: '권한 설정', href: '/backoffice/roles' },
     ]
   },
   {
     label: '시스템 설정',
     subItems: [
-      { label: '공지사항 관리', href: '/notices' },
+      { label: '공지사항 관리', href: '/backoffice/notices' },
     ]
-  },
-  {
-    label: '통계',
-    href: '/stats'
   }
 ];
 
@@ -45,7 +41,7 @@ export const Header: React.FC = () => {
   return (
     <header className={styles.header}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-        <Link href="/" className={styles.logo}>
+        <Link href="/backoffice" className={styles.logo}>
           Backoffice
         </Link>
         <Navbar items={menuItems} />

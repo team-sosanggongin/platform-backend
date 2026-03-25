@@ -1,50 +1,57 @@
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  backdrop-filter: blur(2px);
 }
 
 .modal {
   background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
   width: 90%;
-  max-width: 600px; /* Wider for details */
+  max-width: 580px;
   position: relative;
+  padding: 1.75rem;
 }
 
 .closeButton {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: none;
+  width: 28px;
+  height: 28px;
+  background: #f1f5f9;
   border: none;
-  font-size: 1.5rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
   cursor: pointer;
-  color: #999;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .closeButton:hover {
-  color: #333;
+  background-color: #e2e8f0;
+  color: #0f172a;
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: #0f172a;
+  padding-right: 2rem;
+  letter-spacing: -0.01em;
 }
 
 .content {
-  color: #444;
+  color: #334155;
 }
