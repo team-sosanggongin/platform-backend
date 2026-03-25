@@ -21,10 +21,6 @@ const menuItems: NavigationItem[] = [
     subItems: [
       { label: '공지사항 관리', href: '/backoffice/notices' },
     ]
-  },
-  {
-    label: '통계',
-    href: '/backoffice/stats'
   }
 ];
 
