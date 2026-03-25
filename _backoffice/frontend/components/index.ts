@@ -12,6 +12,8 @@ export * from './molecules/ConfirmModal/ConfirmModal';
 export * from './molecules/Modal/Modal';
 export * from './molecules/Table/Table';
 export * from './molecules/Pagination/Pagination';
+export * from './molecules/DetailRow/DetailRow';
+export * from './molecules/FormModal/FormModal';
 
 // Layout
 export * from './layout/Container/Container';

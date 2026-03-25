@@ -1,0 +1,79 @@
+.fieldGroup {
+  margin-bottom: 16px;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.checkRow {
+  margin-bottom: 12px;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkLabel input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.section {
+  margin-bottom: 4px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.dateRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.maintenanceBox {
+  background-color: #fff4e5;
+  border: 1px solid #ffd6a0;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.maintenanceBox .sectionTitle {
+  color: #663c00;
+  border-bottom-color: #ffd6a0;
+}
