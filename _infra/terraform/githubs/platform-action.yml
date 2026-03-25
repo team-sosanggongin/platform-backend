@@ -1,0 +1,20 @@
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # ID 토큰을 가져오기 위해 쓰기 권한이 필요합니다.
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # 위에서 만든 Role의 ARN을 넣으세요.
+          role-to-assume: arn:aws:iam::123456789012:role/boss-stg-github-actions-role
+          aws-region: ap-northeast-2
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
