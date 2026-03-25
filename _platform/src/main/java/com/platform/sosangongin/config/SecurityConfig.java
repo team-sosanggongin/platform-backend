@@ -23,6 +23,7 @@ public class SecurityConfig {
             "/api/v1/app/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
+            "/api-docs/**",
             "/swagger-resources/**",
             "/actuator/**" // Prometheus 등 Actuator 엔드포인트 허용
     };
