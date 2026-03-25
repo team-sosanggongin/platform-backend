@@ -1,10 +1,6 @@
 package com.platform.sosangongin.cases.search;
 
-import com.platform.sosangongin.domains.business.Business;
-import com.platform.sosangongin.domains.business.BusinessMetadata;
-import com.platform.sosangongin.domains.business.BusinessRepository;
-import com.platform.sosangongin.domains.business.BusinessStatus;
-import com.platform.sosangongin.domains.business.BusinessType;
+import com.platform.sosangongin.domains.business.*;
 import com.platform.sosangongin.domains.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

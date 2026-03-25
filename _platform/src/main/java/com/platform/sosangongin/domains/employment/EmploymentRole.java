@@ -1,7 +1,7 @@
 package com.platform.sosangongin.domains.employment;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +25,6 @@ public class EmploymentRole extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    private BusinessRole role;
+    private Role role;
 
 }

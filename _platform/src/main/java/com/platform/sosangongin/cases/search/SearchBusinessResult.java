@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.search;
 
 import com.platform.sosangongin.cases.CommonResultTemplate;
+import com.platform.sosangongin.domains.business.BusinessDto;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
