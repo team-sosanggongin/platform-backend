@@ -1,0 +1,23 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 68vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.rightActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}

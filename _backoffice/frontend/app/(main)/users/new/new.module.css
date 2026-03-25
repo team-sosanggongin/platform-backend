@@ -1,0 +1,98 @@
+.container {
+  padding: 2rem 2.5rem;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.breadcrumb {
+  margin-bottom: 1.25rem;
+}
+
+.backLink {
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+
+.backLink:hover {
+  color: #3b82f6;
+}
+
+.formCard {
+  overflow: hidden;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.cardHeader {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.cardBody {
+  padding: 0 1.75rem 2rem;
+}
+
+.footer {
+  margin-top: 1.75rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.rolesGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.roleCheckLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  transition: all 0.15s;
+}
+
+.roleCheckLabel:has(input:checked) {
+  border-color: #3b82f6;
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.roleCheckLabel:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.roleCheckLabel input[type='checkbox'] {
+  display: none;
+}
+
+.errorMessage {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 6px;
+  font-weight: 500;
+}
