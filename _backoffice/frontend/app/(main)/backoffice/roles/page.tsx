@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Role } from '../../../types';
-import { Badge, Button, ListLayout, TableColumn } from '../../../components';
-import { RoleFormModal } from './RoleFormModal';
+import { Role } from "@/types";
+import {Badge, Button, ListLayout, TableColumn} from "@/components";
+import {User} from "@/types";import { RoleFormModal } from './RoleFormModal';
 
 const INITIAL_ROLES: Role[] = [
   {

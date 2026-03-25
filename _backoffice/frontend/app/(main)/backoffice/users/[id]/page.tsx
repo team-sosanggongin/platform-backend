@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { User } from '../../../../types';
+import { User } from '@/types';
 import styles from './edit.module.css';
 import {Badge, Button, Card, DetailRow} from "@/components";
 
@@ -38,7 +38,7 @@ export default function UserDetailPage() {
   return (
     <div className={styles.container}>
       <nav className={styles.breadcrumb}>
-        <Link href="/users" className={styles.backLink}>
+        <Link href="/backoffice/users" className={styles.backLink}>
           <span>&larr;</span> 사용자 목록
         </Link>
       </nav>
@@ -60,9 +60,9 @@ export default function UserDetailPage() {
             </span>
           </DetailRow>
           <DetailRow label="계정 상태">
-            <Badge variant={user.status === 'Active' ? 'success' : 'error'}>
-              {user.status === 'Active' ? '활성' : '비활성'}
-            </Badge>
+            {user.status === 'Active' && <Badge variant="success">활성</Badge>}
+            {user.status === 'Inactive' && <Badge variant="error">비활성</Badge>}
+            {user.status === 'Pending' && <Badge variant="warning">대기중</Badge>}
           </DetailRow>
           <DetailRow label="가입일">{user.joinDate}</DetailRow>
 
@@ -71,7 +71,7 @@ export default function UserDetailPage() {
               type="button" 
               variant="primary"
               className={styles.saveButton}
-              onClick={() => router.push('/users')}
+              onClick={() => router.push('/backoffice/users')}
             >
               목록으로 돌아가기
             </Button>

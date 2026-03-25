@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User } from '../../../types';
-import { Badge, Button, ListLayout, TableColumn } from '../../../components';
+import {Badge, Button, ListLayout, TableColumn} from "@/components";
+import {User} from "@/types";
 
 const ALL_USERS: User[] = [
   { id: '1', name: '김관리', email: 'admin@example.com', roles: ['Admin'], joinDate: '2023-01-15', status: 'Active' },
@@ -18,6 +18,8 @@ const ALL_USERS: User[] = [
   { id: '10', name: '임테스트', email: 'test1@example.com', roles: ['Editor'], joinDate: '2024-03-01', status: 'Active' },
   { id: '11', name: '성지원', email: 'support1@example.com', roles: ['Manager'], joinDate: '2024-03-05', status: 'Active' },
   { id: '12', name: '배로그', email: 'log1@example.com', roles: ['Editor'], joinDate: '2024-03-10', status: 'Active' },
+  { id: '13', name: '오신입', email: 'new1@example.com', phone: '010-1234-5678', roles: ['Editor'], joinDate: '2024-03-20', status: 'Pending' },
+  { id: '14', name: '권대기', email: 'new2@example.com', phone: '010-9876-5432', roles: ['Manager'], joinDate: '2024-03-21', status: 'Pending' },
 ];
 
 export default function UserManagementPage() {
@@ -52,11 +54,11 @@ export default function UserManagementPage() {
     { header: '가입일', render: (user) => user.joinDate },
     {
       header: '상태',
-      render: (user) => (
-        <Badge variant={user.status === 'Active' ? 'success' : 'error'}>
-          {user.status === 'Active' ? '활성' : '비활성'}
-        </Badge>
-      ),
+      render: (user) => {
+        if (user.status === 'Active') return <Badge variant="success">활성</Badge>;
+        if (user.status === 'Inactive') return <Badge variant="error">비활성</Badge>;
+        return <Badge variant="warning">대기중</Badge>;
+      },
     },
   ];
 
@@ -81,11 +83,11 @@ export default function UserManagementPage() {
         data: currentItems,
         rowKey: (user) => user.id,
         emptyMessage: '검색 결과가 없습니다.',
-        onRowClick: (user) => router.push(`/users/${user.id}`),
+        onRowClick: (user) => router.push(`/backoffice/users/${user.id}`),
       }}
       pagination={{ currentPage, totalPages, onPageChange: setCurrentPage }}
       extraActions={
-        <Button style={{ width: 'auto' }} onClick={() => router.push('/users/new')}>
+        <Button style={{ width: 'auto' }} onClick={() => router.push('/backoffice/users/new')}>
           + 유저 등록
         </Button>
       }

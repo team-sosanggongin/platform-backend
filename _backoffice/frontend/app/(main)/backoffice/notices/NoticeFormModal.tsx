@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FormModal, Input } from '../../../components';
-import { Notice, NoticeStatus } from '../../../types';
+import { FormModal, Input } from '@/components';
+import { Notice, NoticeStatus } from '@/types';
 import styles from './notices.module.css';
 
 interface NoticeFormModalProps {

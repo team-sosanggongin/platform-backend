@@ -11,7 +11,7 @@ export interface User {
   phone?: string;
   roles: string[];
   joinDate: string;
-  status: 'Active' | 'Inactive';
+  status: 'Active' | 'Inactive' | 'Pending';
 }
 
 export interface RolePermission {

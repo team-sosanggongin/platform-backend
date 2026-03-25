@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, Input, Button, DetailRow } from '../../../../components';
 import styles from './new.module.css';
-
+// TODO :: 새로운 유저가 등록되면, 등록된 유저의 전화번호로 id와 초기비밀번호, URL을 함께 전송
 // 시스템에 등록된 권한 목록 (실제로는 API에서 가져옴)
 const AVAILABLE_ROLES = ['Admin', 'Manager', 'Editor'];
 
@@ -47,7 +47,7 @@ export default function NewUserPage() {
 
     // TODO: API 호출
     alert(`유저 등록 완료\n이름: ${form.name}\nID: ${form.id}\n전화번호: ${form.phone}\n권한: ${form.roles.join(', ')}`);
-    router.push('/users');
+    router.push('/backoffice/users');
   };
 
   const fieldError = (value: string) => submitted && !value.trim();
@@ -56,7 +56,7 @@ export default function NewUserPage() {
   return (
     <div className={styles.container}>
       <nav className={styles.breadcrumb}>
-        <Link href="/users" className={styles.backLink}>
+        <Link href="/backoffice/users" className={styles.backLink}>
           <span>&larr;</span> 사용자 목록
         </Link>
       </nav>
@@ -131,7 +131,7 @@ export default function NewUserPage() {
             <Button
               variant="secondary"
               style={{ width: 120 }}
-              onClick={() => router.push('/users')}
+              onClick={() => router.push('/backoffice/users')}
             >
               취소
             </Button>

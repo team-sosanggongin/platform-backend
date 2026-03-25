@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Notice, NoticeStatus } from '../../../types';
-import { Badge, Button, ListLayout, TableColumn } from '../../../components';
+import { Notice, NoticeStatus } from "@/types";
+import { Badge, Button, ListLayout, TableColumn } from '@/components';
 import { NoticeFormModal } from './NoticeFormModal';
 
 const INITIAL_NOTICES: Notice[] = [

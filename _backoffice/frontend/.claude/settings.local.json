@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"app/\\(main\\)/backoffice\")",
+      "Bash(mv \"app/\\(main\\)/page.tsx\" \"app/\\(main\\)/backoffice/page.tsx\")",
+      "Bash(mv \"app/\\(main\\)/page.module.css\" \"app/\\(main\\)/backoffice/page.module.css\")",
+      "Bash(mv \"app/\\(main\\)/users\" \"app/\\(main\\)/backoffice/users\")",
+      "Bash(mv \"app/\\(main\\)/notices\" \"app/\\(main\\)/backoffice/notices\")",
+      "Bash(ls \"app/\\(main\\)/\")",
+      "Bash(ls \"app/\\(main\\)/backoffice/\")",
+      "Bash(powershell -Command \"Move-Item ''app/\\(main\\)/users'' ''app/\\(main\\)/backoffice/users''; Move-Item ''app/\\(main\\)/notices'' ''app/\\(main\\)/backoffice/notices''; Move-Item ''app/\\(main\\)/roles'' ''app/\\(main\\)/backoffice/roles''; Write-Host ''done''\")"
+    ]
+  }
+}

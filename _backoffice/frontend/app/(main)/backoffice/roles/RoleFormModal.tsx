@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FormModal, Input, Button } from '../../../components';
-import { Role, RolePermission } from '../../../types';
+import { FormModal, Input, Button } from '@/components';
+import { Role, RolePermission } from '@/types';
 import styles from './roles.module.css';
 
 interface RoleFormModalProps {
