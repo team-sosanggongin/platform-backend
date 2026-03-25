@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, Input, Button, DetailRow } from '../../../../components';
+import { Card, Input, Button, DetailRow } from '@/components';
 import styles from './new.module.css';
 // TODO :: 새로운 유저가 등록되면, 등록된 유저의 전화번호로 id와 초기비밀번호, URL을 함께 전송
 // 시스템에 등록된 권한 목록 (실제로는 API에서 가져옴)
