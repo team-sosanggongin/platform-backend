@@ -51,3 +51,31 @@
   font-size: 0.875rem;
   color: #64748b;
 }
+
+.errorMsg {
+  font-size: 0.8rem;
+  color: #ef4444;
+  font-weight: 500;
+  margin-bottom: 8px;
+  margin-top: -4px;
+  line-height: 1.5;
+}
+
+.attemptsBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  margin-top: -4px;
+}
+
+.attemptDot {
+  width: 20px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.attemptFailed {
+  background-color: #ef4444;
+}

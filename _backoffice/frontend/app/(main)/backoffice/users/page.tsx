@@ -20,6 +20,8 @@ const ALL_USERS: User[] = [
   { id: '12', name: '배로그', email: 'log1@example.com', roles: ['Editor'], joinDate: '2024-03-10', status: 'Active' },
   { id: '13', name: '오신입', email: 'new1@example.com', phone: '010-1234-5678', roles: ['Editor'], joinDate: '2024-03-20', status: 'Pending' },
   { id: '14', name: '권대기', email: 'new2@example.com', phone: '010-9876-5432', roles: ['Manager'], joinDate: '2024-03-21', status: 'Pending' },
+  { id: '15', name: '류잠금', email: 'locked1@example.com', phone: '010-5555-1234', roles: ['Editor'], joinDate: '2024-01-08', status: 'Locked', lockedAt: '2024-03-24T14:32:00' },
+  { id: '16', name: '노보안', email: 'locked2@example.com', phone: '010-7777-9999', roles: ['Manager'], joinDate: '2023-11-05', status: 'Locked', lockedAt: '2024-03-25T09:15:00' },
 ];
 
 export default function UserManagementPage() {
@@ -57,6 +59,7 @@ export default function UserManagementPage() {
       render: (user) => {
         if (user.status === 'Active') return <Badge variant="success">활성</Badge>;
         if (user.status === 'Inactive') return <Badge variant="error">비활성</Badge>;
+        if (user.status === 'Locked') return <Badge variant="error">잠금</Badge>;
         return <Badge variant="warning">대기중</Badge>;
       },
     },
