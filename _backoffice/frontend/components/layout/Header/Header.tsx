@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '../../molecules/Navbar/Navbar';
 import { ConfirmModal } from '../../molecules/ConfirmModal/ConfirmModal';
-import { NavigationItem } from '../../types';
 import styles from './Header.module.css';
+import {NavigationItem} from "@/types";
 
 const menuItems: NavigationItem[] = [
   {

@@ -8,7 +8,41 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Manager' | 'Editor';
+  phone?: string;
+  roles: string[];
   joinDate: string;
   status: 'Active' | 'Inactive';
+}
+
+export interface RolePermission {
+  id: string;
+  permission: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: RolePermission[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type NoticeStatus = 'published' | 'draft' | 'scheduled';
+
+export interface Notice {
+  id: string;
+  title: string;
+  content: string;
+  isSystemMaintenance: boolean;
+  status: NoticeStatus;
+  startAt?: string;
+  endAt?: string;
+  scheduledAt?: string;
+  publishedAt?: string;
+  maintenanceStartAt?: string;
+  maintenanceEndAt?: string;
+  author: string;
+  createdAt: string;
+  updatedAt?: string;
 }

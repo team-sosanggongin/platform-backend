@@ -1,111 +1,58 @@
 .container {
-  padding: 2.5rem 2rem;
-  width: 70%;
+  padding: 2rem 2.5rem;
+  max-width: 860px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .breadcrumb {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .backLink {
-  color: #666;
+  color: #64748b;
   text-decoration: none;
-  font-size: 0.9rem;
-  display: flex;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: color 0.15s;
 }
 
 .backLink:hover {
-  color: #007bff;
+  color: #3b82f6;
 }
 
 .formCard {
+  overflow: hidden;
   padding: 0 !important;
   text-align: left !important;
-  overflow: hidden;
 }
 
 .cardHeader {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #eee;
-  background-color: #ffffff;
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .cardTitle {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #333;
+  color: #0f172a;
   margin: 0;
 }
 
 .cardBody {
-  padding: 1rem 2rem 2.5rem 2rem;
-}
-
-.formRow {
-  display: flex;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  align-items: center;
-}
-
-.formRow:last-child {
-  border-bottom: none;
-}
-
-.rowLabel {
-  width: 180px;
-  font-size: 0.95rem;
-  color: #666;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.rowContent {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.readValue {
-  font-size: 1rem;
-  color: #1a1a1a;
-  font-weight: 600;
+  padding: 0 1.75rem 2rem;
 }
 
 .footer {
-  margin-top: 2rem;
+  margin-top: 1.75rem;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-}
-
-.cancelButton {
-  background-color: #ffffff !important;
-  color: #666 !important;
-  border: 1px solid #ddd !important;
-  width: 120px !important;
-}
-
-.cancelButton:hover {
-  background-color: #f8f9fa !important;
-  border-color: #ccc !important;
+  gap: 10px;
 }
 
 .saveButton {
-  width: 140px !important;
-}
-
-/* Custom override for atomic components inside the row to match the clean look */
-.rowContent :global(.inputGroup),
-.rowContent :global(.selectGroup) {
-  margin-bottom: 0 !important;
-  width: 100%;
-}
-
-.rowContent input,
-.rowContent select {
-  max-width: 400px;
+  width: 130px !important;
 }
