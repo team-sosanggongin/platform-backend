@@ -1,5 +1,6 @@
-package com.platform.sosangongin.domains.user;
+package com.platform.sosangongin.domains.user.verification;
 
+import com.platform.sosangongin.domains.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

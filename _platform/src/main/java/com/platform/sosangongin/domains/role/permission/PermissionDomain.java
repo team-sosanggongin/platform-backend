@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.role;
+package com.platform.sosangongin.domains.role.permission;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

@@ -2,7 +2,7 @@ package com.platform.sosangongin.domains.invitation;
 
 import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
-import com.platform.sosangongin.domains.role.BusinessRole;
+import com.platform.sosangongin.domains.role.Role;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,9 +14,10 @@ import java.util.List;
 @Entity
 @Table(name = "invitations")
 @Getter
+@Setter
 @AllArgsConstructor
 @Builder
-@Setter
+@NoArgsConstructor
 public class Invitation extends SoftDeletedBaseEntity {
 
     @Id
@@ -42,6 +43,7 @@ public class Invitation extends SoftDeletedBaseEntity {
     private Business business;
 
     // 수락 시 부여될 다중 역할들 (Cascade 설정으로 함께 저장)
+    @Builder.Default
     @OneToMany(mappedBy = "invitation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvitationRole> invitationRoles = new ArrayList<>();
 
@@ -49,6 +51,7 @@ public class Invitation extends SoftDeletedBaseEntity {
     @Column(name = "invitation_code", unique = true, nullable = false)
     private String invitationCode;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InvitationStatus status = InvitationStatus.PENDING;
@@ -84,17 +87,17 @@ public class Invitation extends SoftDeletedBaseEntity {
     /**
      * 다중 역할 추가 메서드
      */
-    public void addRole(BusinessRole role) {
+    public void addRole(Role role) {
         InvitationRole invitationRole = InvitationRole.builder()
                 .invitation(this)
-                .businessRole(role)
+                .role(role)
                 .build();
         this.invitationRoles.add(invitationRole);
     }
 
-    public void addRoles(List<BusinessRole> roles){
+    public void addRoles(List<Role> roles){
         List<InvitationRole> invitationRoles = roles.stream().map(next -> InvitationRole.builder()
-                        .businessRole(next)
+                        .role(next)
                         .invitation(this)
                         .build())
                 .toList();

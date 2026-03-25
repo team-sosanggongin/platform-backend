@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.search;
 
 import com.platform.sosangongin.domains.business.Business;
+import com.platform.sosangongin.domains.business.BusinessDto;
 import com.platform.sosangongin.domains.business.BusinessRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

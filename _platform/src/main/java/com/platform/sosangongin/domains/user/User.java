@@ -9,15 +9,14 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @Entity
-@Table(name = "users", indexes = {
-        @Index(name = "idx_users_phone_number", columnList = "phone_number")
-})
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
     private UUID id;
 
     @Column(name = "phone_number", unique = true, nullable = false, length = 20)

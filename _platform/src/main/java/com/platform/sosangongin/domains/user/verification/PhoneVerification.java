@@ -1,6 +1,7 @@
-package com.platform.sosangongin.domains.user;
+package com.platform.sosangongin.domains.user.verification;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
+import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class PhoneVerification extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Setter
-    private VerificationStatus status;
+    private PhoneVerificationStatus status;
 
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
@@ -37,17 +38,17 @@ public class PhoneVerification extends BaseEntity {
 
     public PhoneVerification(String code, LocalDateTime expiredAt) {
         this.code = code;
-        this.status = VerificationStatus.PENDING;
+        this.status = PhoneVerificationStatus.PENDING;
         this.expiredAt = expiredAt;
     }
 
     public boolean verify(String code) {
-        if (this.status != VerificationStatus.PENDING) {
+        if (this.status != PhoneVerificationStatus.PENDING) {
             return false;
         }
 
         if (this.code.equals(code)) {
-            this.status = VerificationStatus.VERIFIED;
+            this.status = PhoneVerificationStatus.VERIFIED;
             return true;
         }
 
@@ -56,7 +57,7 @@ public class PhoneVerification extends BaseEntity {
 
     public boolean isExpired(LocalDateTime now) {
         if(this.expiredAt.isBefore(now)) {
-            this.status = VerificationStatus.EXPIRED;
+            this.status = PhoneVerificationStatus.EXPIRED;
             return true;
         }
         return false;
@@ -64,10 +65,10 @@ public class PhoneVerification extends BaseEntity {
 
     public void verified() {
         this.verifiedAt = LocalDateTime.now();
-        this.status = VerificationStatus.VERIFIED;
+        this.status = PhoneVerificationStatus.VERIFIED;
     }
 
     public boolean isVerifiable() {
-        return this.status.equals(VerificationStatus.PENDING);
+        return this.status.equals(PhoneVerificationStatus.PENDING);
     }
 }
