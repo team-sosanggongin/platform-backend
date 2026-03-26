@@ -2,7 +2,6 @@ package com.platform.sosangongin.api.controllers;
 
 import com.platform.sosangongin.api.controllers.dto.*;
 import com.platform.sosangongin.cases.auth.login.LoginUsecase;
-import com.platform.sosangongin.cases.auth.social.SocialAuthRedirectCase;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenUsecase;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecase;
 import com.platform.sosangongin.domains.user.agents.UserAgentDto;
@@ -18,19 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final LoginUsecase loginUsecase;
-    private final SocialAuthRedirectCase socialAuthRedirectCase;
     private final RefreshTokenUsecase refreshTokenUsecase;
     private final PhoneVerificationUsecase phoneVerificationUsecase;
 
-    @Operation(summary = "소셜 로그인 리다이렉트 URL 요청", description = "제공자(KAKAO, NAVER 등)에 따른 로그인 페이지 URL을 반환합니다.")
-    @GetMapping("/social/redirect")
-    public SocialAuthApiResponse getSocialRedirectUrl(SocialAuthApiRequest request) {
-        return new SocialAuthApiResponse(socialAuthRedirectCase.getRedirectionUrl(request.toUseCaseRequest()));
-    }
-
-    @Operation(summary = "소셜 로그인 콜백 처리", description = "소셜 로그인 후 받은 코드로 로그인을 수행합니다.")
-    @PostMapping("/login")
-    public LoginApiResponse login(@RequestBody LoginApiRequest request) {
+    @Operation(summary = "소셜 로그인 콜백 처리", description = "OAuth 제공자의 동의 후 리다이렉트되어 code와 state를 전달받습니다.")
+    @PostMapping("/login-callback")
+    public LoginApiResponse login(@RequestBody SocialLoginRequest req) {
+        LoginApiRequest request = new LoginApiRequest(req.getCode(), req.getProvider());
         return new LoginApiResponse(loginUsecase.loginAfterSocialEvent(request.toUseCaseRequest(new UserAgentDto())));
     }
 

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +59,7 @@ class AppControllerTest {
         given(checkAppStatusUsecase.check(any(CheckAppStatusRequest.class))).willReturn(result);
 
         // when & then
-        mockMvc.perform(get("/api/v1/app/status")
+        mockMvc.perform(post("/api/v1/app/status")
                         .param("platform", "ANDROID")
                         .param("versionCode", "15"))
                 .andExpect(status().isOk())
@@ -87,7 +88,7 @@ class AppControllerTest {
         given(checkAppStatusUsecase.check(any(CheckAppStatusRequest.class))).willReturn(result);
 
         // when & then
-        mockMvc.perform(get("/api/v1/app/status")
+        mockMvc.perform(post("/api/v1/app/status")
                         .param("platform", "IOS")
                         .param("versionCode", "10"))
                 .andExpect(status().isOk())
@@ -117,7 +118,7 @@ class AppControllerTest {
         given(checkAppStatusUsecase.check(any(CheckAppStatusRequest.class))).willReturn(result);
 
         // when & then
-        mockMvc.perform(get("/api/v1/app/status")
+        mockMvc.perform(post("/api/v1/app/status")
                         .param("platform", "ANDROID")
                         .param("versionCode", "5"))
                 .andExpect(status().isOk())

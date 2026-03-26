@@ -17,8 +17,8 @@ public class AppController {
     private final CheckAppStatusUsecase checkAppStatusUsecase;
 
     @Operation(summary = "앱 상태 확인", description = "서비스 점검 여부 및 클라이언트 앱 버전 호환성을 확인합니다.")
-    @GetMapping("/status")
-    public CheckAppStatusApiResponse checkStatus(CheckAppStatusApiRequest request) {
+    @PostMapping("/status")
+    public CheckAppStatusApiResponse checkStatus(@RequestBody CheckAppStatusApiRequest request) {
         return new CheckAppStatusApiResponse(checkAppStatusUsecase.check(request.toUseCaseRequest()));
     }
 }

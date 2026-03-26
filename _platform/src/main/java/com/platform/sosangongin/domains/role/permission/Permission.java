@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
-@Builder
 @Entity
 @Table(name = "permissions")
 public class Permission extends SoftDeletedBaseEntity {
