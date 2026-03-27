@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.search;
 
 import com.platform.sosangongin.domains.business.*;
+import com.platform.sosangongin.domains.business.location.BusinessMetadata;
 import com.platform.sosangongin.domains.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -10,7 +10,8 @@
       "Bash(./gradlew :_platform:compileTestJava)",
       "Bash(git add:*)",
       "Bash(xargs -0 git add)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(./gradlew :_platform:compileJava :_platform:compileTestJava)"
     ]
   }
 }

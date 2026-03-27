@@ -1,7 +1,7 @@
-package com.platform.sosangongin.domains.business;
+package com.platform.sosangongin.domains.business.join;
 
+import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.BaseEntity;
-import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;

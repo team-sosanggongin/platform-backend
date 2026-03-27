@@ -1,5 +1,6 @@
-package com.platform.sosangongin.domains.business;
+package com.platform.sosangongin.domains.business.registration;
 
+import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

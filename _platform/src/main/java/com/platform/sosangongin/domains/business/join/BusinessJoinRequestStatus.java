@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.business;
+package com.platform.sosangongin.domains.business.join;
 
 public enum BusinessJoinRequestStatus {
     PENDING,

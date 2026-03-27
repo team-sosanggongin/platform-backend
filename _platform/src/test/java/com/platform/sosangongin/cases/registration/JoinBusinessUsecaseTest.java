@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.registration;
 
 import com.platform.sosangongin.domains.business.*;
+import com.platform.sosangongin.domains.business.join.*;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.services.external.SmsPushService;

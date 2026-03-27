@@ -1,10 +1,10 @@
 package com.platform.sosangongin.cases.registration;
 
 import com.platform.sosangongin.domains.business.Business;
-import com.platform.sosangongin.domains.business.BusinessJoinRequest;
-import com.platform.sosangongin.domains.business.BusinessJoinRequestRepository;
-import com.platform.sosangongin.domains.business.BusinessJoinRequestStatus;
 import com.platform.sosangongin.domains.business.BusinessRepository;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequest;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequestRepository;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequestStatus;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.services.external.SmsPushService;
