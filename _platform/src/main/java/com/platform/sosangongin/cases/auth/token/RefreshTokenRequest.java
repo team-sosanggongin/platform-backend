@@ -1,6 +1,6 @@
 package com.platform.sosangongin.cases.auth.token;
 
-import com.platform.sosangongin.domains.user.agents.UserAgentDto;
+import com.platform.sosangongin.domains.common.ClientPlatform;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +11,7 @@ import lombok.Getter;
 public class RefreshTokenRequest {
 
     private final String refreshToken;
-    private final UserAgentDto userAgentDto;
+    private final ClientPlatform agentType;
+    private final String deviceInfo;
 
 }

@@ -9,7 +9,7 @@ public class LoginApiResponse {
     private final String refreshToken;
 
     public LoginApiResponse(LoginResult result) {
-        this.accessToken = result.getAccessToken();
-        this.refreshToken = result.getRefreshToken();
+        this.accessToken = result.accessToken();
+        this.refreshToken = result.refreshToken();
     }
 }
