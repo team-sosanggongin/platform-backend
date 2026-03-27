@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.app;
+package com.platform.sosangongin.domains.app.version;
 
 import com.platform.sosangongin.domains.common.ClientPlatform;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 package com.platform.sosangongin.cases.app;
 
-import com.platform.sosangongin.domains.app.*;
-import com.platform.sosangongin.domains.app.AppMaintenanceRepository;
-import com.platform.sosangongin.domains.app.AppVersionRepository;
+import com.platform.sosangongin.domains.app.maintenance.AppMaintenanceRepository;
+import com.platform.sosangongin.domains.app.version.AppVersion;
+import com.platform.sosangongin.domains.app.version.AppVersionRepository;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +63,7 @@ public class CheckAppStatusUsecase {
 
         AppVersion v = latestVersion.get();
         return CheckAppStatusResult.VersionInfo.builder()
-                .latestVersion(v.getVersionName())
-                .latestVersionCode(v.getVersionCode())
+                .latestVersion(v.getVersionSpan().getVersionCode())
                 .supported(supported)
                 .forceUpdateRequired(!supported && v.isForceUpdate())
                 .build();

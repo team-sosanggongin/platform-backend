@@ -34,7 +34,6 @@ public class CheckAppStatusResult {
     @Getter
     public static class VersionInfo {
         private final String latestVersion;
-        private final int latestVersionCode;
         private final boolean supported;
         private final boolean forceUpdateRequired;
     }

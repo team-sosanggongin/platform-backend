@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.app;
+package com.platform.sosangongin.domains.app.maintenance;
 
 import com.platform.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;

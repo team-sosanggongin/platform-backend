@@ -1,4 +1,4 @@
-package com.platform.sosangongin.domains.app;
+package com.platform.sosangongin.domains.app.maintenance;
 
 public enum MaintenanceStatus {
     NONE,
