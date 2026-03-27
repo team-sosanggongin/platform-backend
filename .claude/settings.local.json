@@ -11,7 +11,13 @@
       "Bash(git add:*)",
       "Bash(xargs -0 git add)",
       "Bash(git commit:*)",
-      "Bash(./gradlew :_platform:compileJava :_platform:compileTestJava)"
+      "Bash(./gradlew :_platform:compileJava :_platform:compileTestJava)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.app.AppVersionControllerTest\")",
+      "Read(//mnt/c/Users/lookh/IdeaProjects/**)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\" --tests \"com.platform.sosangongin.api.controllers.app.AppVersionControllerTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\" --stacktrace)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.auth.login.LoginUsecaseTest\")"
     ]
   }
 }

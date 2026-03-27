@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface AppVersionRepository extends JpaRepository<AppVersion, UUID> {
 
-    Optional<AppVersion> findTopByPlatformOrderByVersionCodeDesc(ClientPlatform platform);
+    Optional<AppVersion> findTopByPlatformOrderByCreatedAtDesc(ClientPlatform platform);
 
     boolean existsByPlatformAndMinSupportedVersionCodeLessThanEqual(ClientPlatform platform, int clientVersionCode);
 }
