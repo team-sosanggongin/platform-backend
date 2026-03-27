@@ -1,25 +1,21 @@
 package com.platform.sosangongin.cases.app;
 
-import com.platform.sosangongin.cases.CommonResultTemplate;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class CheckAppStatusResult extends CommonResultTemplate {
+public class CheckAppStatusResult {
 
     private final boolean serviceAvailable;
     private final MaintenanceInfo maintenance;
     private final VersionInfo version;
 
     @Builder
-    public CheckAppStatusResult(HttpStatus httpStatus, String message,
-                                boolean serviceAvailable,
+    public CheckAppStatusResult(boolean serviceAvailable,
                                 MaintenanceInfo maintenance,
                                 VersionInfo version) {
-        super(httpStatus, message);
         this.serviceAvailable = serviceAvailable;
         this.maintenance = maintenance;
         this.version = version;

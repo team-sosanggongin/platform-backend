@@ -20,10 +20,6 @@ public class RefreshToken extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     @Column(name = "token_value", nullable = false, unique = true, columnDefinition = "TEXT")
     private String tokenValue;
 
@@ -34,8 +30,7 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    public RefreshToken(User user, String tokenValue, UserAgent userAgent, LocalDateTime expiresAt) {
-        this.user = user;
+    public RefreshToken(String tokenValue, UserAgent userAgent, LocalDateTime expiresAt) {
         this.tokenValue = tokenValue;
         this.userAgent = userAgent;
         this.expiresAt = expiresAt;

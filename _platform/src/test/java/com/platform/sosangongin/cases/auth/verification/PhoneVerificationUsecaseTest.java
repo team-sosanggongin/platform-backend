@@ -12,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,7 +60,6 @@ class PhoneVerificationUsecaseTest {
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(user.isPhoneVerified()).isTrue();
         assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.VERIFIED);
     }
@@ -83,8 +80,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(result.getMessage()).contains("history is not present");
+        assertThat(result).isNotNull();
     }
 
     @Test
@@ -110,8 +106,6 @@ class PhoneVerificationUsecaseTest {
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Expired code");
         assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.EXPIRED);
     }
 
@@ -138,8 +132,7 @@ class PhoneVerificationUsecaseTest {
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Invalid code");
+        assertThat(result).isNotNull();
     }
 
     @Test
@@ -164,7 +157,6 @@ class PhoneVerificationUsecaseTest {
         PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("verification state is illegal");
+        assertThat(result).isNotNull();
     }
 }

@@ -6,7 +6,6 @@ import com.platform.sosangongin.domains.app.AppVersionRepository;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -31,7 +30,6 @@ public class CheckAppStatusUsecase {
                 && (versionInfo == null || versionInfo.isSupported());
 
         return CheckAppStatusResult.builder()
-                .httpStatus(HttpStatus.OK)
                 .serviceAvailable(serviceAvailable)
                 .maintenance(maintenanceInfo)
                 .version(versionInfo)

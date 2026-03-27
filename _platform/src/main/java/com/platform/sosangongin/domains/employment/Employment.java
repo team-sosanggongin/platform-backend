@@ -6,15 +6,12 @@ import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-// NOTE: (business_id, user_id) 활성 고용 중복 방지는 JPA UniqueConstraint 대신
-//       DB partial index로 처리한다. 마이그레이션에 아래 DDL을 포함해야 한다:
-//       CREATE UNIQUE INDEX uk_active_employment
-//           ON employments (business_id, user_id)
-//           WHERE deleted_at IS NULL;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "employments")
+@Table(name = "employments", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_business",columnNames = {"user_id, business_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Employment extends SoftDeletedBaseEntity {

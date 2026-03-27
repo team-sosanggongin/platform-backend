@@ -1,5 +1,6 @@
 package com.platform.sosangongin.domains.role;
 
+import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import com.platform.sosangongin.domains.role.permission.Permission;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.*;
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RolePermission extends SoftDeletedBaseEntity {
+public class RolePermission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,6 +4,7 @@ import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
+import com.platform.sosangongin.domains.user.agents.UserAgent;
 import com.platform.sosangongin.errors.InvalidTokenException;
 import com.platform.sosangongin.errors.InvalidTokenUsage;
 import com.platform.sosangongin.services.jwt.JwtProperties;
@@ -11,7 +12,6 @@ import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +51,6 @@ public class RefreshTokenUsecase {
             log.warn("Refresh token expired for user: {}", userId);
             this.refreshTokenRepository.delete(latestRefreshToken); // 만료된 토큰 정리
             return RefreshTokenResult.builder()
-                    .httpStatus(HttpStatus.UNAUTHORIZED)
-                    .message("Refresh token expired")
                     .build();
         }
 
@@ -61,8 +59,10 @@ public class RefreshTokenUsecase {
         String newAccessToken = jwtService.createToken(user.getId(), request.getUserAgentDto());
         String newRefreshTokenStr = jwtService.createRefreshToken(user.getId(), request.getUserAgentDto());
 
+        UserAgent userAgentEntity = request.getUserAgentDto().toEntity(user);
+
         RefreshToken newRefreshToken = RefreshToken.builder()
-                .user(user)
+                .userAgent(userAgentEntity)
                 .tokenValue(newRefreshTokenStr)
                 .expiresAt(this.timeGeneratorService.now().plus(jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS))
                 .build();
@@ -72,7 +72,6 @@ public class RefreshTokenUsecase {
         log.debug("Tokens reissued for user: {}", user.getId());
 
         return RefreshTokenResult.builder()
-                .httpStatus(HttpStatus.OK)
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshTokenStr)
                 .build();

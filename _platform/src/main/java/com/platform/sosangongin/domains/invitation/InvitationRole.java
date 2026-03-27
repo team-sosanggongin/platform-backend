@@ -1,5 +1,6 @@
 package com.platform.sosangongin.domains.invitation;
 
+import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class InvitationRole {
+public class InvitationRole extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +21,7 @@ public class InvitationRole {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invitation_id", nullable = false)
-    private Invitation invitation;
+    private InvitationLink invitationLink;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)

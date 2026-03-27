@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -63,7 +61,6 @@ class CheckAppStatusUsecaseTest {
         CheckAppStatusResult result = checkAppStatusUsecase.check(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.isServiceAvailable()).isTrue();
         assertThat(result.getMaintenance().isActive()).isFalse();
         assertThat(result.getVersion().isSupported()).isTrue();

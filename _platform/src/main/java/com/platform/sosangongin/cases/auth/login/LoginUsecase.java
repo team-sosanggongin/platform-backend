@@ -15,7 +15,6 @@ import com.platform.sosangongin.services.times.TimeGeneratorService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.temporal.ChronoUnit;
@@ -88,9 +87,6 @@ public class LoginUsecase {
      */
     private LoginResult redirectForVerification(UUID userId, String message) {
         return LoginResult.builder()
-                .httpStatus(HttpStatus.OK)
-                .message(message)
-                .nextUrl("PHONE_VERIFICATION") // 클라이언트용 힌트
                 .userId(userId)
                 .accessToken(null)
                 .refreshToken(null)
@@ -113,7 +109,7 @@ public class LoginUsecase {
         String refreshTokenStr = jwtService.createRefreshToken(user.getId(), userAgentDto);
 
         RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
+                .userAgent(userAgentDto.toEntity(user))
                 .tokenValue(refreshTokenStr)
                 .expiresAt(timeGeneratorService.now().plus(jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS))
                 .build();
@@ -121,7 +117,6 @@ public class LoginUsecase {
         refreshTokenRepository.save(refreshToken);
 
         return LoginResult.builder()
-                .httpStatus(HttpStatus.OK)
                 .accessToken(accessToken)
                 .refreshToken(refreshTokenStr)
                 .build();

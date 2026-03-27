@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
@@ -69,7 +68,6 @@ class SearchBusinessUsecaseTest {
         SearchBusinessResult result = searchBusinessUsecase.search(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBusinesses()).isNotNull();
         assertThat(result.getBusinesses().getTotalElements()).isEqualTo(1);
         
@@ -101,7 +99,6 @@ class SearchBusinessUsecaseTest {
         SearchBusinessResult result = searchBusinessUsecase.search(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBusinesses()).isNotNull();
         assertThat(result.getBusinesses().isEmpty()).isTrue();
         assertThat(result.getBusinesses().getTotalElements()).isEqualTo(0);
@@ -120,8 +117,6 @@ class SearchBusinessUsecaseTest {
         SearchBusinessResult result = searchBusinessUsecase.search(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Keyword must not be empty");
         assertThat(result.getBusinesses()).isNull();
         verifyNoInteractions(businessRepository);
     }
@@ -138,8 +133,6 @@ class SearchBusinessUsecaseTest {
         SearchBusinessResult result = searchBusinessUsecase.search(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Keyword must not be empty");
         assertThat(result.getBusinesses()).isNull();
         verifyNoInteractions(businessRepository);
     }

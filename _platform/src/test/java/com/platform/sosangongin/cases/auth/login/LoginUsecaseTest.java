@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +75,6 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getAccessToken()).isNull();
         assertThat(result.getRefreshToken()).isNull();
         assertThat(userRepository.findByPhoneNumber("010-1234-5678")).isPresent();
@@ -110,7 +108,6 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getAccessToken()).isEqualTo(null);
         assertThat(result.getRefreshToken()).isEqualTo(null);
 
@@ -140,7 +137,6 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getAccessToken()).isNull();
         assertThat(result.getRefreshToken()).isNull();
 
@@ -194,11 +190,9 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getAccessToken()).isEqualTo(mockAccessToken);   // 토큰 발급 확인
         assertThat(result.getRefreshToken()).isEqualTo(mockRefreshToken); // 토큰 발급 확인
         assertThat(result.getUserId()).isNull(); // 성공 시에는 보통 userId를 따로 주지 않음 (토큰에 포함됨)
-        assertThat(result.getNextUrl()).isNull(); // 다음 스텝 URL이 없어야 함
 
         // 4. 보안 및 저장 로직 검증
         // 기존 토큰 삭제 여부 확인
