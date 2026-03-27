@@ -1,7 +1,5 @@
-package com.platform.sosangongin.api.controllers.auth;
+package com.platform.sosangongin.api.controllers.auth.token;
 
-import com.platform.sosangongin.api.controllers.dto.RefreshTokenApiRequest;
-import com.platform.sosangongin.api.controllers.dto.RefreshTokenApiResponse;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenUsecase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

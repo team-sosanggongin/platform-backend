@@ -1,6 +1,5 @@
-package com.platform.sosangongin.api.controllers;
+package com.platform.sosangongin.api.controllers.auth.login;
 
-import com.platform.sosangongin.api.controllers.dto.*;
 import com.platform.sosangongin.cases.auth.login.LoginUsecase;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecase;
 import io.swagger.v3.oas.annotations.Operation;

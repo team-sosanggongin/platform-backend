@@ -1,4 +1,4 @@
-package com.platform.sosangongin.api.controllers.dto;
+package com.platform.sosangongin.api.controllers.auth.login;
 
 import com.platform.sosangongin.cases.auth.login.LoginRequest;
 import com.platform.sosangongin.domains.common.ClientPlatform;

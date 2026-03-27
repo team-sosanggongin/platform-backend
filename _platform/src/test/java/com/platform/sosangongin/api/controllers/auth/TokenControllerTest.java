@@ -1,7 +1,8 @@
 package com.platform.sosangongin.api.controllers.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.platform.sosangongin.api.controllers.dto.RefreshTokenApiRequest;
+import com.platform.sosangongin.api.controllers.auth.token.RefreshTokenApiRequest;
+import com.platform.sosangongin.api.controllers.auth.token.TokenController;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenFailureReason;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenResult;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenUsecase;

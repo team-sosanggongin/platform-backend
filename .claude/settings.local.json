@@ -17,7 +17,13 @@
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\" --tests \"com.platform.sosangongin.api.controllers.app.AppVersionControllerTest\")",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\")",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.status.CheckAppStatusUsecaseTest\" --stacktrace)",
-      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.auth.login.LoginUsecaseTest\")"
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.auth.login.LoginUsecaseTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.auth.token.RefreshTokenUsecaseTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.auth.token.RefreshTokenUsecaseTest\" --tests \"com.platform.sosangongin.services.jwt.JwtServiceTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\" --stacktrace)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\")",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\" --info)"
     ]
   }
 }

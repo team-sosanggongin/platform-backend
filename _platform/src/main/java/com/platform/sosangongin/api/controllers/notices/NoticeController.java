@@ -1,7 +1,5 @@
-package com.platform.sosangongin.api.controllers;
+package com.platform.sosangongin.api.controllers.notices;
 
-import com.platform.sosangongin.api.controllers.dto.PublicNoticeDetailApiResponse;
-import com.platform.sosangongin.api.controllers.dto.PublicNoticeListApiResponse;
 import com.platform.sosangongin.cases.notices.PublicNoticeRequest;
 import com.platform.sosangongin.cases.notices.PublicNoticeUseCase;
 import io.swagger.v3.oas.annotations.Operation;

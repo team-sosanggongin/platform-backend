@@ -1,4 +1,4 @@
-package com.platform.sosangongin.api.controllers.dto;
+package com.platform.sosangongin.api.controllers.auth.token;
 
 import com.platform.sosangongin.cases.auth.token.RefreshTokenFailureReason;
 import com.platform.sosangongin.cases.auth.token.RefreshTokenResult;

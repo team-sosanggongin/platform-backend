@@ -1,4 +1,4 @@
-package com.platform.sosangongin.api.controllers.dto;
+package com.platform.sosangongin.api.controllers.auth.login;
 
 import com.platform.sosangongin.cases.auth.login.LoginResult;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.platform.sosangongin.api.controllers.dto;
+package com.platform.sosangongin.api.controllers.notices;
 
 import com.platform.sosangongin.cases.notices.PublicNoticeDetailResult;
 import com.platform.sosangongin.cases.notices.PublicNoticeVo;

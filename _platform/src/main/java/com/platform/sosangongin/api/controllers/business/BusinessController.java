@@ -1,8 +1,5 @@
-package com.platform.sosangongin.api.controllers;
+package com.platform.sosangongin.api.controllers.business;
 
-import com.platform.sosangongin.api.controllers.dto.JoinBusinessApiRequest;
-import com.platform.sosangongin.api.controllers.dto.JoinBusinessApiResponse;
-import com.platform.sosangongin.api.controllers.dto.SearchBusinessApiResponse;
 import com.platform.sosangongin.api.resolver.LoginUser;
 import com.platform.sosangongin.cases.registration.JoinBusinessUsecase;
 import com.platform.sosangongin.cases.search.SearchBusinessRequest;

@@ -1,4 +1,4 @@
-package com.platform.sosangongin.api.controllers.dto;
+package com.platform.sosangongin.api.controllers.business;
 
 import com.platform.sosangongin.domains.business.BusinessDto;
 import com.platform.sosangongin.cases.search.SearchBusinessResult;
