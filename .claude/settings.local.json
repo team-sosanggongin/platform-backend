@@ -5,7 +5,12 @@
       "Bash(./gradlew :_platform:compileJava)",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.services.fcm.FcmPushServiceImplTest\")",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.cases.app.CheckAppStatusUsecaseTest\" --tests \"com.platform.sosangongin.api.controllers.AppControllerTest\")",
-      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.NoticeControllerTest\")"
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.NoticeControllerTest\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(./gradlew :_platform:compileTestJava)",
+      "Bash(git add:*)",
+      "Bash(xargs -0 git add)",
+      "Bash(git commit:*)"
     ]
   }
 }
