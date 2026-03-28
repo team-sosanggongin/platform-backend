@@ -10,33 +10,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * 로그인 실패 (아이디/비밀번호 불일치) 등 잘못된 인자로 요청 시 발생
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleEntityNotFound(EntityNotFoundException e) {
+        log.warn("엔티티 조회 실패: {}", e.getMessage());
+        return ErrorResponse.builder()
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
-        log.warn("로그인 실패: {}", e.getMessage());
+    public ErrorResponse handleInvalidCredentials(InvalidCredentialsException e) {
+        log.warn("인증 실패: {}", e.getMessage());
         return ErrorResponse.builder()
                 .message(e.getMessage())
                 .build();
     }
 
-    /**
-     * 잠긴 계정으로 로그인 시도 등 부적절한 상태에서 요청 시 발생
-     */
-    @ExceptionHandler(IllegalStateException.class)
+    @ExceptionHandler(AccountLockedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleIllegalStateException(IllegalStateException e) {
-        log.warn("접근 거부: {}", e.getMessage());
+    public ErrorResponse handleAccountLocked(AccountLockedException e) {
+        log.warn("잠긴 계정 접근: {}", e.getMessage());
         return ErrorResponse.builder()
                 .message(e.getMessage())
                 .build();
     }
 
-    /**
-     * 처리되지 않은 나머지 예외들을 처리
-     */
+    @ExceptionHandler(BackofficeBusinessError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBusinessError(BackofficeBusinessError e) {
+        log.warn("비즈니스 오류: {}", e.getMessage());
+        return ErrorResponse.builder()
+                .message(e.getMessage())
+                .build();
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {

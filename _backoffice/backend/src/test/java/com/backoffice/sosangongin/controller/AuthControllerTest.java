@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -53,14 +55,17 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 성공: 200 OK 반환")
+    @DisplayName("로그인 성공: 200 OK + LoginResponse 반환")
     void login_success() throws Exception {
         LoginRequest request = new LoginRequest("testuser", "password123");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountId").value(testAccount.getId().toString()))
+                .andExpect(jsonPath("$.name").value("테스트관리자"))
+                .andExpect(jsonPath("$.passwordExpired").value(false));
     }
 
     @Test
@@ -113,5 +118,31 @@ class AuthControllerTest {
         // then: 실패 횟수 초기화 검증
         BackofficeAdmin accountAfterSuccess = adminRepository.findById(testAccount.getId()).get();
         assertEquals(0, accountAfterSuccess.getFailedLoginAttempts());
+    }
+
+    @Test
+    @DisplayName("GET /me: 로그인 후 세션으로 내 정보 조회 성공")
+    void me_success_afterLogin() throws Exception {
+        LoginRequest request = new LoginRequest("testuser", "password123");
+
+        var loginResult = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var session = loginResult.getRequest().getSession();
+
+        mockMvc.perform(get("/api/auth/me").session((org.springframework.mock.web.MockHttpSession) session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountId").value(testAccount.getId().toString()))
+                .andExpect(jsonPath("$.name").value("테스트관리자"));
+    }
+
+    @Test
+    @DisplayName("GET /me: 세션 없으면 401")
+    void me_fail_noSession() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
     }
 }

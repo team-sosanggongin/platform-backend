@@ -2,10 +2,7 @@ package com.backoffice.sosangongin.domains.loginHistory;
 
 import com.backoffice.sosangongin.domains.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +10,8 @@ import java.util.UUID;
 @Table(name = "admin_login_history")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class AdminLoginHistory extends BaseEntity {
 
     @Id
@@ -28,12 +27,4 @@ public class AdminLoginHistory extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isSuccess;
-
-    @Builder
-    public AdminLoginHistory(UUID accountId, String ipAddress, String userAgent, boolean isSuccess) {
-        this.accountId = accountId;
-        this.ipAddress = ipAddress;
-        this.userAgent = userAgent;
-        this.isSuccess = isSuccess;
-    }
 }

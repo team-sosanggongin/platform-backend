@@ -2,18 +2,19 @@ package com.backoffice.sosangongin.cases.auth;
 
 import com.backoffice.sosangongin.domains.account.BackofficeAdmin;
 import com.backoffice.sosangongin.domains.account.BackofficeAdminRepository;
+import com.backoffice.sosangongin.errors.AccountLockedException;
+import com.backoffice.sosangongin.errors.InvalidCredentialsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.mock.web.MockHttpSession;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -30,13 +31,9 @@ class LoginUsecaseTest {
     private PasswordEncoder passwordEncoder;
 
     private BackofficeAdmin testAccount;
-    private MockHttpSession session;
-    private MockHttpServletRequest request;
 
     @BeforeEach
     void setup() {
-        session = new MockHttpSession();
-        request = new MockHttpServletRequest();
         testAccount = BackofficeAdmin.builder()
                 .loginId("testuser")
                 .name("테스트관리자")
@@ -49,28 +46,24 @@ class LoginUsecaseTest {
     }
 
     @Test
-    @DisplayName("로그인 성공: 세션에 ACCOUNT_ID가 저장되고, 실패 횟수가 초기화된다")
-    void login_success_setsSessionAndResetsAttempts() {
-        // given
+    @DisplayName("로그인 성공: BackofficeAdmin이 반환되고, 실패 횟수가 초기화된다")
+    void login_success_returnsAdminAndResetsAttempts() {
         testAccount.incrementFailedLoginAttempts();
         adminRepository.save(testAccount);
 
-        // when
-        LoginResult result = loginUsecase.login("testuser", "password123", request, session);
+        BackofficeAdmin result = loginUsecase.login("testuser", "password123", "127.0.0.1", "Test-Agent");
 
-        // then
-        assertNotNull(session.getAttribute("ACCOUNT_ID"));
-        assertEquals(testAccount.getId(), session.getAttribute("ACCOUNT_ID"));
-        assertFalse(result.isPasswordExpired());
+        assertThat(result.getId()).isEqualTo(testAccount.getId());
+        assertThat(result.getName()).isEqualTo("테스트관리자");
+        assertThat(result.isPasswordExpired()).isFalse();
 
         BackofficeAdmin freshAccount = adminRepository.findById(testAccount.getId()).get();
-        assertEquals(0, freshAccount.getFailedLoginAttempts());
+        assertThat(freshAccount.getFailedLoginAttempts()).isZero();
     }
 
     @Test
     @DisplayName("로그인 성공 (비밀번호 만료): passwordExpired가 true로 반환된다")
     void login_success_passwordExpired_returnsTrue() {
-        // given
         BackofficeAdmin expiredAccount = BackofficeAdmin.builder()
                 .loginId("expireduser")
                 .name("만료관리자")
@@ -79,54 +72,51 @@ class LoginUsecaseTest {
                 .build();
         adminRepository.save(expiredAccount);
 
-        // when
-        LoginResult result = loginUsecase.login("expireduser", "password123", request, session);
+        BackofficeAdmin result = loginUsecase.login("expireduser", "password123", "127.0.0.1", "Test-Agent");
 
-        // then
-        assertNotNull(session.getAttribute("ACCOUNT_ID"));
-        assertTrue(result.isPasswordExpired());
+        assertThat(result.isPasswordExpired()).isTrue();
     }
 
     @Test
-    @DisplayName("로그인 실패: 잘못된 비밀번호 입력 시 예외가 발생하고, 실패 횟수가 증가한다")
-    void login_fail_wrongPassword_throwsExceptionAndIncrementsAttempts() {
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> loginUsecase.login("testuser", "wrongpassword", request, session));
+    @DisplayName("로그인 실패: 잘못된 비밀번호 입력 시 InvalidCredentialsException, 실패 횟수 증가")
+    void login_fail_wrongPassword_throwsInvalidCredentials() {
+        assertThatThrownBy(() -> loginUsecase.login("testuser", "wrongpassword", "127.0.0.1", "Test-Agent"))
+                .isInstanceOf(InvalidCredentialsException.class);
 
         BackofficeAdmin freshAccount = adminRepository.findById(testAccount.getId()).get();
-        assertEquals(1, freshAccount.getFailedLoginAttempts());
+        assertThat(freshAccount.getFailedLoginAttempts()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("로그인 실패: 존재하지 않는 아이디로 InvalidCredentialsException")
+    void login_fail_unknownUser_throwsInvalidCredentials() {
+        assertThatThrownBy(() -> loginUsecase.login("unknown", "password123", "127.0.0.1", "Test-Agent"))
+                .isInstanceOf(InvalidCredentialsException.class);
     }
 
     @Test
     @DisplayName("로그인 5회 실패: 계정이 잠금 처리된다")
     void login_fail_fiveTimes_locksAccount() {
-        // given
-        for (int i = 0; i < 4; i++) {
-            assertThrows(IllegalArgumentException.class,
-                    () -> loginUsecase.login("testuser", "wrongpassword", request, session));
+        for (int i = 0; i < 5; i++) {
+            try {
+                loginUsecase.login("testuser", "wrongpassword", "127.0.0.1", "Test-Agent");
+            } catch (InvalidCredentialsException ignored) {
+            }
         }
 
-        // when: 5번째 실패
-        assertThrows(IllegalArgumentException.class,
-                () -> loginUsecase.login("testuser", "wrongpassword", request, session));
-
-        // then
         BackofficeAdmin lockedAccount = adminRepository.findById(testAccount.getId()).get();
-        assertTrue(lockedAccount.isLocked());
-        assertEquals(5, lockedAccount.getFailedLoginAttempts());
-        assertNotNull(lockedAccount.getLockedAt());
+        assertThat(lockedAccount.isLocked()).isTrue();
+        assertThat(lockedAccount.getFailedLoginAttempts()).isEqualTo(5);
+        assertThat(lockedAccount.getLockedAt()).isNotNull();
     }
 
     @Test
-    @DisplayName("잠긴 계정 로그인 시도: IllegalStateException 예외가 발생한다")
-    void login_fail_lockedAccount_throwsIllegalStateException() {
-        // given
+    @DisplayName("잠긴 계정 로그인 시도: AccountLockedException")
+    void login_fail_lockedAccount_throwsAccountLocked() {
         testAccount.lockAccount();
         adminRepository.save(testAccount);
 
-        // when & then
-        assertThrows(IllegalStateException.class,
-                () -> loginUsecase.login("testuser", "password123", request, session));
+        assertThatThrownBy(() -> loginUsecase.login("testuser", "password123", "127.0.0.1", "Test-Agent"))
+                .isInstanceOf(AccountLockedException.class);
     }
 }
