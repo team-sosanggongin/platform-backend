@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Container, Form } from '../../../../components';
+import { api } from '@/lib/api';
 import styles from './change-password.module.css';
 
 interface Requirements {
@@ -21,23 +22,37 @@ const allMet = (req: Requirements) => Object.values(req).every(Boolean);
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const req = checkRequirements(password);
   const passwordsMatch = password === confirm;
   const confirmTouched = confirm.length > 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    if (!allMet(req) || !passwordsMatch || !confirm) return;
+    setErrorMsg('');
 
-    // TODO: API 호출
-    router.push('/verify');
+    if (!currentPassword || !allMet(req) || !passwordsMatch || !confirm) return;
+
+    const res = await api.post('/api/auth/change-password', {
+      currentPassword,
+      newPassword: password,
+    });
+
+    if (res.ok) {
+      router.push('/backoffice');
+      return;
+    }
+
+    setErrorMsg(res.message ?? '비밀번호 변경에 실패했습니다.');
   };
 
   const EyeIcon = ({ open }: { open: boolean }) => (
@@ -92,6 +107,36 @@ export default function ChangePasswordPage() {
         </div>
 
         <Form onSubmit={handleSubmit}>
+          <div className={styles.passwordWrapper}>
+            <input
+              id="current-password"
+              type={showCurrent ? 'text' : 'password'}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="현재 비밀번호 (임시 비밀번호)"
+              style={{
+                width: '100%',
+                height: 38,
+                padding: '0 44px 0 12px',
+                border: `1px solid ${submitted && !currentPassword ? '#ef4444' : '#e2e8f0'}`,
+                borderRadius: 6,
+                fontSize: 14,
+                marginBottom: 16,
+                boxSizing: 'border-box',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+            <button
+              type="button"
+              className={styles.toggleBtn}
+              onClick={() => setShowCurrent((v) => !v)}
+              tabIndex={-1}
+            >
+              <EyeIcon open={showCurrent} />
+            </button>
+          </div>
+
           <div className={styles.passwordWrapper}>
             <input
               id="new-password"
@@ -155,6 +200,12 @@ export default function ChangePasswordPage() {
           {confirmTouched && (
             <p className={`${styles.matchMessage} ${passwordsMatch ? styles.matchOk : styles.matchFail}`}>
               {passwordsMatch ? '✓ 비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+            </p>
+          )}
+
+          {errorMsg && (
+            <p className={styles.matchFail} style={{ fontSize: '0.8rem', marginBottom: 8 }}>
+              {errorMsg}
             </p>
           )}
 

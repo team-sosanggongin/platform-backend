@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '../../molecules/Navbar/Navbar';
 import { ConfirmModal } from '../../molecules/ConfirmModal/ConfirmModal';
+import { api } from '@/lib/api';
 import styles from './Header.module.css';
 import {NavigationItem} from "@/types";
 
@@ -33,8 +34,9 @@ export const Header: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async () => {
     setIsModalOpen(false);
+    await api.post('/api/auth/logout');
     router.push('/login');
   };
 

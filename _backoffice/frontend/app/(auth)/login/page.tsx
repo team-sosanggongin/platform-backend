@@ -1,55 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Input, Button, Container, Form } from '../../../components';
+import { api } from '@/lib/api';
 import styles from './login.module.css';
 
-// 최초 로그인 유저 시뮬레이션 (실제로는 API 응답으로 판단)
-const FIRST_TIME_USERS = ['newuser', 'test123'];
-
-const MAX_ATTEMPTS = 5;
+interface LoginResponseData {
+  accountId: string;
+  name: string;
+  passwordExpired: boolean;
+}
 
 export default function LoginPage() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
-  const [failCount, setFailCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // 이미 로그인된 상태면 /backoffice로 이동
+  useEffect(() => {
+    api.get<LoginResponseData>('/api/auth/me').then((res) => {
+      if (res.ok) {
+        router.replace('/backoffice');
+      } else {
+        setLoading(false);
+      }
+    });
+  }, [router]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id || !password) return;
 
-    if (FIRST_TIME_USERS.includes(id)) {
-      router.push('/login/change-password');
+    setErrorMsg('');
+
+    const res = await api.post<LoginResponseData>('/api/auth/login', {
+      loginId: id,
+      password,
+    });
+
+    if (res.ok && res.data) {
+      if (res.data.passwordExpired) {
+        router.push('/login/change-password');
+      } else {
+        router.push('/backoffice');
+      }
       return;
     }
 
-    // Demo: password '1234' → success, anything else → failure
-    if (password === '1234') {
-      setErrorMsg('');
-      router.push('/verify');
-      return;
-    }
-
-    const newCount = failCount + 1;
-    setFailCount(newCount);
-
-    if (newCount >= MAX_ATTEMPTS) {
-      const now = Date.now();
-      const history = Array.from({ length: MAX_ATTEMPTS }, (_, i) => ({
-        attempt: i + 1,
-        time: new Date(now - (MAX_ATTEMPTS - 1 - i) * 4 * 60 * 1000).toISOString(),
-        ip: `192.168.1.${100 + i}`,
-      }));
-      sessionStorage.setItem('lockHistory', JSON.stringify({ id, history }));
+    // 403: 계정 잠금
+    if (res.status === 403) {
       router.push('/locked');
-    } else {
-      const remaining = MAX_ATTEMPTS - newCount;
-      setErrorMsg(`비밀번호가 올바르지 않습니다. (${newCount}/${MAX_ATTEMPTS}회 실패, ${remaining}회 남음)`);
+      return;
     }
+
+    // 401 등: 에러 메시지 표시
+    setErrorMsg(res.message ?? '로그인에 실패했습니다.');
   };
+
+  if (loading) return null;
 
   return (
     <Container>
@@ -88,16 +99,6 @@ export default function LoginPage() {
           />
           {errorMsg && (
             <p className={styles.errorMsg}>{errorMsg}</p>
-          )}
-          {failCount > 0 && failCount < MAX_ATTEMPTS && (
-            <div className={styles.attemptsBar}>
-              {Array.from({ length: MAX_ATTEMPTS }, (_, i) => (
-                <div
-                  key={i}
-                  className={`${styles.attemptDot} ${i < failCount ? styles.attemptFailed : ''}`}
-                />
-              ))}
-            </div>
           )}
           <Button type="submit">로그인</Button>
         </Form>
