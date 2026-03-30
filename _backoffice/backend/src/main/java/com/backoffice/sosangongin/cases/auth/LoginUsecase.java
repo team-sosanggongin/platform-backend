@@ -19,7 +19,7 @@ public class LoginUsecase {
 
     private static final int MAX_LOGIN_ATTEMPTS = 5;
 
-    @Transactional
+    @Transactional(noRollbackFor = {InvalidCredentialsException.class, AccountLockedException.class})
     public BackofficeAdmin login(String loginId, String rawPassword, String ipAddress, String userAgent) {
         BackofficeAdmin account = backofficeAdminRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new InvalidCredentialsException("아이디 또는 비밀번호가 잘못되었습니다."));
