@@ -19,15 +19,6 @@ public class BusinessMetadata extends BaseEntity {
     @Column(name = "business_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "business_id")
-    private Business business;
-
     @Embedded
     private BusinessLocation location;
-
-    public BusinessMetadata(Business business) {
-        this.business = business;
-    }
 }

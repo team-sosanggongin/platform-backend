@@ -35,12 +35,6 @@ public class Business extends SoftDeletedBaseEntity {
     @Column(name = "status", nullable = false)
     private BusinessStatus status;
 
-    @OneToOne(mappedBy = "business", cascade = CascadeType.ALL)
+    @OneToOne
     private BusinessMetadata metadata;
-
-    // 연관관계 편의 메서드
-    public void setMetadata(BusinessMetadata metadata) {
-        this.metadata = metadata;
-        metadata.setBusiness(this);
-    }
 }
