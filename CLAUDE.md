@@ -76,16 +76,19 @@ Authenticated endpoints use `@LoginUser` annotation on controller method paramet
 ### `_backoffice/backend` Structure
 
 ```
-controller/    ← AuthController, NoticeController
-cases/auth/    ← LoginUsecase (admin login with login history tracking)
-domains/       ← AccountBackoffice, AdminLoginHistory entities + repos
-gateways/      ← PlatformNoticeGateway interface + PlatformNoticeGatewayImpl (calls _platform API)
-dto/           ← Notice request/response DTOs
-config/        ← SecurityConfig, JpaAuditingConfig
-errors/        ← GlobalExceptionHandler
+controller/          ← AuthController, NoticeController
+controller/dto/      ← API 요청/응답 DTO (LoginResponse, notice/)
+cases/auth/          ← LoginUsecase, GetMyInfoUsecase, ChangePasswordUsecase
+cases/notice/        ← NoticeUsecase, CreateNoticeCommand, UpdateNoticeCommand
+domains/account/     ← BackofficeAdmin + Repository (독립 도메인, _platform과 연결 없음)
+domains/notice/      ← BackofficeNotice + Repository + NoticeContent 값 객체 (@Table("public_notice"))
+domains/loginHistory/ ← AdminLoginHistory + Service (REQUIRES_NEW 트랜잭션)
+domains/common/      ← BaseEntity, SoftDeletedBaseEntity
+config/              ← SecurityConfig, SessionManager, SessionAuthenticationFilter, CorsConfig
+errors/              ← BackofficeBusinessError 예외 계층 + GlobalExceptionHandler
 ```
 
-The backoffice backend proxies notice CRUD to the platform API via the gateway pattern.
+Notice는 `BackofficeNotice` 엔티티로 같은 DB 테이블에 직접 접근. 백오피스가 CRUD 주인, platform은 조회만.
 
 ### `_backoffice/frontend` Structure
 
