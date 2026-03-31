@@ -23,7 +23,19 @@
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest\")",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\" --stacktrace)",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\")",
-      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\" --info)"
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.controllers.auth.TokenControllerTest.refresh_success_accessTokenOnly\" --info)",
+      "Bash(find:*)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.consent.ConsentUseCaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.bankaccount.BankAccountUseCaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.role.RoleUseCaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.domains.role.PermissionDomainTest --tests com.platform.sosangongin.cases.role.RoleUseCaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.auth.login.LoginUsecaseTest)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest.entityNotFound_Returns400)",
+      "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest.entityNotFound_Returns400\" --info)",
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest --info)"
     ]
   }
 }
