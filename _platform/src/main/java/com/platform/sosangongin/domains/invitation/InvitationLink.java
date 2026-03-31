@@ -41,7 +41,7 @@ public class InvitationLink extends SoftDeletedBaseEntity {
 
     // 수락 시 부여될 다중 역할들 (Cascade 설정으로 함께 저장)
     @Builder.Default
-    @OneToMany(mappedBy = "invitation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "invitation_link", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvitationRole> invitationRoles = new ArrayList<>();
 
     @Builder.Default

@@ -9,10 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface InvitationRepository extends JpaRepository<InvitationLink, Long> {
-
-    @Query("SELECT i FROM InvitationLink i JOIN FETCH i.invitationRoles WHERE i.id = :id")
-    Optional<InvitationLink> findByIdWithRoles(@Param("id") Long id);
-
-    @Query("SELECT i FROM InvitationLink i JOIN FETCH i.invitationRoles WHERE i.invitationCode = :code")
-    Optional<InvitationLink> findByInvitationCodeWithRoles(@Param("code") String invitationCode);
 }
