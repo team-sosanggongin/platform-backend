@@ -10,10 +10,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PhoneVerificationApiRequest {
     private boolean isPhoneVerificationRequest;
-    private String userId;
     private String code;
 
     public PhoneVerificationRequest toUseCaseRequest() {
-        return new PhoneVerificationRequest(isPhoneVerificationRequest, userId, code);
+        return new PhoneVerificationRequest(isPhoneVerificationRequest, code);
     }
 }

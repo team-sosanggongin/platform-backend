@@ -43,7 +43,7 @@ class PhoneVerificationUsecaseTest {
         UUID userId = UUID.randomUUID();
         User user = new User("010-1234-5678", "Test User");
         String code = "12345";
-        PhoneVerificationRequest request = new PhoneVerificationRequest(true, userId.toString(), code);
+        PhoneVerificationRequest request = new PhoneVerificationRequest(true, code);
 
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
@@ -57,7 +57,7 @@ class PhoneVerificationUsecaseTest {
         given(timeGeneratorService.now()).willReturn(LocalDateTime.now());
 
         // when
-        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
+        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request);
 
         // then
         assertThat(user.isPhoneVerified()).isTrue();
@@ -70,14 +70,14 @@ class PhoneVerificationUsecaseTest {
         // given
         UUID userId = UUID.randomUUID();
         User user = new User("010-1234-5678", "Test User");
-        PhoneVerificationRequest request = new PhoneVerificationRequest(true, userId.toString(), "12345");
+        PhoneVerificationRequest request = new PhoneVerificationRequest(true, "12345");
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(phoneVerificationRepository.findTopByUserOrderByCreatedAtDesc(user)).willReturn(Optional.empty());
 
         // when
 
-        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
+        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request);
 
         // then
         assertThat(result).isNotNull();
@@ -89,7 +89,7 @@ class PhoneVerificationUsecaseTest {
         // given
         UUID userId = UUID.randomUUID();
         User user = new User("010-1234-5678", "Test User");
-        PhoneVerificationRequest request = new PhoneVerificationRequest(true, userId.toString(), "12345");
+        PhoneVerificationRequest request = new PhoneVerificationRequest(true, "12345");
 
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
@@ -103,7 +103,7 @@ class PhoneVerificationUsecaseTest {
         given(timeGeneratorService.now()).willReturn(LocalDateTime.now());
 
         // when
-        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
+        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request);
 
         // then
         assertThat(verification.getStatus()).isEqualTo(PhoneVerificationStatus.EXPIRED);
@@ -115,7 +115,7 @@ class PhoneVerificationUsecaseTest {
         // given
         UUID userId = UUID.randomUUID();
         User user = new User("010-1234-5678", "Test User");
-        PhoneVerificationRequest request = new PhoneVerificationRequest(true, userId.toString(), "wrong_code");
+        PhoneVerificationRequest request = new PhoneVerificationRequest(true, "wrong_code");
 
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
@@ -129,7 +129,7 @@ class PhoneVerificationUsecaseTest {
         given(timeGeneratorService.now()).willReturn(LocalDateTime.now());
 
         // when
-        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
+        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request);
 
         // then
         assertThat(result).isNotNull();
@@ -141,7 +141,7 @@ class PhoneVerificationUsecaseTest {
         // given
         UUID userId = UUID.randomUUID();
         User user = new User("010-1234-5678", "Test User");
-        PhoneVerificationRequest request = new PhoneVerificationRequest(true, userId.toString(), "12345");
+        PhoneVerificationRequest request = new PhoneVerificationRequest(true, "12345");
 
         PhoneVerification verification = PhoneVerification.builder()
                 .user(user)
@@ -154,7 +154,7 @@ class PhoneVerificationUsecaseTest {
         given(phoneVerificationRepository.findTopByUserOrderByCreatedAtDesc(user)).willReturn(Optional.of(verification));
 
         // when
-        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(request);
+        PhoneVerificationResult result = phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request);
 
         // then
         assertThat(result).isNotNull();

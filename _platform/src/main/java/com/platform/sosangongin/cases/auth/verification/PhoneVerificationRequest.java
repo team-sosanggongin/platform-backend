@@ -11,6 +11,5 @@ import lombok.ToString;
 @ToString
 public class PhoneVerificationRequest {
     private final boolean isPhoneVerificationRequest;
-    private final String userId;
     private final String code;
 }

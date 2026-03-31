@@ -28,9 +28,9 @@ public class PhoneVerificationUsecase {
     private final TimeGeneratorService timeGeneratorService;
     private final PhoneVerificationRepository phoneVerificationRepository;
 
-    public PhoneVerificationResult handlePhoneVerification(PhoneVerificationRequest req) throws EntityNotFoundException{
-        User user = userRepository.findById(UUID.fromString(req.getUserId()))
-                .orElseThrow(() -> new EntityNotFoundException(req.getUserId(), EntityType.USER, "user is not found")); // 예외 처리 예시
+    public PhoneVerificationResult handlePhoneVerification(String userId, PhoneVerificationRequest req) throws EntityNotFoundException{
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new EntityNotFoundException(userId, EntityType.USER, "user is not found"));
 
         if (user.isPhoneVerified()) {
             return errorResult();

@@ -1,11 +1,15 @@
 package com.platform.sosangongin.api.controllers.auth.login;
 
+import com.platform.sosangongin.api.resolver.LoginUser;
 import com.platform.sosangongin.cases.auth.login.LoginUsecase;
 import com.platform.sosangongin.cases.auth.verification.PhoneVerificationUsecase;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Tag(name = "Auth", description = "인증 및 인가 API")
 @RestController
@@ -25,7 +29,9 @@ public class AuthController {
 
     @Operation(summary = "휴대전화 인증 요청", description = "사용자의 휴대전화 인증을 요청하거나, 인증 코드를 검증합니다.")
     @PostMapping("/verify-phone")
-    public PhoneVerificationApiResponse verifyPhone(@RequestBody PhoneVerificationApiRequest request) {
-        return new PhoneVerificationApiResponse(phoneVerificationUsecase.handlePhoneVerification(request.toUseCaseRequest()));
+    public PhoneVerificationApiResponse verifyPhone(
+            @Parameter(hidden = true) @LoginUser UUID userId,
+            @RequestBody PhoneVerificationApiRequest request) {
+        return new PhoneVerificationApiResponse(phoneVerificationUsecase.handlePhoneVerification(userId.toString(), request.toUseCaseRequest()));
     }
 }

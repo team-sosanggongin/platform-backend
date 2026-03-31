@@ -38,4 +38,9 @@ public class Role extends BaseEntity {
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    public void update(String roleName, String description) {
+        this.roleName = roleName;
+        this.description = description;
+    }
 }
