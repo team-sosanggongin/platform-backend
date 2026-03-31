@@ -1,19 +1,21 @@
 package com.platform.sosangongin.cases.auth.token;
 
-import com.platform.sosangongin.cases.CommonResultTemplate;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
-public class RefreshTokenResult extends CommonResultTemplate {
+public class RefreshTokenResult {
+    private final boolean success;
     private final String accessToken;
     private final String refreshToken;
 
+    private final RefreshTokenFailureReason failureReason;
+
     @Builder
-    public RefreshTokenResult(HttpStatus httpStatus, String message, String accessToken, String refreshToken) {
-        super(httpStatus, message);
+    public RefreshTokenResult(boolean success, String accessToken, String refreshToken, RefreshTokenFailureReason failureReason) {
+        this.success = success;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.failureReason = failureReason;
     }
 }

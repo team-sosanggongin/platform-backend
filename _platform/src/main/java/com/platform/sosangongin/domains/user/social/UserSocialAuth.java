@@ -8,14 +8,14 @@ import lombok.*;
 
 @Entity
 @Table(name = "user_social_auths", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_social_auth_provider_user", columnNames = {"provider", "user_id"})
-})
+        @UniqueConstraint(name = "uk_user_social_auth_provider_user", columnNames = {"provider", "user_id"}),
+        @UniqueConstraint(name = "uk_provider_provider_id", columnNames = {"provider, provider_user_id"})}
+)
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSocialAuth extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +28,6 @@ public class UserSocialAuth extends BaseEntity {
     @Column(nullable = false)
     private SocialProvider provider;
 
-    @Column(name = "provider_user_id", unique = true, nullable = false)
+    @Column(name = "provider_user_id", nullable = false)
     private String providerUserId;
 }

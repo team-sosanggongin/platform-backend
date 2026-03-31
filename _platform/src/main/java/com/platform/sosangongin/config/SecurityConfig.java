@@ -20,9 +20,11 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_URLS = {
             "/api/v1/auth/**",
+            "/api/v1/token/**",
             "/api/v1/app/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
+            "/api-docs/**",
             "/swagger-resources/**",
             "/actuator/**" // Prometheus 등 Actuator 엔드포인트 허용
     };

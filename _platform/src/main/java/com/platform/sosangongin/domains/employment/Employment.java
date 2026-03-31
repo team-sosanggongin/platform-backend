@@ -1,23 +1,27 @@
 package com.platform.sosangongin.domains.employment;
 
 import com.platform.sosangongin.domains.business.Business;
-import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
+import com.platform.sosangongin.domains.employment.history.EmploymentStatusChangedEvent;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-// NOTE: (business_id, user_id) 활성 고용 중복 방지는 JPA UniqueConstraint 대신
-//       DB partial index로 처리한다. 마이그레이션에 아래 DDL을 포함해야 한다:
-//       CREATE UNIQUE INDEX uk_active_employment
-//           ON employments (business_id, user_id)
-//           WHERE deleted_at IS NULL;
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "employments")
+@Table(name = "employments", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_business",columnNames = {"user_id, business_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Employment extends SoftDeletedBaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Employment extends AbstractAggregateRoot<Employment> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +39,25 @@ public class Employment extends SoftDeletedBaseEntity {
     @Column(nullable = false)
     private EmploymentStatus status;
 
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     public Employment(User user, Business business, EmploymentStatus status) {
         this.user = user;
         this.business = business;
         this.status = status;
+    }
+
+    public void changeStatus(EmploymentStatus newStatus) {
+        if (this.status == newStatus) {
+            return;
+        }
+        registerEvent(new EmploymentStatusChangedEvent(this.id, this.status, newStatus));
+        this.status = newStatus;
     }
 }

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,8 +21,6 @@ public class SearchBusinessUsecase {
         if (request.getKeyword() == null || request.getKeyword().trim().isEmpty()) {
             log.warn("Search keyword is empty");
             return SearchBusinessResult.builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("Keyword must not be empty")
                     .build();
         }
 
@@ -37,7 +34,6 @@ public class SearchBusinessUsecase {
         Page<BusinessDto> businessDtoPage = businessPage.map(BusinessDto::from);
 
         return SearchBusinessResult.builder()
-                .httpStatus(HttpStatus.OK)
                 .businesses(businessDtoPage)
                 .build();
     }

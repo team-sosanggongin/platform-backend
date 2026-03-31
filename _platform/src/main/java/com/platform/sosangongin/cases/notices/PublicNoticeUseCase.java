@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ public class PublicNoticeUseCase {
                 .map(PublicNoticeVo::from);
 
         // 3. DTO로 변환하여 반환
-        return new PublicNoticeResult(HttpStatus.OK, "", noticePage);
+        return new PublicNoticeResult(noticePage);
     }
 
     /**
@@ -44,16 +43,12 @@ public class PublicNoticeUseCase {
 
         if(notice.isEmpty()){
             return PublicNoticeDetailResult.builder()
-                    .httpStatus(HttpStatus.NOT_FOUND)
-                    .message("notice is not found")
                     .build();
         }
 
         PublicNotice publicNotice = notice.get();
         if(!publicNotice.isDisplayable(this.timeGeneratorService.now())){
             return PublicNoticeDetailResult.builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("you can`t access this notice")
                     .build();
         }
 
@@ -62,7 +57,6 @@ public class PublicNoticeUseCase {
 
         return PublicNoticeDetailResult.builder()
                 .vo(PublicNoticeVo.from(publicNotice))
-                .httpStatus(HttpStatus.OK)
                 .build();
     }
 }

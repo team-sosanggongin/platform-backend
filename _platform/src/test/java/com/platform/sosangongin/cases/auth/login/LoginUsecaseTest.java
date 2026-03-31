@@ -1,12 +1,11 @@
 package com.platform.sosangongin.cases.auth.login;
 
+import com.platform.sosangongin.domains.common.ClientPlatform;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
-import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import com.platform.sosangongin.domains.user.social.UserSocialAuth;
 import com.platform.sosangongin.domains.user.social.UserSocialAuthRepository;
-import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.oauth.AuthResponse;
 import com.platform.sosangongin.services.oauth.OauthService;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,9 +57,6 @@ class LoginUsecaseTest {
     private JwtService mockJwtService;
 
     @MockBean
-    private JwtProperties jwtProperties;
-
-    @MockBean
     private TimeGeneratorService timeGeneratorService;
 
     @Test
@@ -76,9 +71,8 @@ class LoginUsecaseTest {
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isNull();
-        assertThat(result.getRefreshToken()).isNull();
+        assertThat(result.accessToken()).isNull();
+        assertThat(result.refreshToken()).isNull();
         assertThat(userRepository.findByPhoneNumber("010-1234-5678")).isPresent();
     }
 
@@ -103,16 +97,15 @@ class LoginUsecaseTest {
         when(mockOauthService.getAuth(eq(KAKAO), anyString()))
                 .thenReturn(new AuthResponse(KAKAO, "existing-id", "Existing User", "010-1111-2222"));
 
-        when(mockJwtService.createToken(any(UUID.class), any())).thenReturn("fake-access-token");
-        when(mockJwtService.createRefreshToken(any(UUID.class), any())).thenReturn("fake-refresh-token");
+        when(mockJwtService.createToken(any(UUID.class))).thenReturn("fake-access-token");
+        when(mockJwtService.createRefreshToken(any(UUID.class))).thenReturn("fake-refresh-token");
 
         // when
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isEqualTo(null);
-        assertThat(result.getRefreshToken()).isEqualTo(null);
+        assertThat(result.accessToken()).isEqualTo(null);
+        assertThat(result.refreshToken()).isEqualTo(null);
 
         // 전화번호 인증이 끝나지 않았기 때문에, 토큰은 생성되지 않음
         Optional<RefreshToken> savedRefreshToken = refreshTokenRepository.findAll().stream().findFirst();
@@ -133,16 +126,15 @@ class LoginUsecaseTest {
         when(mockOauthService.getAuth(eq(KAKAO), anyString()))
                 .thenReturn(new AuthResponse(KAKAO, "new-social-id", "Existing User", "010-3333-4444"));
 
-        when(mockJwtService.createToken(any(UUID.class), any())).thenReturn("new-access-token");
-        when(mockJwtService.createRefreshToken(any(UUID.class), any())).thenReturn("new-refresh-token");
+        when(mockJwtService.createToken(any(UUID.class))).thenReturn("new-access-token");
+        when(mockJwtService.createRefreshToken(any(UUID.class))).thenReturn("new-refresh-token");
 
         // when
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isNull();
-        assertThat(result.getRefreshToken()).isNull();
+        assertThat(result.accessToken()).isNull();
+        assertThat(result.refreshToken()).isNull();
 
         // 새로운 소셜 정보가 저장되었는지 확인
         Assertions.assertNotNull(userSocialAuthRepository.findByProviderAndProviderUserId(KAKAO, "new-social-id"));
@@ -183,22 +175,18 @@ class LoginUsecaseTest {
         // 3. 토큰 발급 및 시간 설정 Mocking
         String mockAccessToken = "mock.access.token";
         String mockRefreshToken = "mock.refresh.token";
-        long expirationMillis = 3600000L; // 1시간
 
-        given(mockJwtService.createToken(any(), any())).willReturn(mockAccessToken);
-        given(mockJwtService.createRefreshToken(any(), any())).willReturn(mockRefreshToken);
+        given(mockJwtService.createToken(any(UUID.class))).willReturn(mockAccessToken);
+        given(mockJwtService.createRefreshToken(any(UUID.class))).willReturn(mockRefreshToken);
         given(this.timeGeneratorService.now()).willReturn(now);
-        given(this.jwtProperties.getRefreshTokenExpirationTime()).willReturn(expirationMillis);
 
         // when
         LoginResult result = loginUsecase.loginAfterSocialEvent(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(result.getAccessToken()).isEqualTo(mockAccessToken);   // 토큰 발급 확인
-        assertThat(result.getRefreshToken()).isEqualTo(mockRefreshToken); // 토큰 발급 확인
-        assertThat(result.getUserId()).isNull(); // 성공 시에는 보통 userId를 따로 주지 않음 (토큰에 포함됨)
-        assertThat(result.getNextUrl()).isNull(); // 다음 스텝 URL이 없어야 함
+        assertThat(result.accessToken()).isEqualTo(mockAccessToken);   // 토큰 발급 확인
+        assertThat(result.refreshToken()).isEqualTo(mockRefreshToken); // 토큰 발급 확인
+        // 성공 시에는 userId를 따로 주지 않음 (토큰에 포함됨)
 
         // 4. 보안 및 저장 로직 검증
         // 기존 토큰 삭제 여부 확인
@@ -208,7 +196,6 @@ class LoginUsecaseTest {
     }
 
     private static LoginRequest getLoginRequest(String code, SocialProvider provider) {
-        LoginRequest request = new LoginRequest(code, provider, new UserAgentDto());
-        return request;
+        return new LoginRequest(code, provider, ClientPlatform.ANDROID, "TestDevice");
     }
 }
