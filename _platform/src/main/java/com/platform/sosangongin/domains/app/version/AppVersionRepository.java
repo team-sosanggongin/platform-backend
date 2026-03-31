@@ -10,5 +10,4 @@ public interface AppVersionRepository extends JpaRepository<AppVersion, UUID> {
 
     Optional<AppVersion> findTopByPlatformOrderByCreatedAtDesc(ClientPlatform platform);
 
-    boolean existsByPlatformAndMinSupportedVersionCodeLessThanEqual(ClientPlatform platform, int clientVersionCode);
 }
