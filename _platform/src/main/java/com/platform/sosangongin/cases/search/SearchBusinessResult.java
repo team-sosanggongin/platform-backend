@@ -1,20 +1,17 @@
 package com.platform.sosangongin.cases.search;
 
-import com.platform.sosangongin.cases.CommonResultTemplate;
 import com.platform.sosangongin.domains.business.BusinessDto;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 
 @Getter
-public class SearchBusinessResult extends CommonResultTemplate {
+public class SearchBusinessResult {
 
     private final Page<BusinessDto> businesses;
 
     @Builder
-    public SearchBusinessResult(HttpStatus httpStatus, String message, Page<BusinessDto> businesses) {
-        super(httpStatus, message);
+    public SearchBusinessResult(Page<BusinessDto> businesses) {
         this.businesses = businesses;
     }
 }

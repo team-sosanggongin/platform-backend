@@ -1,37 +1,36 @@
 package com.platform.sosangongin.cases.auth.token;
 
+import com.platform.sosangongin.domains.common.ClientPlatform;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.errors.InvalidTokenException;
-import com.platform.sosangongin.errors.InvalidTokenUsage;
-import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
-import io.jsonwebtoken.security.SignatureException;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenUsecaseTest {
+
+    @InjectMocks
+    private RefreshTokenUsecase refreshTokenUsecase;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -40,121 +39,176 @@ class RefreshTokenUsecaseTest {
     @Mock
     private JwtService jwtService;
     @Mock
-    private JwtProperties jwtProperties;
+    private TimeGeneratorService timeGeneratorService;
 
-    @Mock
-    TimeGeneratorService timeGeneratorService;
+    private UUID userId;
+    private User user;
+    private static final String REQUEST_TOKEN = "valid-refresh-token";
+    private static final ClientPlatform AGENT_TYPE = ClientPlatform.ANDROID;
+    private static final String DEVICE_INFO = "Galaxy S24";
+    private static final LocalDateTime NOW = LocalDateTime.of(2026, 3, 27, 12, 0);
 
-    @InjectMocks
-    private RefreshTokenUsecase refreshTokenUsecase;
+    @BeforeEach
+    void setUp() {
+        userId = UUID.randomUUID();
+        user = User.builder().id(userId).name("테스트유저").phoneNumber("01012345678").build();
+    }
+
+    private RefreshTokenRequest createRequest() {
+        return RefreshTokenRequest.builder()
+                .refreshToken(REQUEST_TOKEN)
+                .agentType(AGENT_TYPE)
+                .deviceInfo(DEVICE_INFO)
+                .build();
+    }
+
+    private RefreshToken createRefreshToken(LocalDateTime expiresAt) {
+        return RefreshToken.builder()
+                .tokenValue(REQUEST_TOKEN)
+                .user(user)
+                .agentType(AGENT_TYPE)
+                .deviceInfo(DEVICE_INFO)
+                .expiresAt(expiresAt)
+                .build();
+    }
 
     @Test
-    @DisplayName("토큰 재발급 성공")
-    void reissue_Success() {
+    @DisplayName("정상 요청 시 accessToken만 발급하고 success=true를 반환한다")
+    void reissue_success_accessTokenOnly() {
         // given
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId); // ID 설정
+        RefreshToken token = createRefreshToken(NOW.plusDays(5));
 
-        String oldRefreshToken = "old-refresh-token";
-        RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(oldRefreshToken).build();
-
-        RefreshToken storedToken = RefreshToken.builder()
-                .user(user)
-                .tokenValue(oldRefreshToken)
-                .expiresAt(LocalDateTime.now().plusDays(1))
-                .build();
-
-        given(jwtService.getUserIdFromToken(oldRefreshToken)).willReturn(userId);
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(storedToken));
-        given(jwtService.createToken(any(UUID.class), any())).willReturn("new-access-token");
-        given(jwtService.createRefreshToken(any(UUID.class), any())).willReturn("new-refresh-token");
-        given(this.timeGeneratorService.now()).willReturn(LocalDateTime.now());
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(token));
+        given(timeGeneratorService.now()).willReturn(NOW);
+        given(jwtService.createToken(any(UUID.class))).willReturn("new-access-token");
+
         // when
-        RefreshTokenResult result = refreshTokenUsecase.reissue(request);
+        RefreshTokenResult result = refreshTokenUsecase.reissue(createRequest());
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getAccessToken()).isEqualTo("new-access-token");
+        assertThat(result.getRefreshToken()).isNull();
+        assertThat(result.getFailureReason()).isNull();
+    }
+
+    @Test
+    @DisplayName("refreshToken 만료 임박 시 refreshToken도 함께 재발급한다")
+    void reissue_success_withRefreshTokenRenewal() {
+        // given
+        RefreshToken token = createRefreshToken(NOW.plusHours(5)); // 5시간 남음 (10시간 미만)
+
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(token));
+        given(timeGeneratorService.now()).willReturn(NOW);
+        given(jwtService.createToken(any(UUID.class))).willReturn("new-access-token");
+        given(jwtService.createRefreshToken(any(UUID.class))).willReturn("new-refresh-token");
+
+        // when
+        RefreshTokenResult result = refreshTokenUsecase.reissue(createRequest());
+
+        // then
+        assertThat(result.isSuccess()).isTrue();
         assertThat(result.getAccessToken()).isEqualTo("new-access-token");
         assertThat(result.getRefreshToken()).isEqualTo("new-refresh-token");
-        verify(refreshTokenRepository).delete(storedToken);
         verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
 
     @Test
-    @DisplayName("실패: 유효하지 않은 토큰 형식")
-    void reissue_Fail_InvalidTokenFormat() {
+    @DisplayName("DB에 refreshToken이 없으면 TOKEN_NOT_FOUND를 반환한다")
+    void reissue_fail_tokenNotFound() {
         // given
-        String invalidToken = "not-a-jwt";
-        RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(invalidToken).build();
-        given(jwtService.getUserIdFromToken(invalidToken)).willThrow(new InvalidTokenException("",invalidToken, InvalidTokenUsage.INVALID_FORMAT));
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.empty());
 
         // when
-        InvalidTokenException invalidTokenException = Assertions.assertThrows(InvalidTokenException.class, () -> refreshTokenUsecase.reissue(request));
+        RefreshTokenResult result = refreshTokenUsecase.reissue(createRequest());
 
         // then
-        assertThat(invalidTokenException.getOriginalRefreshToken()).contains(invalidToken);
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureReason()).isEqualTo(RefreshTokenFailureReason.TOKEN_NOT_FOUND);
     }
 
     @Test
-    @DisplayName("실패: 토큰 재사용 의심")
-    void reissue_Fail_TokenMismatch() {
+    @DisplayName("refreshToken이 만료되었으면 TOKEN_EXPIRED를 반환하고 토큰을 삭제한다")
+    void reissue_fail_tokenExpired() {
         // given
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId);
+        RefreshToken expiredToken = createRefreshToken(NOW.minusHours(1));
 
-        String requestToken = "used-token"; // 재사용 시도 토큰
-        String latestTokenValue = "latest-token"; // DB에 있는 최신 토큰
-        RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(requestToken).build();
-
-        RefreshToken latestToken = RefreshToken.builder()
-                .user(user)
-                .tokenValue(latestTokenValue)
-                .expiresAt(LocalDateTime.now().plusDays(1))
-                .build();
-
-        given(jwtService.getUserIdFromToken(requestToken)).willReturn(userId);
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(latestToken));
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(expiredToken));
+        given(timeGeneratorService.now()).willReturn(NOW);
 
         // when
-        InvalidTokenException invalidTokenException = Assertions.assertThrows(InvalidTokenException.class, () -> refreshTokenUsecase.reissue(request));
-        Assertions.assertEquals(requestToken, invalidTokenException.getOriginalRefreshToken());
+        RefreshTokenResult result = refreshTokenUsecase.reissue(createRequest());
 
-
-        verify(refreshTokenRepository).deleteAllByUser(user); // 모든 토큰 삭제
+        // then
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureReason()).isEqualTo(RefreshTokenFailureReason.TOKEN_EXPIRED);
+        verify(refreshTokenRepository).delete(expiredToken);
     }
 
     @Test
-    @DisplayName("실패: 만료된 토큰")
-    void reissue_Fail_ExpiredToken() {
+    @DisplayName("기기 정보가 다르면 DEVICE_MISMATCH를 반환한다")
+    void reissue_fail_deviceMismatch() {
         // given
-        UUID userId = UUID.randomUUID();
-        User user = User.builder().build();
-        ReflectionTestUtils.setField(user, "id", userId);
-
-        String expiredToken = "expired-token";
-        RefreshTokenRequest request = RefreshTokenRequest.builder().refreshToken(expiredToken).build();
-
-        RefreshToken storedToken = RefreshToken.builder()
+        RefreshToken token = RefreshToken.builder()
+                .tokenValue(REQUEST_TOKEN)
                 .user(user)
-                .tokenValue(expiredToken)
-                .expiresAt(LocalDateTime.now().minusDays(1)) // 만료됨
+                .agentType(ClientPlatform.IOS)
+                .deviceInfo("iPhone 15")
+                .expiresAt(NOW.plusDays(5))
                 .build();
 
-        given(jwtService.getUserIdFromToken(expiredToken)).willReturn(userId);
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(storedToken));
-        given(this.timeGeneratorService.now()).willReturn(LocalDateTime.now());
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(token));
+        given(timeGeneratorService.now()).willReturn(NOW);
 
         // when
-        RefreshTokenResult result = refreshTokenUsecase.reissue(request);
+        RefreshTokenResult result = refreshTokenUsecase.reissue(createRequest());
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(result.getMessage()).contains("Refresh token expired");
-        verify(refreshTokenRepository).delete(storedToken);
+        assertThat(result.isSuccess()).isFalse();
+        assertThat(result.getFailureReason()).isEqualTo(RefreshTokenFailureReason.DEVICE_MISMATCH);
+    }
+
+    @Test
+    @DisplayName("토큰 값이 불일치하면 토큰 재사용으로 간주하여 예외를 던지고 전체 토큰을 삭제한다")
+    void reissue_throw_tokenReused() {
+        // given
+        RefreshToken token = RefreshToken.builder()
+                .tokenValue("different-token-value")
+                .user(user)
+                .agentType(AGENT_TYPE)
+                .deviceInfo(DEVICE_INFO)
+                .expiresAt(NOW.plusDays(5))
+                .build();
+
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)).willReturn(Optional.of(token));
+
+        // when & then
+        assertThatThrownBy(() -> refreshTokenUsecase.reissue(createRequest()))
+                .isInstanceOf(InvalidTokenException.class);
+        verify(refreshTokenRepository).deleteAllByUser(user);
+    }
+
+    @Test
+    @DisplayName("토큰 안의 userId로 유저를 못 찾으면 예외를 던진다")
+    void reissue_throw_userNotFound() {
+        // given
+        given(jwtService.getUserIdFromToken(REQUEST_TOKEN)).willReturn(userId);
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> refreshTokenUsecase.reissue(createRequest()))
+                .isInstanceOf(InvalidTokenException.class);
     }
 }

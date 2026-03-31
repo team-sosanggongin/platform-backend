@@ -12,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +57,6 @@ class PublicNoticeUseCaseTest {
         PublicNoticeResult result = publicNoticeUseCase.getNoticeList(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getPublicNotices().getContent()).hasSize(1);
         verify(noticeRepository).findActiveNotices(fixedNow, pageable);
     }
@@ -81,7 +78,6 @@ class PublicNoticeUseCaseTest {
         PublicNoticeDetailResult result = publicNoticeUseCase.getNoticeDetail(noticeId);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
         assertThat(result.getPublicNotice().viewCount()).isEqualTo(initialViewCount + 1);
 
         // 중요: 도메인 메서드가 호출되었는지 검증 (더티 체킹에 의해 DB 반영 예정)
@@ -103,8 +99,7 @@ class PublicNoticeUseCaseTest {
         PublicNoticeDetailResult result = publicNoticeUseCase.getNoticeDetail(noticeId);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("you can`t access");
+        assertThat(result.getPublicNotice()).isNull();
     }
 
     @Test
@@ -118,7 +113,7 @@ class PublicNoticeUseCaseTest {
         PublicNoticeDetailResult result = publicNoticeUseCase.getNoticeDetail(noticeId);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(result.getPublicNotice()).isNull();
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.platform.sosangongin.domains.business;
 
+import com.platform.sosangongin.domains.business.location.BusinessMetadata;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,9 +21,6 @@ public class BusinessDto {
                 .bizName(business.getBizName())
                 .bizType(business.getBizType().name())
                 .status(business.getStatus().name());
-
-        BusinessMetadata metadata = business.getMetadata();
-
         return builder.build();
     }
 }

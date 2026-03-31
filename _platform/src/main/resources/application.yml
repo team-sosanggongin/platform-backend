@@ -50,7 +50,8 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-
+server:
+  port: 8081
 jwt:
   secret-key: ${JWT_SECRET_KEY:sosangongin-platform-backend-secret-key-must-be-long-enough}
   expiration-time: ${JWT_EXPIRATION_TIME:900000}

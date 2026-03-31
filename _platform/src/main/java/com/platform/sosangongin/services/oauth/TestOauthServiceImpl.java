@@ -7,13 +7,8 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-@Profile("test")
+@Profile({"test","local"})
 public class TestOauthServiceImpl implements OauthService{
-    @Override
-    public String buildAuthorizeUrl(SocialProvider provider) {
-        return "";
-    }
-
     @Override
     public AuthResponse getAuth(SocialProvider provider, String code) {
         return new AuthResponse(provider, UUID.randomUUID().toString(), "testName","01000000000");

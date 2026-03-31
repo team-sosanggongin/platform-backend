@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
-public class InvalidTokenException extends RuntimeException{
+public class InvalidTokenException extends PlatFormBusinessError{
     private final UUID userId;
     private final String originalRefreshToken;
     private final InvalidTokenUsage usage;

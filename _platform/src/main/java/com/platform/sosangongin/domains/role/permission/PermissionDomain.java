@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PermissionDomain {
+public class PermissionDomain implements Comparable<PermissionDomain> {
 
     // 알파벳, 숫자, 또는 '*' 허용. 각 세그먼트는 점(.)으로 구분
     // 예: "write.notice", "*.notice", "write.*"
@@ -61,6 +61,43 @@ public class PermissionDomain {
         }
 
         return true;
+    }
+
+    /**
+     * 정렬 규칙 (오른쪽이 루트 도메인, 왼쪽이 하위 행동):
+     * 1. 오른쪽(루트)부터 세그먼트 비교
+     * 2. 같은 루트 도메인 내에서 세그먼트가 짧은 것(부모)이 먼저
+     * 3. 와일드카드(*)는 같은 위치의 알파벳보다 앞에 위치
+     *
+     * 예: notices < *.notices < read.notices < read.comment.notices
+     */
+    @Override
+    public int compareTo(PermissionDomain other) {
+        String[] thisParts = this.value.split("\\.");
+        String[] otherParts = other.value.split("\\.");
+
+        // 오른쪽(루트)부터 비교
+        int thisIdx = thisParts.length - 1;
+        int otherIdx = otherParts.length - 1;
+
+        while (thisIdx >= 0 && otherIdx >= 0) {
+            int cmp = compareSegment(thisParts[thisIdx], otherParts[otherIdx]);
+            if (cmp != 0) {
+                return cmp;
+            }
+            thisIdx--;
+            otherIdx--;
+        }
+
+        // 루트가 같으면 세그먼트가 짧은 것(부모)이 먼저
+        return Integer.compare(thisParts.length, otherParts.length);
+    }
+
+    private int compareSegment(String a, String b) {
+        if (a.equals(b)) return 0;
+        if ("*".equals(a)) return -1;
+        if ("*".equals(b)) return 1;
+        return a.compareTo(b);
     }
 
     @Override

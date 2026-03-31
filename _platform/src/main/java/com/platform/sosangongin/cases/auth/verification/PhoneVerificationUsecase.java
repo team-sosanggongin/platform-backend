@@ -10,7 +10,6 @@ import com.platform.sosangongin.services.randoms.RandomCharGeneratorService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +28,12 @@ public class PhoneVerificationUsecase {
     private final TimeGeneratorService timeGeneratorService;
     private final PhoneVerificationRepository phoneVerificationRepository;
 
-    public PhoneVerificationResult handlePhoneVerification(PhoneVerificationRequest req) throws EntityNotFoundException{
-        User user = userRepository.findById(UUID.fromString(req.getUserId()))
-                .orElseThrow(() -> new EntityNotFoundException(req.getUserId(), EntityType.USER, "user is not found")); // 예외 처리 예시
+    public PhoneVerificationResult handlePhoneVerification(String userId, PhoneVerificationRequest req) throws EntityNotFoundException{
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new EntityNotFoundException(userId, EntityType.USER, "user is not found"));
 
         if (user.isPhoneVerified()) {
-            return errorResult(HttpStatus.BAD_REQUEST, "Already verified");
+            return errorResult();
         }
 
         return req.isPhoneVerificationRequest()
@@ -46,30 +45,30 @@ public class PhoneVerificationUsecase {
         Optional<PhoneVerification> verificationOptional = phoneVerificationRepository.findTopByUserOrderByCreatedAtDesc(user);
 
         if(verificationOptional.isEmpty()){
-            return errorResult(HttpStatus.NOT_FOUND, "history is not present");
+            return errorResult();
         }
 
         PhoneVerification verification = verificationOptional.get();
 
         // 유효성 체크 로직을 도메인 내부로 위임하는 것을 추천
         if (!verification.isVerifiable()) {
-            return errorResult(HttpStatus.BAD_REQUEST, "verification state is illegal");
+            return errorResult();
         }
 
         if (verification.isExpired(timeGeneratorService.now())) {
             verification.setStatus(PhoneVerificationStatus.EXPIRED);
-            return errorResult(HttpStatus.BAD_REQUEST, "Expired code");
+            return errorResult();
         }
 
         if (!verification.verify(code)) {
-            return errorResult(HttpStatus.BAD_REQUEST, "Invalid code");
+            return errorResult();
         }
 
         // 성공 처리
         verification.verified();
         user.verifyPhone(); // Dirty Checking으로 저장됨
 
-        return PhoneVerificationResult.builder().httpStatus(HttpStatus.OK).build();
+        return PhoneVerificationResult.builder().build();
     }
 
     private PhoneVerificationResult sendVerificationCode(User user) {
@@ -85,11 +84,10 @@ public class PhoneVerificationUsecase {
         phoneVerificationRepository.save(phoneVerification);
         // TODO: smsPushService.send(user.getPhoneNumber(), randomNumber);
 
-        return PhoneVerificationResult.builder().httpStatus(HttpStatus.OK)
-                .build();
+        return PhoneVerificationResult.builder().build();
     }
 
-    private PhoneVerificationResult errorResult(HttpStatus status, String message) {
-        return PhoneVerificationResult.builder().httpStatus(status).message(message).build();
+    private PhoneVerificationResult errorResult() {
+        return PhoneVerificationResult.builder().build();
     }
 }
