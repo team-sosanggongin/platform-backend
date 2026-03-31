@@ -33,6 +33,10 @@ public class PublicNotice extends SoftDeletedBaseEntity {
     private boolean isPinned = false;
 
     @Builder.Default
+    @Column(name = "is_maintenance")
+    private boolean isServiceMaintenance=false;
+
+    @Builder.Default
     private Long viewCount = 0L;
 
     // 공지 시작 및 예약 시간

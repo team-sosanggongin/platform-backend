@@ -19,7 +19,10 @@ public class User {
     @Column(name = "user_id")
     private UUID id;
 
-    @Column(name = "phone_number", unique = true, nullable = false, length = 20)
+    @Column(name = "user_code", unique = true, length = 6, nullable = false, updatable = false)
+    private String userCode;
+
+    @Column(name = "phone_number", unique = true, length = 20)
     private String phoneNumber;
 
     @Column(name = "is_phone_verified", nullable = false)

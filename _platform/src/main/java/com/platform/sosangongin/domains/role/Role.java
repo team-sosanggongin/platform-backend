@@ -1,14 +1,9 @@
 package com.platform.sosangongin.domains.role;
 
-import com.platform.sosangongin.domains.business.Business;
 import com.platform.sosangongin.domains.common.BaseEntity;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Builder
@@ -37,6 +32,15 @@ public class Role extends BaseEntity {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private PlatformType platformType = PlatformType.PLATFORM;
+
     @Column(name = "is_active")
     private boolean isActive;
+
+    public void update(String roleName, String description) {
+        this.roleName = roleName;
+        this.description = description;
+    }
 }

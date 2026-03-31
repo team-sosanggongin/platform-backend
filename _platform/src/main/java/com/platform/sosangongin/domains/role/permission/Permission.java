@@ -1,16 +1,16 @@
 package com.platform.sosangongin.domains.role.permission;
 
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
+import com.platform.sosangongin.domains.role.PlatformType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
-@Builder
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_permission_name", columnNames = {"permission_name", "platform_type", "is_deleted"}),
+        @UniqueConstraint(name = "uk_permission_domain", columnNames = {"perm_domain", "platform_type", "is_deleted"})
+})
 public class Permission extends SoftDeletedBaseEntity {
 
     @Id
@@ -28,8 +28,8 @@ public class Permission extends SoftDeletedBaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "permission_type",nullable = false, columnDefinition = "권한이 사용되는 서비스 - BACKOFFICE, PLATFORM")
-    private PermissionType permissionType;
+    @Column(name = "platform_type", nullable = false)
+    private PlatformType platformType;
 
     @Column(name = "is_active")
     private boolean isActive;

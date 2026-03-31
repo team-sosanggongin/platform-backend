@@ -1,5 +1,6 @@
 package com.platform.sosangongin.domains.business;
 
+import com.platform.sosangongin.domains.business.location.BusinessMetadata;
 import com.platform.sosangongin.domains.common.SoftDeletedBaseEntity;
 import com.platform.sosangongin.domains.user.User;
 import jakarta.persistence.*;
@@ -34,22 +35,6 @@ public class Business extends SoftDeletedBaseEntity {
     @Column(name = "status", nullable = false)
     private BusinessStatus status;
 
-    @OneToOne(mappedBy = "business", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne
     private BusinessMetadata metadata;
-
-    /**
-     * @throws IllegalStateException 해당 엔티티의 Owner 정보가 없을 경우
-     */
-    public boolean isRealOwner(UUID inviterId) throws IllegalStateException{
-        if(this.owner == null){
-            this.status = BusinessStatus.ILLEGAL_STATE;
-            throw new IllegalStateException("this business "+this.id+" do not have owner and this violate date integrity");
-        }
-        return this.owner.getId().equals(inviterId);
-    }
-    
-    // 연관관계 편의 메서드
-    public void setMetadata(BusinessMetadata metadata) {
-        this.metadata = metadata;
-    }
 }

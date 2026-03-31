@@ -17,23 +17,12 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@Profile("!test")
+@Profile({"localApi","stg","prod"})
 @RequiredArgsConstructor
 public class OauthServiceImpl implements OauthService {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final WebClient webClient;
-
-    @Override
-    public String buildAuthorizeUrl(SocialProvider provider) {
-        ClientRegistration registration = getClientRegistration(provider);
-
-        return registration.getProviderDetails().getAuthorizationUri()
-                + "?client_id=" + registration.getClientId()
-                + "&redirect_uri=" + registration.getRedirectUri()
-                + "&response_type=code"
-                + "&scope=" + String.join(",", registration.getScopes());
-    }
 
     @Override
     public AuthResponse getAuth(SocialProvider provider, String code) {

@@ -1,16 +1,15 @@
 package com.platform.sosangongin.cases.registration;
 
 import com.platform.sosangongin.domains.business.Business;
-import com.platform.sosangongin.domains.business.BusinessJoinRequest;
-import com.platform.sosangongin.domains.business.BusinessJoinRequestRepository;
-import com.platform.sosangongin.domains.business.BusinessJoinRequestStatus;
 import com.platform.sosangongin.domains.business.BusinessRepository;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequest;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequestRepository;
+import com.platform.sosangongin.domains.business.join.BusinessJoinRequestStatus;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.services.external.SmsPushService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +35,6 @@ public class JoinBusinessUsecase {
         if (userOptional.isEmpty()) {
             log.warn("User not found: {}", request.getUserId());
             return JoinBusinessResult.builder()
-                    .httpStatus(HttpStatus.NOT_FOUND)
-                    .message("User not found")
                     .build();
         }
         User user = userOptional.get();
@@ -47,8 +44,6 @@ public class JoinBusinessUsecase {
         if (businessOptional.isEmpty()) {
             log.warn("Business not found: {}", request.getBusinessId());
             return JoinBusinessResult.builder()
-                    .httpStatus(HttpStatus.NOT_FOUND)
-                    .message("Business not found")
                     .build();
         }
         Business business = businessOptional.get();
@@ -60,8 +55,6 @@ public class JoinBusinessUsecase {
         if (alreadyRequested) {
             log.warn("Join request already exists or approved for user {} and business {}", user.getId(), business.getId());
             return JoinBusinessResult.builder()
-                    .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("Already requested or approved")
                     .build();
         }
 
@@ -81,8 +74,6 @@ public class JoinBusinessUsecase {
         }
 
         return JoinBusinessResult.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("Successfully requested to join business")
                 .build();
     }
 }

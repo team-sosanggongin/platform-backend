@@ -1,8 +1,6 @@
 package com.platform.sosangongin.services.jwt;
 
 import com.platform.sosangongin.domains.role.Role;
-import com.platform.sosangongin.domains.user.agents.UserAgent;
-import com.platform.sosangongin.domains.user.agents.UserAgentDto;
 import com.platform.sosangongin.errors.InvalidTokenException;
 import com.platform.sosangongin.errors.InvalidTokenUsage;
 import io.jsonwebtoken.Claims;
@@ -29,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String createToken(UUID userId, UserAgentDto userAgent) {
+    public String createToken(UUID userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getExpirationTime());
 
@@ -43,7 +41,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String createToken(UUID userId, UserAgentDto userAgent, UUID businessId, List<Role> roles) {
+    public String createToken(UUID userId, UUID businessId, List<Role> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getExpirationTime());
 
@@ -52,8 +50,8 @@ public class JwtServiceImpl implements JwtService {
                 .collect(Collectors.toList());
 
         return Jwts.builder()
-                .setSubject(userId.toString()) // 표준 subject claim에 userId 사용
-                .claim("userId", userId.toString()) // 명시적으로 userId claim 추가 (필요 시)
+                .setSubject(userId.toString())
+                .claim("userId", userId.toString())
                 .claim("businessId", businessId.toString())
                 .claim("roles", roleNames)
                 .setIssuedAt(now)
@@ -63,7 +61,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String createRefreshToken(UUID userId, UserAgentDto userAgent) {
+    public String createRefreshToken(UUID userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getRefreshTokenExpirationTime());
 
@@ -86,7 +84,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public UUID getUserIdFromToken(String token) throws InvalidTokenException{
+    public UUID getUserIdFromToken(String token) throws InvalidTokenException {
         try {
             Claims claims = parseClaims(token);
             String userIdStr = claims.getSubject();
@@ -94,7 +92,7 @@ public class JwtServiceImpl implements JwtService {
                 userIdStr = claims.get("userId", String.class);
             }
             return UUID.fromString(userIdStr);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new InvalidTokenException(e.getMessage(), token, InvalidTokenUsage.INVALID_FORMAT);
         }
     }

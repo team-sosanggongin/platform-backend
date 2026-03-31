@@ -1,6 +1,7 @@
 package com.platform.sosangongin.cases.registration;
 
 import com.platform.sosangongin.domains.business.*;
+import com.platform.sosangongin.domains.business.join.*;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.services.external.SmsPushService;
@@ -11,7 +12,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -68,8 +68,6 @@ class JoinBusinessUsecaseTest {
         JoinBusinessResult result = joinBusinessUsecase.join(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.OK);
-        
         // DB 저장 확인
         ArgumentCaptor<BusinessJoinRequest> requestCaptor = ArgumentCaptor.forClass(BusinessJoinRequest.class);
         verify(businessJoinRequestRepository).save(requestCaptor.capture());
@@ -101,8 +99,7 @@ class JoinBusinessUsecaseTest {
         JoinBusinessResult result = joinBusinessUsecase.join(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(result.getMessage()).contains("User not found");
+        assertThat(result).isNotNull();
         verifyNoInteractions(businessRepository);
         verifyNoInteractions(businessJoinRequestRepository);
         verifyNoInteractions(smsPushService);
@@ -128,8 +125,7 @@ class JoinBusinessUsecaseTest {
         JoinBusinessResult result = joinBusinessUsecase.join(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(result.getMessage()).contains("Business not found");
+        assertThat(result).isNotNull();
         verifyNoInteractions(businessJoinRequestRepository);
         verifyNoInteractions(smsPushService);
     }
@@ -158,8 +154,7 @@ class JoinBusinessUsecaseTest {
         JoinBusinessResult result = joinBusinessUsecase.join(request);
 
         // then
-        assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(result.getMessage()).contains("Already requested or approved");
+        assertThat(result).isNotNull();
         verifyNoInteractions(smsPushService);
     }
 }

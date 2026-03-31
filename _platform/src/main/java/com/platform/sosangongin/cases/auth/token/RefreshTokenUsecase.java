@@ -1,23 +1,19 @@
 package com.platform.sosangongin.cases.auth.token;
 
+import com.platform.sosangongin.domains.common.ClientPlatform;
 import com.platform.sosangongin.domains.token.RefreshToken;
 import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.User;
 import com.platform.sosangongin.domains.user.UserRepository;
 import com.platform.sosangongin.errors.InvalidTokenException;
 import com.platform.sosangongin.errors.InvalidTokenUsage;
-import com.platform.sosangongin.services.jwt.JwtProperties;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.times.TimeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -28,53 +24,70 @@ public class RefreshTokenUsecase {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final JwtProperties jwtProperties;
     private final TimeGeneratorService timeGeneratorService;
 
     @Transactional
-    public RefreshTokenResult reissue(RefreshTokenRequest request) throws InvalidTokenException {
+    public RefreshTokenResult reissue(RefreshTokenRequest request) {
         String requestToken = request.getRefreshToken();
+        UUID userId = jwtService.getUserIdFromToken(requestToken);
+        User user = findUserOrThrow(userId, requestToken);
+        RefreshToken latestRefreshToken = findLatestRefreshToken(user);
 
-        UUID userId = this.jwtService.getUserIdFromToken(requestToken);
-
-        User user = this.userRepository.findById(userId).orElseThrow(()->new InvalidTokenException("user not found", requestToken, InvalidTokenUsage.INVALID_CLAIMS));
-
-        RefreshToken latestRefreshToken = this.refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user)
-                .orElseThrow(()->new InvalidTokenException("No refresh token found", userId, requestToken, InvalidTokenUsage.INVALID_STATE));
-
-        if(!latestRefreshToken.isTokenValueEquals(requestToken)){
-            this.refreshTokenRepository.deleteAllByUser(user);
-            throw new InvalidTokenException("received request token is not the latest one, this could mean refresh token is reused", userId, requestToken, InvalidTokenUsage.INVALID_STATE);
+        if (latestRefreshToken == null) {
+            return failResult(RefreshTokenFailureReason.TOKEN_NOT_FOUND);
         }
 
-        if (latestRefreshToken.isBefore(this.timeGeneratorService.now())) {
-            log.warn("Refresh token expired for user: {}", userId);
-            this.refreshTokenRepository.delete(latestRefreshToken); // 만료된 토큰 정리
-            return RefreshTokenResult.builder()
-                    .httpStatus(HttpStatus.UNAUTHORIZED)
-                    .message("Refresh token expired")
-                    .build();
+        validateTokenReuse(latestRefreshToken, requestToken, userId, user);
+
+        if (latestRefreshToken.isBefore(timeGeneratorService.now())) {
+            refreshTokenRepository.delete(latestRefreshToken);
+            return failResult(RefreshTokenFailureReason.TOKEN_EXPIRED);
         }
 
-        this.refreshTokenRepository.delete(latestRefreshToken);
+        if (!latestRefreshToken.isDeviceMatch(request.getAgentType(), request.getDeviceInfo())) {
+            return failResult(RefreshTokenFailureReason.DEVICE_MISMATCH);
+        }
 
-        String newAccessToken = jwtService.createToken(user.getId(), request.getUserAgentDto());
-        String newRefreshTokenStr = jwtService.createRefreshToken(user.getId(), request.getUserAgentDto());
+        return issueTokens(user, latestRefreshToken, request.getAgentType(), request.getDeviceInfo());
+    }
 
-        RefreshToken newRefreshToken = RefreshToken.builder()
-                .user(user)
-                .tokenValue(newRefreshTokenStr)
-                .expiresAt(this.timeGeneratorService.now().plus(jwtProperties.getRefreshTokenExpirationTime(), ChronoUnit.MILLIS))
-                .build();
-        
-        this.refreshTokenRepository.save(newRefreshToken);
+    private User findUserOrThrow(UUID userId, String requestToken) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidTokenException("user not found", requestToken, InvalidTokenUsage.INVALID_CLAIMS));
+    }
 
-        log.debug("Tokens reissued for user: {}", user.getId());
+    private RefreshToken findLatestRefreshToken(User user) {
+        return refreshTokenRepository.findTopByUserOrderByExpiresAtDesc(user).orElse(null);
+    }
+
+    private void validateTokenReuse(RefreshToken latestRefreshToken, String requestToken, UUID userId, User user) throws InvalidTokenException {
+        if (!latestRefreshToken.isTokenValueEquals(requestToken)) {
+            refreshTokenRepository.deleteAllByUser(user);
+            throw new InvalidTokenException("refresh token reused", userId, requestToken, InvalidTokenUsage.INVALID_STATE);
+        }
+    }
+
+    private RefreshTokenResult issueTokens(User user, RefreshToken currentToken, ClientPlatform agentType, String deviceInfo) {
+        String newAccessToken = jwtService.createToken(user.getId());
+        String newRefreshToken = null;
+
+        if (currentToken.shouldRefreshTokenRefreshed(timeGeneratorService.now())) {
+            newRefreshToken = jwtService.createRefreshToken(user.getId());
+            refreshTokenRepository.save(new RefreshToken(newRefreshToken, user, agentType, deviceInfo, timeGeneratorService.now()));
+        }
+
+        log.debug("Access token reissued for user: {}", user.getId());
 
         return RefreshTokenResult.builder()
-                .httpStatus(HttpStatus.OK)
+                .success(true)
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshTokenStr)
+                .refreshToken(newRefreshToken)
+                .build();
+    }
+
+    private RefreshTokenResult failResult(RefreshTokenFailureReason reason) {
+        return RefreshTokenResult.builder()
+                .failureReason(reason)
                 .build();
     }
 }
