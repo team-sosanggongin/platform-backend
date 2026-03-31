@@ -32,7 +32,7 @@ export interface Role {
 export type NoticeStatus = 'published' | 'draft' | 'scheduled';
 
 export interface Notice {
-  id: string;
+  id: number;
   title: string;
   content: string;
   isSystemMaintenance: boolean;

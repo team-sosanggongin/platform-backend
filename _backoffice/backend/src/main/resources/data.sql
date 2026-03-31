@@ -1,0 +1,31 @@
+INSERT INTO backoffice_admin (
+    id,
+    login_id,
+    password,
+    name,
+    email,
+    created_by,
+    is_password_expired,
+    password_changed_at,
+    failed_login_attempts,
+    is_locked,
+    locked_at,
+    deleted_at,
+    created_at,
+    updated_at
+) VALUES (
+             RANDOM_UUID(),
+             'admin',
+             '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+             '루트관리자',
+             'admin@backoffice.com',
+             NULL,
+             FALSE,
+             NOW(),
+             0,
+             FALSE,
+             NULL,
+             NULL,
+             NOW(),
+             NOW()
+         );

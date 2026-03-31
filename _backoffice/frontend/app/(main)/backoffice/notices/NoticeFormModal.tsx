@@ -9,7 +9,7 @@ interface NoticeFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (notice: Omit<Notice, 'id' | 'createdAt'>, status: NoticeStatus) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: number) => void;
   notice?: Notice | null;
 }
 
@@ -79,16 +79,11 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
         startAt: form.startAt || undefined,
         endAt: form.endAt || undefined,
         scheduledAt: status === 'scheduled' ? form.scheduledAt : undefined,
-        publishedAt:
-          status === 'published'
-            ? new Date().toISOString().slice(0, 16).replace('T', ' ')
-            : notice?.publishedAt,
         maintenanceStartAt: form.isSystemMaintenance ? form.maintenanceStartAt : undefined,
         maintenanceEndAt: form.isSystemMaintenance ? form.maintenanceEndAt : undefined,
       },
       status,
     );
-    onClose();
   };
 
   const isEdit = !!notice;
