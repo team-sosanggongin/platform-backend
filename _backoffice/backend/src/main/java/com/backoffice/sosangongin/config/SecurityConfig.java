@@ -49,18 +49,27 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> {
+                    auth
+                            .requestMatchers(
+                                    "/api/auth/login",
+                                    "/api/auth/logout",
+                                    "/h2-console/**",
+                                    "/actuator/health"
+                            ).permitAll()
+                            .requestMatchers("POST", "/api/admin/**").hasRole("ROOT")
+                            .requestMatchers("PUT", "/api/admin/**").hasRole("ROOT")
+                            .requestMatchers("DELETE", "/api/admin/**").hasRole("ROOT");
+
                     if (isLocal) {
                         auth.anyRequest().permitAll();
                     } else {
-                        auth
-                                .requestMatchers(
-                                        "/api/auth/**",
-                                        "/h2-console/**",
-                                        "/actuator/health"
-                                ).permitAll()
-                                .anyRequest().authenticated();
+                        auth.anyRequest().authenticated();
                     }
                 })
+                .addFilterBefore(
+                        new SessionAuthenticationFilter(sessionManager),
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -72,13 +81,6 @@ public class SecurityConfig {
                             );
                         })
                 );
-
-        if (!isLocal) {
-            http.addFilterBefore(
-                    new SessionAuthenticationFilter(sessionManager),
-                    UsernamePasswordAuthenticationFilter.class
-            );
-        }
 
         return http.build();
     }

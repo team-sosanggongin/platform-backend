@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,29 +31,21 @@ public class AuthController {
 
         BackofficeAdmin admin = loginUsecase.login(request.getLoginId(), request.getPassword(), ipAddress, userAgent);
         sessionManager.setAccountId(session, admin.getId());
+        sessionManager.setRole(session, admin.isRoot() ? SessionManager.ROLE_ROOT : SessionManager.ROLE_BACKOFFICE_USER);
 
         return ResponseEntity.ok(LoginResponse.from(admin));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(HttpSession session) {
-        UUID accountId = sessionManager.getAccountId(session).orElse(null);
-        if (accountId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ErrorResponse.builder().message("로그인이 필요합니다.").build());
-        }
-
+    public ResponseEntity<LoginResponse> me() {
+        UUID accountId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         BackofficeAdmin admin = getMyInfoUsecase.getMyInfo(accountId);
         return ResponseEntity.ok(LoginResponse.from(admin));
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, HttpSession session) {
-        UUID accountId = sessionManager.getAccountId(session).orElse(null);
-        if (accountId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ErrorResponse.builder().message("로그인이 필요합니다.").build());
-        }
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        UUID accountId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         ChangePasswordResult result = changePasswordUsecase.changePassword(
                 accountId, request.getCurrentPassword(), request.getNewPassword());

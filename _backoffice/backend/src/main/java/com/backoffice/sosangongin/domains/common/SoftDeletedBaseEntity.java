@@ -21,4 +21,8 @@ public class SoftDeletedBaseEntity extends BaseEntity{
         return deletedAt != null;
     }
 
+    public void restore() {
+        this.deletedAt = null;
+    }
+
 }
