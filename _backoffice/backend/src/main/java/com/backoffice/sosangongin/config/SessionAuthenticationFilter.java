@@ -26,18 +26,21 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
-            sessionManager.getAccountId(session).ifPresent(this::setAuthentication);
+            sessionManager.getAccountId(session).ifPresent(accountId -> {
+                String role = sessionManager.getRole(session);
+                setAuthentication(accountId, role);
+            });
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(UUID accountId) {
+    private void setAuthentication(UUID accountId, String role) {
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         accountId,
                         null,
-                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                        List.of(new SimpleGrantedAuthority(role))
                 );
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

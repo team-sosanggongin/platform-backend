@@ -95,8 +95,33 @@ class LoginUsecaseTest {
     }
 
     @Test
-    @DisplayName("로그인 5회 실패: 계정이 잠금 처리된다")
-    void login_fail_fiveTimes_locksAccount() {
+    @DisplayName("로그인 5회 실패: 일반 계정이 잠금 처리된다")
+    void login_fail_fiveTimes_locksNonRootAccount() {
+        BackofficeAdmin normalAdmin = BackofficeAdmin.builder()
+                .loginId("normaluser")
+                .name("일반관리자")
+                .password(passwordEncoder.encode("password123"))
+                .createdBy(testAccount.getId())
+                .isPasswordExpired(false)
+                .build();
+        adminRepository.save(normalAdmin);
+
+        for (int i = 0; i < 5; i++) {
+            try {
+                loginUsecase.login("normaluser", "wrongpassword", "127.0.0.1", "Test-Agent");
+            } catch (InvalidCredentialsException ignored) {
+            }
+        }
+
+        BackofficeAdmin lockedAccount = adminRepository.findById(normalAdmin.getId()).get();
+        assertThat(lockedAccount.isLocked()).isTrue();
+        assertThat(lockedAccount.getFailedLoginAttempts()).isEqualTo(5);
+        assertThat(lockedAccount.getLockedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("로그인 5회 실패: root 계정은 잠금되지 않는다")
+    void login_fail_fiveTimes_rootNotLocked() {
         for (int i = 0; i < 5; i++) {
             try {
                 loginUsecase.login("testuser", "wrongpassword", "127.0.0.1", "Test-Agent");
@@ -104,10 +129,9 @@ class LoginUsecaseTest {
             }
         }
 
-        BackofficeAdmin lockedAccount = adminRepository.findById(testAccount.getId()).get();
-        assertThat(lockedAccount.isLocked()).isTrue();
-        assertThat(lockedAccount.getFailedLoginAttempts()).isEqualTo(5);
-        assertThat(lockedAccount.getLockedAt()).isNotNull();
+        BackofficeAdmin rootAccount = adminRepository.findById(testAccount.getId()).get();
+        assertThat(rootAccount.isLocked()).isFalse();
+        assertThat(rootAccount.getFailedLoginAttempts()).isEqualTo(5);
     }
 
     @Test
