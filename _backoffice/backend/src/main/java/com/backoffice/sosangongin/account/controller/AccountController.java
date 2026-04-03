@@ -7,7 +7,6 @@ import com.backoffice.sosangongin.account.dto.PasswordChangeRequest;
 import com.backoffice.sosangongin.account.usecase.AccountUseCase;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,9 +56,8 @@ public class AccountController {
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> changePassword(@RequestBody PasswordChangeRequest request,
-                                               HttpSession session) {
-        UUID requesterId = sessionManager.getAccountId(session)
+    public ResponseEntity<Void> changePassword(@RequestBody PasswordChangeRequest request) {
+        UUID requesterId = sessionManager.getAccountId()
                 .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
         accountUseCase.changePassword(requesterId, request);
         return ResponseEntity.ok().build();
