@@ -35,7 +35,13 @@
       "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.cases.auth.login.LoginUsecaseTest)",
       "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest.entityNotFound_Returns400)",
       "Bash(./gradlew :_platform:test --tests \"com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest.entityNotFound_Returns400\" --info)",
-      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest --info)"
+      "Bash(./gradlew :_platform:test --tests com.platform.sosangongin.api.error.GlobalExceptionHandlerIntegrationTest --info)",
+      "Bash(sed 's/.class$//')",
+      "Bash(grep -E \"^/c/public/sosanggongin/platform-backend/[^/]+$\")",
+      "Bash(git ls-tree:*)",
+      "Bash(git reset:*)",
+      "Read(//mnt/c/public/sosanggongin/**)",
+      "Bash(./gradlew :_backoffice:backend:compileJava)"
     ]
   }
 }
