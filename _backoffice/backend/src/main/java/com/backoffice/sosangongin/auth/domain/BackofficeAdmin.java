@@ -44,8 +44,8 @@ public class BackofficeAdmin extends SoftDeletedBaseEntity {
     @Column(name = "is_password_expired", nullable = false)
     private boolean isPasswordExpired = true;
 
-    // @Column(name = "password_changed_at")
-    // private LocalDateTime passwordChangedAt;
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
 
     @Column(name = "failed_login_attempts", nullable = false)
     private int failedLoginAttempts = 0;
@@ -67,6 +67,24 @@ public class BackofficeAdmin extends SoftDeletedBaseEntity {
 
     public void resetFailedAttempts() {
         this.failedLoginAttempts = 0;
+    }
+
+    public void update(String name, String email, String phoneNumber) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void unlock() {
+        this.isLocked = false;
+        this.lockedAt = null;
+        this.failedLoginAttempts = 0;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+        this.isPasswordExpired = false;
+        this.passwordChangedAt = LocalDateTime.now();
     }
 
 }
