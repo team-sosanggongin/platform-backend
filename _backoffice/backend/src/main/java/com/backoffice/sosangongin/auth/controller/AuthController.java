@@ -4,7 +4,6 @@ import com.backoffice.sosangongin.auth.dto.LoginRequest;
 import com.backoffice.sosangongin.auth.dto.LoginResponse;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.auth.usecase.LoginUseCase;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,18 +17,16 @@ public class AuthController {
     private final SessionManager sessionManager;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
-                                               HttpSession session) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = loginUseCase.execute(request);
         String role = response.isRoot() ? SessionManager.ROLE_ROOT : SessionManager.ROLE_BACKOFFICE_USER;
-        sessionManager.setAccountId(session, response.getId());
-        sessionManager.setRole(session, role);
+        sessionManager.afterLogin(response.getId(), role);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
-        sessionManager.invalidate(session);
+    public ResponseEntity<Void> logout() {
+        sessionManager.invalidate();
         return ResponseEntity.ok().build();
     }
 }

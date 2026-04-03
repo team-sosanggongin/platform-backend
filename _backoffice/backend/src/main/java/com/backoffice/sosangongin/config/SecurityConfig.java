@@ -1,7 +1,6 @@
 package com.backoffice.sosangongin.config;
 
 import com.backoffice.sosangongin.auth.session.SessionAuthenticationFilter;
-import com.backoffice.sosangongin.auth.session.SessionManager;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
-    private final SessionManager sessionManager;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,7 +39,7 @@ public class SecurityConfig {
                         })
                 )
                 .addFilterBefore(
-                        new SessionAuthenticationFilter(sessionManager),
+                        new SessionAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .authorizeHttpRequests(auth -> auth

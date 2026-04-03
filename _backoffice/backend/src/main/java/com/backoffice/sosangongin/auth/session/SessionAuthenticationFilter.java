@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,10 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 public class SessionAuthenticationFilter extends OncePerRequestFilter {
-
-    private final SessionManager sessionManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -26,10 +22,12 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
-            sessionManager.getAccountId(session).ifPresent(accountId -> {
-                String role = sessionManager.getRole(session);
+            Object value = session.getAttribute(SessionManager.ACCOUNT_ID_KEY);
+            if (value instanceof UUID accountId) {
+                Object roleValue = session.getAttribute(SessionManager.ROLE_KEY);
+                String role = roleValue instanceof String r ? r : SessionManager.ROLE_BACKOFFICE_USER;
                 setAuthentication(accountId, role);
-            });
+            }
         }
 
         filterChain.doFilter(request, response);
