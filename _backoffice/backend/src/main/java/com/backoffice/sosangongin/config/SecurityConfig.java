@@ -44,8 +44,10 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // TODO: role-permission 브랜치에서 교체 예정
+                        .requestMatchers("/api/account/me/password").authenticated()
                         .requestMatchers("/api/account/**").hasRole("ROOT")
+                        .requestMatchers("/api/role/**").hasRole("ROOT")
+                        .requestMatchers("/api/permission/**").hasRole("ROOT")
                         .anyRequest().authenticated()
                 );
 
