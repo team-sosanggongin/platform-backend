@@ -18,6 +18,7 @@ public class AuthService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginAttemptService loginAttemptService;
 
     @Transactional
     public BackofficeAdmin authenticate(String loginId, String password) {
@@ -29,10 +30,7 @@ public class AuthService {
         }
 
         if (!passwordEncoder.matches(password, admin.getPassword())) {
-            admin.increaseFailedAttempts();
-            if (admin.getFailedLoginAttempts() >= MAX_FAILED_ATTEMPTS) {
-                admin.lock();
-            }
+            loginAttemptService.handleFailedAttempt(admin);
             throw new InvalidCredentialsException("비밀번호가 올바르지 않습니다.");
         }
 

@@ -42,15 +42,18 @@ public class BackofficeAdmin extends SoftDeletedBaseEntity {
     private boolean isRoot = false;
 
     @Column(name = "is_password_expired", nullable = false)
+    @Builder.Default
     private boolean isPasswordExpired = true;
 
     @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
 
     @Column(name = "failed_login_attempts", nullable = false)
+    @Builder.Default
     private int failedLoginAttempts = 0;
 
     @Column(name = "is_locked", nullable = false)
+    @Builder.Default
     private boolean isLocked = false;
 
     @Column(name = "locked_at")
