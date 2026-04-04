@@ -1,28 +1,47 @@
 package com.backoffice.sosangongin.global.aop;
 
+import com.backoffice.sosangongin.auth.session.SessionManager;
+import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
 import com.backoffice.sosangongin.global.exception.PermissionDeniedException;
+import com.backoffice.sosangongin.role.repository.AccountRoleRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class PermissionAspect {
+
+    private final SessionManager sessionManager;
+    private final AccountRoleRepository accountRoleRepository;
 
     @Around("@annotation(requiresPermission)")
     public Object check(ProceedingJoinPoint joinPoint,
                         RequiresPermission requiresPermission) throws Throwable {
-        // TODO: notice 브랜치에서 실제 permission 체크 로직 구현
-        // 1. SecurityContext에서 accountId 꺼내기
-        // 2. accountId로 role 조회
-        // 3. role에 매핑된 permission 목록 조회
-        // 4. requiresPermission.value()와 매칭 여부 확인
-        // 5. (예외 처리) PermissionDeniedException
+        UUID accountId = sessionManager.getAccountId()
+                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
 
-        log.debug("Permission check: {}", requiresPermission.value());
+        if (SessionManager.ROLE_ROOT.equals(sessionManager.getRole())) {
+            return joinPoint.proceed();
+        }
+
+        String requiredPermission = requiresPermission.value();
+
+        boolean hasPermission = accountRoleRepository.findByIdAccountId(accountId)
+                .stream()
+                .flatMap(ar -> ar.getRole().getRolePermissions().stream())
+                .anyMatch(rp -> rp.getPermission().getPermissionName().equals(requiredPermission));
+
+        if (!hasPermission) {
+            throw new PermissionDeniedException("권한이 없습니다.");
+        }
         return joinPoint.proceed();
     }
 }

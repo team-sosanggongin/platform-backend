@@ -20,7 +20,7 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = loginUseCase.execute(request);
         String role = response.isRoot() ? SessionManager.ROLE_ROOT : SessionManager.ROLE_BACKOFFICE_USER;
-        sessionManager.afterLogin(response.getId(), role);
+        sessionManager.afterLogin(response.getId(), role, response.getName());
         return ResponseEntity.ok(response);
     }
 
