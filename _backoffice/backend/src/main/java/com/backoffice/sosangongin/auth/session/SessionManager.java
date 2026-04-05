@@ -15,15 +15,17 @@ public class SessionManager {
 
     static final String ACCOUNT_ID_KEY = "ACCOUNT_ID";
     static final String ROLE_KEY = "ROLE";
+    static final String ADMIN_NAME_KEY = "ADMIN_NAME";
 
     public static final String ROLE_ROOT = "ROLE_ROOT";
     public static final String ROLE_BACKOFFICE_USER = "ROLE_BACKOFFICE_USER";
 
     private final HttpSession session;
 
-    public void afterLogin(UUID accountId, String role) {
+    public void afterLogin(UUID accountId, String role, String adminName) {
         session.setAttribute(ACCOUNT_ID_KEY, accountId);
         session.setAttribute(ROLE_KEY, role);
+        session.setAttribute(ADMIN_NAME_KEY, adminName);
     }
 
     public Optional<UUID> getAccountId() {
@@ -40,6 +42,14 @@ public class SessionManager {
             return role;
         }
         return ROLE_BACKOFFICE_USER;
+    }
+
+    public Optional<String> getAdminName() {
+        Object value = session.getAttribute(ADMIN_NAME_KEY);
+        if (value instanceof String name) {
+            return Optional.of(name);
+        }
+        return Optional.empty();
     }
 
     public void invalidate() {
