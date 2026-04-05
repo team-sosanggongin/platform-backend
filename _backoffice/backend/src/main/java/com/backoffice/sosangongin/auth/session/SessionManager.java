@@ -1,5 +1,6 @@
 package com.backoffice.sosangongin.auth.session;
 
+import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,11 @@ public class SessionManager {
         return Optional.empty();
     }
 
+    public UUID getRequiredAccountId() {
+        return getAccountId()
+                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
+    }
+
     public String getRole() {
         Object value = session.getAttribute(ROLE_KEY);
         if (value instanceof String role) {
@@ -50,6 +56,11 @@ public class SessionManager {
             return Optional.of(name);
         }
         return Optional.empty();
+    }
+
+    public String getRequiredAdminName() {
+        return getAdminName()
+                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
     }
 
     public void invalidate() {

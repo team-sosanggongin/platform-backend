@@ -1,7 +1,6 @@
 package com.backoffice.sosangongin.global.aop;
 
 import com.backoffice.sosangongin.auth.session.SessionManager;
-import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
 import com.backoffice.sosangongin.global.exception.PermissionDeniedException;
 import com.backoffice.sosangongin.role.repository.AccountRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,7 @@ public class PermissionAspect {
     @Around("@annotation(requiresPermission)")
     public Object check(ProceedingJoinPoint joinPoint,
                         RequiresPermission requiresPermission) throws Throwable {
-        UUID accountId = sessionManager.getAccountId()
-                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
+        UUID accountId = sessionManager.getRequiredAccountId();
 
         if (SessionManager.ROLE_ROOT.equals(sessionManager.getRole())) {
             return joinPoint.proceed();

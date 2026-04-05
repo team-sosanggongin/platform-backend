@@ -1,7 +1,6 @@
 package com.backoffice.sosangongin.role.controller;
 
 import com.backoffice.sosangongin.auth.session.SessionManager;
-import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
 import com.backoffice.sosangongin.role.dto.*;
 import com.backoffice.sosangongin.role.usecase.RoleUseCase;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +21,7 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<RoleResponse> create(@RequestBody RoleRequest request) {
-        UUID createdBy = sessionManager.getAccountId()
-                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
+        UUID createdBy = sessionManager.getRequiredAccountId();
         return ResponseEntity.created(URI.create("/api/role")).body(roleUseCase.create(request, createdBy));
     }
 

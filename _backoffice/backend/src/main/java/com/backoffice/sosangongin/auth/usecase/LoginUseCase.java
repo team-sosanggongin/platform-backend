@@ -13,8 +13,8 @@ public class LoginUseCase {
 
     private final AuthService authService;
 
-    public LoginResponse execute(LoginRequest request) {
-        BackofficeAdmin admin = authService.authenticate(request.getLoginId(), request.getPassword());
+    public LoginResponse execute(LoginRequest request, String ipAddress, String userAgent) {
+        BackofficeAdmin admin = authService.authenticate(request.getLoginId(), request.getPassword(), ipAddress, userAgent);
 
         return LoginResponse.builder()
                 .id(admin.getId())
