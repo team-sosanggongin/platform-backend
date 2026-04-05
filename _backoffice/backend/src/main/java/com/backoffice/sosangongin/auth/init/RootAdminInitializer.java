@@ -24,6 +24,7 @@ public class RootAdminInitializer implements ApplicationRunner {
                             .password(passwordEncoder.encode("root"))
                             .name("root")
                             .isRoot(true)
+                            .isPasswordExpired(false)
                             .build()
             );
         }
