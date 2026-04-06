@@ -91,7 +91,7 @@ export default function RolesPage() {
 
   const columns: TableColumn<Role>[] = [
     { header: 'No', render: (r) => r.id, width: '60px' },
-    { header: '권한명', render: (r) => <strong>{r.name}</strong>, width: '130px' },
+    { header: '역할', render: (r) => <strong>{r.name}</strong>, width: '130px' },
     { header: '설명', render: (r) => r.description },
     {
       header: '권한 목록',
@@ -111,7 +111,8 @@ export default function RolesPage() {
     { header: '수정일', render: (r) => r.updatedAt ?? '-', width: '140px' },
   ];
 
-  const searchOptions = [{ value: 'name', label: '권한명' }];
+  const searchOptions = [{ value: 'name', label: '역할' },
+      { value: 'permission', label: '권한' },];
 
   return (
     <>

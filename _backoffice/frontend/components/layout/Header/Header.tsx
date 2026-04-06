@@ -20,6 +20,8 @@ const menuItems: NavigationItem[] = [
     label: '시스템 설정',
     subItems: [
       { label: '공지사항 관리', href: '/backoffice/notices' },
+      { label: '활동 이력', href: '/backoffice/activity-log/audit' },
+      { label: '로그인 이력', href: '/backoffice/activity-log/login' },
     ]
   }
 ];
