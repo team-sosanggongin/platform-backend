@@ -7,6 +7,7 @@ import { Navbar } from '../../molecules/Navbar/Navbar';
 import { ConfirmModal } from '../../molecules/ConfirmModal/ConfirmModal';
 import styles from './Header.module.css';
 import {NavigationItem} from "@/types";
+import { api } from '../../../lib/api';
 
 const menuItems: NavigationItem[] = [
   {
@@ -35,9 +36,15 @@ export const Header: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleConfirmLogout = () => {
-    setIsModalOpen(false);
-    router.push('/login');
+  const handleConfirmLogout = async () => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch (e) {
+      // 로그아웃 실패해도 로그인 페이지로 이동
+    } finally {
+      setIsModalOpen(false);
+      router.push('/login');
+    }
   };
 
   return (

@@ -4,6 +4,8 @@ import com.backoffice.sosangongin.auth.dto.LoginRequest;
 import com.backoffice.sosangongin.auth.dto.LoginResponse;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.auth.usecase.LoginUseCase;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
         sessionManager.invalidate();
+
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
 }

@@ -3,51 +3,49 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Input, Button, Container, Form } from '../../../components';
+import { api, ApiError } from '../../../lib/api';
 import styles from './login.module.css';
-
-// 최초 로그인 유저 시뮬레이션 (실제로는 API 응답으로 판단)
-const FIRST_TIME_USERS = ['newuser', 'test123'];
-
-const MAX_ATTEMPTS = 5;
 
 export default function LoginPage() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
-  const [failCount, setFailCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id || !password) return;
 
-    if (FIRST_TIME_USERS.includes(id)) {
-      router.push('/login/change-password');
-      return;
-    }
+    setIsLoading(true);
+    setErrorMsg('');
 
-    // Demo: password '1234' → success, anything else → failure
-    if (password === '1234') {
-      setErrorMsg('');
-      router.push('/verify');
-      return;
-    }
+    try {
+      const response = await api.post<{
+        id: string;
+        name: string;
+        root: boolean;
+        passwordExpired: boolean;
+      }>('/api/auth/login', { loginId: id, password });
 
-    const newCount = failCount + 1;
-    setFailCount(newCount);
+      if (response.passwordExpired) {
+        router.push('/login/change-password');
+        return;
+      }
 
-    if (newCount >= MAX_ATTEMPTS) {
-      const now = Date.now();
-      const history = Array.from({ length: MAX_ATTEMPTS }, (_, i) => ({
-        attempt: i + 1,
-        time: new Date(now - (MAX_ATTEMPTS - 1 - i) * 4 * 60 * 1000).toISOString(),
-        ip: `192.168.1.${100 + i}`,
-      }));
-      sessionStorage.setItem('lockHistory', JSON.stringify({ id, history }));
-      router.push('/locked');
-    } else {
-      const remaining = MAX_ATTEMPTS - newCount;
-      setErrorMsg(`비밀번호가 올바르지 않습니다. (${newCount}/${MAX_ATTEMPTS}회 실패, ${remaining}회 남음)`);
+      router.push('/backoffice');
+    } catch (e) {
+      if (e instanceof ApiError) {
+        if (e.status === 403) {
+          router.push('/locked');
+        } else {
+          setErrorMsg(e.message);
+        }
+      } else {
+        setErrorMsg('오류가 발생했습니다.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,17 +87,9 @@ export default function LoginPage() {
           {errorMsg && (
             <p className={styles.errorMsg}>{errorMsg}</p>
           )}
-          {failCount > 0 && failCount < MAX_ATTEMPTS && (
-            <div className={styles.attemptsBar}>
-              {Array.from({ length: MAX_ATTEMPTS }, (_, i) => (
-                <div
-                  key={i}
-                  className={`${styles.attemptDot} ${i < failCount ? styles.attemptFailed : ''}`}
-                />
-              ))}
-            </div>
-          )}
-          <Button type="submit">로그인</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? '로그인 중...' : '로그인'}
+          </Button>
         </Form>
       </Card>
     </Container>
