@@ -4,54 +4,90 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, Input, Button, DetailRow } from '@/components';
+import { api, ApiError } from '@/lib/api';
 import styles from './new.module.css';
-// TODO :: 새로운 유저가 등록되면, 등록된 유저의 전화번호로 id와 초기비밀번호, URL을 함께 전송
-// 시스템에 등록된 권한 목록 (실제로는 API에서 가져옴)
-const AVAILABLE_ROLES = ['Admin', 'Manager', 'Editor'];
 
 interface FormState {
   name: string;
-  id: string;
-  phone: string;
-  roles: string[];
+  loginId: string;
+  email: string;
+  phoneNumber: string;
 }
 
-const emptyForm: FormState = { name: '', id: '', phone: '', roles: [] };
+const emptyForm: FormState = { name: '', loginId: '', email: '', phoneNumber: '' };
 
 export default function NewUserPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [createdLoginId, setCreatedLoginId] = useState<string | null>(null);
 
   const set = (patch: Partial<FormState>) => setForm((prev) => ({ ...prev, ...patch }));
 
-  const toggleRole = (role: string) => {
-    set({
-      roles: form.roles.includes(role)
-        ? form.roles.filter((r) => r !== role)
-        : [...form.roles, role],
-    });
-  };
-
   const validate = () => {
     if (!form.name.trim()) return false;
-    if (!form.id.trim()) return false;
-    if (!form.phone.trim()) return false;
-    if (form.roles.length === 0) return false;
+    if (!form.loginId.trim()) return false;
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSubmitted(true);
     if (!validate()) return;
 
-    // TODO: API 호출
-    alert(`유저 등록 완료\n이름: ${form.name}\nID: ${form.id}\n전화번호: ${form.phone}\n권한: ${form.roles.join(', ')}`);
-    router.push('/backoffice/users');
+    try {
+      await api.post('/api/account', {
+        name: form.name,
+        loginId: form.loginId,
+        email: form.email || null,
+        phoneNumber: form.phoneNumber || null,
+      });
+      setCreatedLoginId(form.loginId);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrorMsg(e.message);
+      } else {
+        setErrorMsg('오류가 발생했습니다.');
+      }
+    }
   };
 
   const fieldError = (value: string) => submitted && !value.trim();
-  const rolesError = submitted && form.roles.length === 0;
+
+  if (createdLoginId) {
+    return (
+      <div className={styles.container}>
+        <Card className={styles.formCard}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>등록 완료</h2>
+          </div>
+          <div className={styles.cardBody}>
+            <p style={{ marginBottom: 16, color: '#334155' }}>
+              새 관리자 계정이 등록되었습니다.
+            </p>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '12px 16px', marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#64748b', marginBottom: 8 }}>초기 로그인 정보</p>
+              <p style={{ fontSize: 14, color: '#334155' }}>아이디: <strong>{createdLoginId}</strong></p>
+              <p style={{ fontSize: 14, color: '#334155' }}>초기 비밀번호: <strong>{createdLoginId}</strong></p>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 8 }}>
+                첫 로그인 시 비밀번호 변경이 필요합니다.
+              </p>
+            </div>
+            <div className={styles.footer}>
+              <Button variant="secondary" style={{ width: 130 }}
+                onClick={() => router.push('/backoffice/users')}>
+                목록으로
+              </Button>
+              <Button style={{ width: 160 }}
+                onClick={() => { setCreatedLoginId(null); setForm(emptyForm); setSubmitted(false); }}>
+                추가 등록
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -82,50 +118,42 @@ export default function NewUserPage() {
 
           <DetailRow label="아이디">
             <Input
-              id="user-id"
-              value={form.id}
-              onChange={(e) => set({ id: e.target.value })}
+              id="user-loginId"
+              value={form.loginId}
+              onChange={(e) => set({ loginId: e.target.value })}
               placeholder="로그인에 사용할 아이디를 입력하세요"
               wrapperStyle={{ marginBottom: 0, maxWidth: 400 }}
             />
-            {fieldError(form.id) && (
+            {fieldError(form.loginId) && (
               <span className={styles.errorMessage}>아이디를 입력해주세요.</span>
             )}
+          </DetailRow>
+
+          <DetailRow label="이메일">
+            <Input
+              id="user-email"
+              type="email"
+              value={form.email}
+              onChange={(e) => set({ email: e.target.value })}
+              placeholder="이메일을 입력하세요 (선택)"
+              wrapperStyle={{ marginBottom: 0, maxWidth: 400 }}
+            />
           </DetailRow>
 
           <DetailRow label="전화번호">
             <Input
               id="user-phone"
               type="tel"
-              value={form.phone}
-              onChange={(e) => set({ phone: e.target.value })}
-              placeholder="010-0000-0000"
+              value={form.phoneNumber}
+              onChange={(e) => set({ phoneNumber: e.target.value })}
+              placeholder="010-0000-0000 (선택)"
               wrapperStyle={{ marginBottom: 0, maxWidth: 400 }}
             />
-            {fieldError(form.phone) && (
-              <span className={styles.errorMessage}>전화번호를 입력해주세요.</span>
-            )}
           </DetailRow>
 
-          <DetailRow label="권한">
-            <div>
-              <div className={styles.rolesGroup}>
-                {AVAILABLE_ROLES.map((role) => (
-                  <label key={role} className={styles.roleCheckLabel}>
-                    <input
-                      type="checkbox"
-                      checked={form.roles.includes(role)}
-                      onChange={() => toggleRole(role)}
-                    />
-                    {role}
-                  </label>
-                ))}
-              </div>
-              {rolesError && (
-                <p className={styles.errorMessage}>권한을 하나 이상 선택해주세요.</p>
-              )}
-            </div>
-          </DetailRow>
+          {errorMsg && (
+            <p className={styles.errorMessage}>{errorMsg}</p>
+          )}
 
           <div className={styles.footer}>
             <Button

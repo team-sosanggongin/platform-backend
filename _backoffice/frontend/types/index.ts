@@ -6,13 +6,15 @@ export interface NavigationItem {
 
 export interface User {
   id: string;
+  loginId: string;
   name: string;
-  email: string;
-  phone?: string;
-  roles: string[];
-  joinDate: string;
-  status: 'Active' | 'Inactive' | 'Pending' | 'Locked';
-  lockedAt?: string;
+  email: string | null;
+  phoneNumber: string | null;
+  root: boolean;
+  locked: boolean;
+  passwordExpired: boolean;
+  lockedAt: string | null;
+  createdAt: string;
 }
 
 export interface RolePermission {
@@ -29,21 +31,18 @@ export interface Role {
   updatedAt?: string;
 }
 
-export type NoticeStatus = 'published' | 'draft' | 'scheduled';
+export type NoticeStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
 
 export interface Notice {
-  id: string;
+  id: number;
   title: string;
   content: string;
-  isSystemMaintenance: boolean;
+  isServiceMaintenance: boolean;
   status: NoticeStatus;
-  startAt?: string;
-  endAt?: string;
-  scheduledAt?: string;
-  publishedAt?: string;
-  maintenanceStartAt?: string;
-  maintenanceEndAt?: string;
-  author: string;
+  startsAt?: string;
+  endsAt?: string;
+  authorName: string;
+  createdBy: string;
+  viewCount: number | null;
   createdAt: string;
-  updatedAt?: string;
 }

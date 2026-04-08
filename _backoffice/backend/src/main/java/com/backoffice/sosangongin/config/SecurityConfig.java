@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/account/me/password").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/account").authenticated()
                         .requestMatchers("/api/account/**").hasRole("ROOT")
                         .requestMatchers("/api/role/**").hasRole("ROOT")
                         .requestMatchers("/api/permission/**").hasRole("ROOT")

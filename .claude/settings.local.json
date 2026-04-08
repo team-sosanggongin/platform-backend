@@ -41,7 +41,11 @@
       "Bash(git ls-tree:*)",
       "Bash(git reset:*)",
       "Read(//mnt/c/public/sosanggongin/**)",
-      "Bash(./gradlew :_backoffice:backend:compileJava)"
+      "Bash(./gradlew :_backoffice:backend:compileJava)",
+      "Bash(gh issue:*)",
+      "Bash(git -C \"C:/public/sosanggongin/platform-backend\" status)",
+      "Bash(git -C \"C:/public/sosanggongin/platform-backend\" diff HEAD --stat)",
+      "Bash(git -C \"C:/public/sosanggongin/platform-backend\" grep -n \"validation\" _backoffice/backend/build.gradle)"
     ]
   }
 }

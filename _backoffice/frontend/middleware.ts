@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isAuthPage = pathname.startsWith('/login') ||
-                     pathname.startsWith('/locked') ||
-                     pathname.startsWith('/verify');
+  const isAuthPage = (pathname.startsWith('/login') &&
+                   !pathname.startsWith('/login/change-password')) ||
+                   pathname.startsWith('/locked') ||
+                   pathname.startsWith('/verify');
 
   const sessionCookie = request.cookies.get('JSESSIONID');
 
