@@ -47,7 +47,7 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public BackofficeAdmin findById(UUID id) {
-        return adminRepository.findById(id)
+        return adminRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계정입니다."));
     }
 

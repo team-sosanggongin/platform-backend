@@ -18,6 +18,7 @@ public class AccountResponse {
     private boolean isRoot;
     private boolean isLocked;
     private boolean isPasswordExpired;
+    private LocalDateTime lockedAt;
     private LocalDateTime createdAt;
 
     public static AccountResponse from(BackofficeAdmin admin) {
@@ -30,6 +31,7 @@ public class AccountResponse {
                 .isRoot(admin.isRoot())
                 .isLocked(admin.isLocked())
                 .isPasswordExpired(admin.isPasswordExpired())
+                .lockedAt(admin.getLockedAt())
                 .createdAt(admin.getCreatedAt())
                 .build();
     }

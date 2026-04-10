@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Container, Form } from '../../../../components';
+import { api, ApiError } from '../../../../lib/api';
 import styles from './change-password.module.css';
 
 interface Requirements {
@@ -21,23 +22,36 @@ const allMet = (req: Requirements) => Object.values(req).every(Boolean);
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const req = checkRequirements(password);
   const passwordsMatch = password === confirm;
   const confirmTouched = confirm.length > 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     if (!allMet(req) || !passwordsMatch || !confirm) return;
 
-    // TODO: API 호출
-    router.push('/verify');
+    try {
+      await api.patch('/api/account/me/password', {
+        currentPassword,
+        newPassword: password,
+      });
+      router.push('/backoffice');
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrorMsg(e.message);
+      } else {
+        setErrorMsg('오류가 발생했습니다.');
+      }
+    }
   };
 
   const EyeIcon = ({ open }: { open: boolean }) => (
@@ -92,6 +106,28 @@ export default function ChangePasswordPage() {
         </div>
 
         <Form onSubmit={handleSubmit}>
+          <div className={styles.passwordWrapper}>
+            <input
+              id="current-password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="현재 비밀번호 (임시 비밀번호)"
+              style={{
+                width: '100%',
+                height: 38,
+                padding: '0 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: 6,
+                fontSize: 14,
+                marginBottom: 16,
+                boxSizing: 'border-box',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+          </div>
+
           <div className={styles.passwordWrapper}>
             <input
               id="new-password"
@@ -156,6 +192,10 @@ export default function ChangePasswordPage() {
             <p className={`${styles.matchMessage} ${passwordsMatch ? styles.matchOk : styles.matchFail}`}>
               {passwordsMatch ? '✓ 비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
             </p>
+          )}
+
+          {errorMsg && (
+            <p style={{ color: '#ef4444', fontSize: 14, marginBottom: 8 }}>{errorMsg}</p>
           )}
 
           <Button type="submit" variant="success">

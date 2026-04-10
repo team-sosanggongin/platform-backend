@@ -7,6 +7,7 @@ import com.backoffice.sosangongin.account.dto.PasswordChangeRequest;
 import com.backoffice.sosangongin.account.usecase.AccountUseCase;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +24,19 @@ public class AccountController {
     private final SessionManager sessionManager;
 
     @PostMapping
-    public ResponseEntity<AccountResponse> create(@RequestBody AccountCreateRequest request) {
+    public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountCreateRequest request) {
         return ResponseEntity.status(201).body(accountUseCase.create(request));
     }
 
     @GetMapping
     public ResponseEntity<List<AccountResponse>> findAll() {
         return ResponseEntity.ok(accountUseCase.findAll());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AccountResponse> getMe() {
+        UUID accountId = sessionManager.getRequiredAccountId();
+        return ResponseEntity.ok(accountUseCase.findById(accountId));
     }
 
     @GetMapping("/{id}")
@@ -39,7 +46,7 @@ public class AccountController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<AccountResponse> update(@PathVariable UUID id,
-                                                  @RequestBody AccountUpdateRequest request) {
+                                                  @Valid @RequestBody AccountUpdateRequest request) {
         return ResponseEntity.ok(accountUseCase.update(id, request));
     }
 
@@ -56,9 +63,8 @@ public class AccountController {
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> changePassword(@RequestBody PasswordChangeRequest request) {
-        UUID requesterId = sessionManager.getAccountId()
-                .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody PasswordChangeRequest request) {
+        UUID requesterId = sessionManager.getRequiredAccountId();
         accountUseCase.changePassword(requesterId, request);
         return ResponseEntity.ok().build();
     }
