@@ -1,8 +1,10 @@
 package com.backoffice.sosangongin.notice.usecase;
 
+import com.backoffice.sosangongin.global.response.PageResponse;
 import com.backoffice.sosangongin.notice.dto.*;
 import com.backoffice.sosangongin.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,6 +24,12 @@ public class NoticeUseCase {
         return noticeService.findAll().stream()
                 .map(NoticeResponse::from)
                 .toList();
+    }
+
+    public PageResponse<NoticeResponse> findAll(String keyword, Pageable pageable) {
+        return PageResponse.from(
+                noticeService.findAll(keyword, pageable).map(NoticeResponse::from)
+        );
     }
 
     public NoticeResponse findById(Long id) {

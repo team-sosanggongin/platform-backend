@@ -2,6 +2,7 @@ package com.backoffice.sosangongin.notice.dto;
 
 import com.backoffice.sosangongin.notice.domain.Notice;
 import com.backoffice.sosangongin.notice.domain.NoticeStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,12 +18,21 @@ public class NoticeResponse {
     private String authorName;
     private UUID createdBy;
     private NoticeStatus status;
+
+    @JsonProperty("isPinned")
     private boolean isPinned;
+
+    @JsonProperty("isServiceMaintenance")
     private boolean isServiceMaintenance;
+
     private Long viewCount;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;
+    private LocalDateTime scheduledAt;
+    private LocalDateTime maintenanceStartAt;
+    private LocalDateTime maintenanceEndAt;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static NoticeResponse from(Notice notice) {
         return NoticeResponse.builder()
@@ -37,7 +47,11 @@ public class NoticeResponse {
                 .viewCount(notice.getViewCount())
                 .startsAt(notice.getStartsAt())
                 .endsAt(notice.getEndsAt())
+                .scheduledAt(notice.getScheduledAt())
+                .maintenanceStartAt(notice.getMaintenanceStartAt())
+                .maintenanceEndAt(notice.getMaintenanceEndAt())
                 .createdAt(notice.getCreatedAt())
+                .updatedAt(notice.getUpdatedAt())
                 .build();
     }
 }

@@ -8,18 +8,17 @@ import styles from './notices.module.css';
 interface NoticeFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (notice: Omit<Notice, 'id' | 'createdAt'>, status: NoticeStatus) => void;
-  onDelete?: (id: string) => void;
+  onSave: (data: Record<string, unknown>, status: NoticeStatus) => void;
+  onDelete?: (id: number) => void;
   notice?: Notice | null;
 }
 
 const emptyForm = {
   title: '',
   content: '',
-  author: '',
-  isSystemMaintenance: false,
-  startAt: '',
-  endAt: '',
+  isServiceMaintenance: false,
+  startsAt: '',
+  endsAt: '',
   maintenanceStartAt: '',
   maintenanceEndAt: '',
   isScheduled: false,
@@ -40,14 +39,13 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
       setForm({
         title: notice.title,
         content: notice.content,
-        author: notice.author,
-        isSystemMaintenance: notice.isSystemMaintenance,
-        startAt: notice.startAt ?? '',
-        endAt: notice.endAt ?? '',
-        maintenanceStartAt: notice.maintenanceStartAt ?? '',
-        maintenanceEndAt: notice.maintenanceEndAt ?? '',
-        isScheduled: notice.status === 'scheduled',
-        scheduledAt: notice.scheduledAt ?? '',
+        isServiceMaintenance: notice.isServiceMaintenance,
+        startsAt: notice.startsAt?.replace(' ', 'T')?.slice(0, 16) ?? '',
+        endsAt: notice.endsAt?.replace(' ', 'T')?.slice(0, 16) ?? '',
+        maintenanceStartAt: notice.maintenanceStartAt?.replace(' ', 'T')?.slice(0, 16) ?? '',
+        maintenanceEndAt: notice.maintenanceEndAt?.replace(' ', 'T')?.slice(0, 16) ?? '',
+        isScheduled: notice.status === 'SCHEDULED',
+        scheduledAt: notice.scheduledAt?.replace(' ', 'T')?.slice(0, 16) ?? '',
       });
     } else {
       setForm(emptyForm);
@@ -57,38 +55,35 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
   const set = (patch: Partial<typeof emptyForm>) => setForm((prev) => ({ ...prev, ...patch }));
 
   const handleSubmit = (status: NoticeStatus) => {
-    if (!form.title.trim() || !form.content.trim() || !form.author.trim()) {
-      alert('제목, 내용, 작성자를 입력해주세요.');
+    if (!form.title.trim() || !form.content.trim()) {
+      alert('제목과 내용을 입력해주세요.');
       return;
     }
-    if (status === 'scheduled' && !form.scheduledAt) {
+    if (!form.startsAt) {
+      alert('노출 시작 일시를 입력해주세요.');
+      return;
+    }
+    if (form.isScheduled && !form.scheduledAt) {
       alert('예약 발행 시간을 입력해주세요.');
       return;
     }
-    if (form.isSystemMaintenance && (!form.maintenanceStartAt || !form.maintenanceEndAt)) {
+    if (form.isServiceMaintenance && (!form.maintenanceStartAt || !form.maintenanceEndAt)) {
       alert('시스템 점검 시작/종료 시간을 입력해주세요.');
       return;
     }
-    onSave(
-      {
-        title: form.title,
-        content: form.content,
-        author: form.author,
-        isSystemMaintenance: form.isSystemMaintenance,
-        status,
-        startAt: form.startAt || undefined,
-        endAt: form.endAt || undefined,
-        scheduledAt: status === 'scheduled' ? form.scheduledAt : undefined,
-        publishedAt:
-          status === 'published'
-            ? new Date().toISOString().slice(0, 16).replace('T', ' ')
-            : notice?.publishedAt,
-        maintenanceStartAt: form.isSystemMaintenance ? form.maintenanceStartAt : undefined,
-        maintenanceEndAt: form.isSystemMaintenance ? form.maintenanceEndAt : undefined,
-      },
-      status,
-    );
-    onClose();
+
+    const payload: Record<string, unknown> = {
+      title: form.title,
+      content: form.content,
+      isServiceMaintenance: form.isServiceMaintenance,
+      startsAt: form.startsAt ? `${form.startsAt}:00` : null,
+      endsAt: form.endsAt ? `${form.endsAt}:00` : null,
+      scheduledAt: form.isScheduled && form.scheduledAt ? `${form.scheduledAt}:00` : null,
+      maintenanceStartAt: form.isServiceMaintenance && form.maintenanceStartAt ? `${form.maintenanceStartAt}:00` : null,
+      maintenanceEndAt: form.isServiceMaintenance && form.maintenanceEndAt ? `${form.maintenanceEndAt}:00` : null,
+    };
+
+    onSave(payload, status);
   };
 
   const isEdit = !!notice;
@@ -99,11 +94,11 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
       onClose={onClose}
       title={isEdit ? '공지 수정' : '공지 작성'}
       actions={[
-        { label: '임시저장', variant: 'secondary', onClick: () => handleSubmit('draft') },
+        { label: '임시저장', variant: 'secondary', onClick: () => handleSubmit('DRAFT') },
         {
           label: form.isScheduled ? '예약 발행' : '발행',
           variant: form.isScheduled ? 'primary' : 'success',
-          onClick: () => handleSubmit(form.isScheduled ? 'scheduled' : 'published'),
+          onClick: () => handleSubmit(form.isScheduled ? 'SCHEDULED' : 'PUBLISHED'),
         },
       ]}
       deleteConfig={
@@ -124,14 +119,6 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
         placeholder="공지 제목을 입력하세요"
       />
 
-      <Input
-        label="작성자"
-        id="notice-author"
-        value={form.author}
-        onChange={(e) => set({ author: e.target.value })}
-        placeholder="작성자 이름을 입력하세요"
-      />
-
       <div className={styles.fieldGroup}>
         <label className={styles.fieldLabel}>내용</label>
         <textarea
@@ -148,17 +135,17 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
         <div className={styles.dateRow}>
           <Input
             label="시작 일시"
-            id="notice-startAt"
+            id="notice-startsAt"
             type="datetime-local"
-            value={form.startAt}
-            onChange={(e) => set({ startAt: e.target.value })}
+            value={form.startsAt}
+            onChange={(e) => set({ startsAt: e.target.value })}
           />
           <Input
             label="종료 일시"
-            id="notice-endAt"
+            id="notice-endsAt"
             type="datetime-local"
-            value={form.endAt}
-            onChange={(e) => set({ endAt: e.target.value })}
+            value={form.endsAt}
+            onChange={(e) => set({ endsAt: e.target.value })}
           />
         </div>
       </div>
@@ -167,16 +154,16 @@ export const NoticeFormModal: React.FC<NoticeFormModalProps> = ({
         <label className={styles.checkLabel}>
           <input
             type="checkbox"
-            checked={form.isSystemMaintenance}
+            checked={form.isServiceMaintenance}
             onChange={(e) =>
-              set({ isSystemMaintenance: e.target.checked, maintenanceStartAt: '', maintenanceEndAt: '' })
+              set({ isServiceMaintenance: e.target.checked, maintenanceStartAt: '', maintenanceEndAt: '' })
             }
           />
           <span>시스템 점검 공지</span>
         </label>
       </div>
 
-      {form.isSystemMaintenance && (
+      {form.isServiceMaintenance && (
         <div className={styles.maintenanceBox}>
           <div className={styles.sectionTitle}>시스템 점검 시간</div>
           <div className={styles.dateRow}>

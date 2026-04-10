@@ -53,12 +53,26 @@ public class Notice extends SoftDeletedBaseEntity {
     @Column(name = "ends_at")
     private LocalDateTime endsAt;
 
-    public void update(String title, String content, LocalDateTime startsAt, LocalDateTime endsAt, boolean isServiceMaintenance) {
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
+
+    @Column(name = "maintenance_start_at")
+    private LocalDateTime maintenanceStartAt;
+
+    @Column(name = "maintenance_end_at")
+    private LocalDateTime maintenanceEndAt;
+
+    public void update(String title, String content, LocalDateTime startsAt, LocalDateTime endsAt,
+                       boolean isServiceMaintenance, LocalDateTime scheduledAt,
+                       LocalDateTime maintenanceStartAt, LocalDateTime maintenanceEndAt) {
         this.title = title;
         this.content = content;
         this.startsAt = startsAt;
         this.endsAt = endsAt;
         this.isServiceMaintenance = isServiceMaintenance;
+        this.scheduledAt = scheduledAt;
+        this.maintenanceStartAt = maintenanceStartAt;
+        this.maintenanceEndAt = maintenanceEndAt;
     }
 
     public void changeStatus(NoticeStatus status) {

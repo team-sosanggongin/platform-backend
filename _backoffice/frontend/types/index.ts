@@ -31,7 +31,7 @@ export interface Role {
   updatedAt?: string;
 }
 
-export type NoticeStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
+export type NoticeStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN' | 'SCHEDULED';
 
 export interface Notice {
   id: number;
@@ -39,10 +39,23 @@ export interface Notice {
   content: string;
   isServiceMaintenance: boolean;
   status: NoticeStatus;
+  isPinned: boolean;
   startsAt?: string;
   endsAt?: string;
+  scheduledAt?: string;
+  maintenanceStartAt?: string;
+  maintenanceEndAt?: string;
   authorName: string;
   createdBy: string;
   viewCount: number | null;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
