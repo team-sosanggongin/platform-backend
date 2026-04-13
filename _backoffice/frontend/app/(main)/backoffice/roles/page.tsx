@@ -1,69 +1,57 @@
 'use client';
 
-import { useState } from 'react';
-import { Role } from "@/types";
-import {Badge, Button, ListLayout, TableColumn} from "@/components";
-import {User} from "@/types";import { RoleFormModal } from './RoleFormModal';
+import { useCallback, useEffect, useState } from 'react';
+import { Badge, Button, ListLayout, TableColumn } from '@/components';
+import { Role } from '@/types';
+import { api, ApiError } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { RoleFormModal, RoleFormPayload } from './RoleFormModal';
 
-const INITIAL_ROLES: Role[] = [
-  {
-    id: '1',
-    name: 'Admin',
-    description: '모든 기능에 대한 전체 접근 권한',
-    permissions: [
-      { id: 'p1', permission: '*.notices' },
-      { id: 'p2', permission: '*.members' },
-      { id: 'p3', permission: '*.roles' },
-    ],
-    createdAt: '2023-01-01 00:00',
-  },
-  {
-    id: '2',
-    name: 'Manager',
-    description: '사용자 조회 및 공지 관리 권한',
-    permissions: [
-      { id: 'p4', permission: 'read.members' },
-      { id: 'p5', permission: '*.notices' },
-    ],
-    createdAt: '2023-01-01 00:00',
-  },
-  {
-    id: '3',
-    name: 'Editor',
-    description: '공지 조회 및 작성 권한',
-    permissions: [
-      { id: 'p6', permission: 'read.notices' },
-      { id: 'p7', permission: 'write.notices' },
-    ],
-    createdAt: '2023-06-01 00:00',
-    updatedAt: '2024-01-15 10:30',
-  },
-];
-
-let nextId = INITIAL_ROLES.length + 1;
+const formatDateTime = (value?: string) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleString('ko-KR');
+};
 
 export default function RolesPage() {
-  const [roles, setRoles] = useState<Role[]>(INITIAL_ROLES);
+  const { me, loading } = useAuth();
+  const [roles, setRoles] = useState<Role[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const itemsPerPage = 8;
+  const isRoot = me?.root ?? false;
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const data = await api.get<Role[]>('/api/role');
+      setRoles(data);
+    } catch (e) {
+      if (e instanceof ApiError) setErrorMsg(e.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    fetchRoles();
+  }, [loading, fetchRoles]);
 
   const filtered = roles.filter(
     (r) =>
-      r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      r.roleName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (r.description ?? '').toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const currentItems = filtered.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
   const handleRowClick = (role: Role) => {
+    if (!isRoot) return;
     setSelectedRole(role);
     setIsModalOpen(true);
   };
@@ -73,32 +61,61 @@ export default function RolesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = (data: Omit<Role, 'id' | 'createdAt'>) => {
-    const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
-    if (selectedRole) {
-      setRoles((prev) =>
-        prev.map((r) => (r.id === selectedRole.id ? { ...r, ...data } : r)),
-      );
-    } else {
-      setRoles((prev) => [...prev, { id: String(nextId++), createdAt: now, ...data }]);
+  const handleSave = async (payload: RoleFormPayload) => {
+    try {
+      let roleId: number;
+      if (selectedRole) {
+        const updated = await api.put<Role>(`/api/role/${selectedRole.id}`, {
+          roleName: payload.roleName,
+          description: payload.description,
+        });
+        roleId = updated.id;
+      } else {
+        const created = await api.post<Role>('/api/role', {
+          roleName: payload.roleName,
+          description: payload.description,
+        });
+        roleId = created.id;
+      }
+
+      await api.put(`/api/role/${roleId}/permissions`, {
+        permissionIds: payload.permissionIds,
+      });
+
+      setIsModalOpen(false);
+      setCurrentPage(1);
+      await fetchRoles();
+    } catch (e) {
+      if (e instanceof ApiError) {
+        alert(`저장에 실패했습니다: ${e.message}`);
+      } else {
+        alert('저장에 실패했습니다.');
+      }
     }
-    setCurrentPage(1);
   };
 
-  const handleDelete = (id: string) => {
-    setRoles((prev) => prev.filter((r) => r.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      await api.delete(`/api/role/${id}`);
+      setIsModalOpen(false);
+      await fetchRoles();
+    } catch (e) {
+      if (e instanceof ApiError) {
+        alert(`삭제에 실패했습니다: ${e.message}`);
+      }
+    }
   };
 
   const columns: TableColumn<Role>[] = [
     { header: 'No', render: (r) => r.id, width: '60px' },
-    { header: '역할', render: (r) => <strong>{r.name}</strong>, width: '130px' },
-    { header: '설명', render: (r) => r.description },
+    { header: '역할', render: (r) => <strong>{r.roleName}</strong>, width: '160px' },
+    { header: '설명', render: (r) => r.description ?? '-' },
     {
       header: '권한 목록',
       render: (r) => (
         <span style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
           {r.permissions.slice(0, 3).map((p) => (
-            <Badge key={p.id} variant="info">{p.permission}</Badge>
+            <Badge key={p.id} variant="info">{p.permissionName}</Badge>
           ))}
           {r.permissions.length > 3 && (
             <Badge variant="info">+{r.permissions.length - 3}</Badge>
@@ -107,15 +124,22 @@ export default function RolesPage() {
       ),
     },
     { header: '권한 수', render: (r) => `${r.permissions.length}개`, width: '80px' },
-    { header: '등록일', render: (r) => r.createdAt, width: '140px' },
-    { header: '수정일', render: (r) => r.updatedAt ?? '-', width: '140px' },
+    { header: '등록일', render: (r) => formatDateTime(r.createdAt), width: '180px' },
+    { header: '수정일', render: (r) => formatDateTime(r.updatedAt), width: '180px' },
   ];
 
-  const searchOptions = [{ value: 'name', label: '역할' },
-      { value: 'permission', label: '권한' },];
+  const searchOptions = [{ value: 'name', label: '역할' }];
+
+  if (loading) return null;
 
   return (
     <>
+      {errorMsg && (
+        <div style={{ padding: '12px 16px', margin: '0 0 12px', background: '#fee', color: '#c33', borderRadius: 4 }}>
+          {errorMsg}
+        </div>
+      )}
+
       <ListLayout
         title="권한 관리"
         search={{
@@ -133,13 +157,15 @@ export default function RolesPage() {
           data: currentItems,
           rowKey: (r) => r.id,
           emptyMessage: '등록된 권한이 없습니다.',
-          onRowClick: handleRowClick,
+          onRowClick: isRoot ? handleRowClick : undefined,
         }}
         pagination={{ currentPage, totalPages, onPageChange: setCurrentPage }}
         extraActions={
-          <Button style={{ width: 'auto' }} onClick={handleOpenCreate}>
-            + 권한 추가
-          </Button>
+          isRoot ? (
+            <Button style={{ width: 'auto' }} onClick={handleOpenCreate}>
+              + 권한 추가
+            </Button>
+          ) : undefined
         }
       />
 

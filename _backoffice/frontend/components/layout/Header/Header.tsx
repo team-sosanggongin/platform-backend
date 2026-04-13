@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '../../molecules/Navbar/Navbar';
 import { ConfirmModal } from '../../molecules/ConfirmModal/ConfirmModal';
 import styles from './Header.module.css';
-import {NavigationItem} from "@/types";
+import { NavigationItem } from '@/types';
 import { api } from '../../../lib/api';
+import { useAuth } from '@/lib/auth-context';
 
-const menuItems: NavigationItem[] = [
+const ROOT_ONLY_PATHS = new Set<string>();
+
+const allMenuItems: NavigationItem[] = [
   {
     label: '사용자 관리',
     subItems: [
@@ -30,6 +33,17 @@ const menuItems: NavigationItem[] = [
 export const Header: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const { me } = useAuth();
+
+  const menuItems = useMemo(() => {
+    if (me?.root) return allMenuItems;
+    return allMenuItems
+      .map((group) => ({
+        ...group,
+        subItems: group.subItems?.filter((item) => !item.href || !ROOT_ONLY_PATHS.has(item.href)),
+      }))
+      .filter((group) => (group.subItems?.length ?? 0) > 0);
+  }, [me]);
 
   const handleLogoutClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -56,8 +70,8 @@ export const Header: React.FC = () => {
         <Navbar items={menuItems} />
       </div>
       <div className={styles.nav}>
-        <span 
-          className={styles.navLink} 
+        <span
+          className={styles.navLink}
           onClick={handleLogoutClick}
           style={{ cursor: 'pointer' }}
         >

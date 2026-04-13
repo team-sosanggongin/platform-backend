@@ -5,6 +5,7 @@ import com.backoffice.sosangongin.role.domain.RoleBackoffice;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -14,6 +15,8 @@ public class RoleResponse {
     private String roleName;
     private String description;
     private List<PermissionResponse> permissions;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static RoleResponse from(RoleBackoffice role) {
         return RoleResponse.builder()
@@ -23,6 +26,8 @@ public class RoleResponse {
                 .permissions(role.getRolePermissions().stream()
                         .map(rp -> PermissionResponse.from(rp.getPermission()))
                         .toList())
+                .createdAt(role.getCreatedAt())
+                .updatedAt(role.getUpdatedAt())
                 .build();
     }
 }

@@ -4,6 +4,12 @@ export interface NavigationItem {
   subItems?: NavigationItem[];
 }
 
+export interface RoleSummary {
+  id: number;
+  roleName: string;
+  description: string;
+}
+
 export interface User {
   id: string;
   loginId: string;
@@ -15,18 +21,21 @@ export interface User {
   passwordExpired: boolean;
   lockedAt: string | null;
   createdAt: string;
+  roles?: RoleSummary[];
+  permissionCodes?: string[];
 }
 
-export interface RolePermission {
-  id: string;
-  permission: string;
+export interface Permission {
+  id: number;
+  permissionName: string;
+  permDomain: string;
 }
 
 export interface Role {
-  id: string;
-  name: string;
+  id: number;
+  roleName: string;
   description: string;
-  permissions: RolePermission[];
+  permissions: Permission[];
   createdAt: string;
   updatedAt?: string;
 }

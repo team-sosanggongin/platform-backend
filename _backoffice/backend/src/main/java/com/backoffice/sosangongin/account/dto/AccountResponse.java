@@ -1,10 +1,13 @@
 package com.backoffice.sosangongin.account.dto;
 
 import com.backoffice.sosangongin.auth.domain.BackofficeAdmin;
+import com.backoffice.sosangongin.role.dto.RoleSummary;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,8 +23,18 @@ public class AccountResponse {
     private boolean isPasswordExpired;
     private LocalDateTime lockedAt;
     private LocalDateTime createdAt;
+    private List<RoleSummary> roles;
+    private List<String> permissionCodes;
 
     public static AccountResponse from(BackofficeAdmin admin) {
+        return from(admin, Collections.emptyList(), Collections.emptyList());
+    }
+
+    public static AccountResponse from(BackofficeAdmin admin, List<RoleSummary> roles) {
+        return from(admin, roles, Collections.emptyList());
+    }
+
+    public static AccountResponse from(BackofficeAdmin admin, List<RoleSummary> roles, List<String> permissionCodes) {
         return AccountResponse.builder()
                 .id(admin.getId())
                 .loginId(admin.getLoginId())
@@ -33,6 +46,8 @@ public class AccountResponse {
                 .isPasswordExpired(admin.isPasswordExpired())
                 .lockedAt(admin.getLockedAt())
                 .createdAt(admin.getCreatedAt())
+                .roles(roles)
+                .permissionCodes(permissionCodes)
                 .build();
     }
 }

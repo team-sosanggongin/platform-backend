@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Notice, NoticeStatus, PageResponse } from "@/types";
 import { Badge, Button, ListLayout, TableColumn } from '@/components';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
+import { useAuth, useHasPermission } from '@/lib/auth-context';
 import { NoticeFormModal } from './NoticeFormModal';
 
 const STATUS_LABEL: Record<NoticeStatus, string> = {
@@ -21,6 +22,11 @@ const STATUS_VARIANT: Record<NoticeStatus, 'success' | 'info' | 'warning' | 'err
 };
 
 export default function NoticesPage() {
+  const { me } = useAuth();
+  const canCreate = useHasPermission('create.notice');
+  const canUpdate = useHasPermission('update.notice');
+  const canDelete = useHasPermission('delete.notice');
+
   const [notices, setNotices] = useState<Notice[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,8 +82,11 @@ export default function NoticesPage() {
       setCurrentPage(1);
       await fetchNotices();
     } catch (e) {
-      console.error('공지사항 저장 실패:', e);
-      alert('저장에 실패했습니다.');
+      if (e instanceof ApiError) {
+        alert(e.message);
+      } else {
+        alert('저장에 실패했습니다.');
+      }
     }
   };
 
@@ -87,8 +96,11 @@ export default function NoticesPage() {
       setIsModalOpen(false);
       await fetchNotices();
     } catch (e) {
-      console.error('공지사항 삭제 실패:', e);
-      alert('삭제에 실패했습니다.');
+      if (e instanceof ApiError) {
+        alert(e.message);
+      } else {
+        alert('삭제에 실패했습니다.');
+      }
     }
   };
 
@@ -151,17 +163,19 @@ export default function NoticesPage() {
         }}
         pagination={{ currentPage, totalPages, onPageChange: setCurrentPage }}
         extraActions={
-          <Button style={{ width: 'auto' }} onClick={handleOpenCreate}>
-            + 새 공지 작성
-          </Button>
+          canCreate ? (
+            <Button style={{ width: 'auto' }} onClick={handleOpenCreate}>
+              + 새 공지 작성
+            </Button>
+          ) : undefined
         }
       />
 
       <NoticeFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        onDelete={handleDelete}
+        onSave={canUpdate || canCreate ? handleSave : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
         notice={selectedNotice}
       />
     </>

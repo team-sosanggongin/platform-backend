@@ -6,7 +6,7 @@ import com.backoffice.sosangongin.account.dto.AccountUpdateRequest;
 import com.backoffice.sosangongin.account.dto.PasswordChangeRequest;
 import com.backoffice.sosangongin.account.usecase.AccountUseCase;
 import com.backoffice.sosangongin.auth.session.SessionManager;
-import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
+import com.backoffice.sosangongin.global.aop.RequiresRoot;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,7 @@ public class AccountController {
     private final SessionManager sessionManager;
 
     @PostMapping
+    @RequiresRoot
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountCreateRequest request) {
         return ResponseEntity.status(201).body(accountUseCase.create(request));
     }
@@ -36,27 +37,31 @@ public class AccountController {
     @GetMapping("/me")
     public ResponseEntity<AccountResponse> getMe() {
         UUID accountId = sessionManager.getRequiredAccountId();
-        return ResponseEntity.ok(accountUseCase.findById(accountId));
+        return ResponseEntity.ok(accountUseCase.getMe(accountId));
     }
 
     @GetMapping("/{id}")
+    @RequiresRoot
     public ResponseEntity<AccountResponse> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(accountUseCase.findById(id));
     }
 
     @PatchMapping("/{id}")
+    @RequiresRoot
     public ResponseEntity<AccountResponse> update(@PathVariable UUID id,
                                                   @Valid @RequestBody AccountUpdateRequest request) {
         return ResponseEntity.ok(accountUseCase.update(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @RequiresRoot
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         accountUseCase.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/unlock")
+    @RequiresRoot
     public ResponseEntity<Void> unlock(@PathVariable UUID id) {
         accountUseCase.unlock(id);
         return ResponseEntity.ok().build();

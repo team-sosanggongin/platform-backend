@@ -9,8 +9,6 @@ import com.backoffice.sosangongin.permission.repository.PermissionRepository;
 import com.backoffice.sosangongin.role.domain.AccountRole;
 import com.backoffice.sosangongin.role.domain.AccountRoleId;
 import com.backoffice.sosangongin.role.domain.RoleBackoffice;
-import com.backoffice.sosangongin.role.domain.RolePermission;
-import com.backoffice.sosangongin.role.domain.RolePermissionId;
 import com.backoffice.sosangongin.role.repository.AccountRoleRepository;
 import com.backoffice.sosangongin.role.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +47,23 @@ public class RoleService {
     }
 
     @Transactional(readOnly = true)
+    public List<RoleBackoffice> findRolesByAccountId(UUID accountId) {
+        return accountRoleRepository.findByIdAccountId(accountId).stream()
+                .map(AccountRole::getRole)
+                .filter(role -> !role.isDeleted())
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findPermissionCodesByAccountId(UUID accountId) {
+        return findRolesByAccountId(accountId).stream()
+                .flatMap(role -> role.getRolePermissions().stream())
+                .map(rp -> rp.getPermission().getPermissionName())
+                .distinct()
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public RoleBackoffice findById(Long id) {
         return roleRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 role입니다."));
@@ -76,15 +91,7 @@ public class RoleService {
             throw new EntityNotFoundException("존재하지 않는 permission이 포함되어 있습니다.");
         }
 
-        List<RolePermission> newMappings = permissions.stream()
-                .map(p -> RolePermission.builder()
-                        .id(new RolePermissionId(roleId, p.getId()))
-                        .role(role)
-                        .permission(p)
-                        .build())
-                .toList();
-
-        role.updatePermissions(newMappings);
+        role.replacePermissions(permissions);
     }
 
     @Transactional

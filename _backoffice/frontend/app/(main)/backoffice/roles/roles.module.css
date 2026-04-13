@@ -18,44 +18,45 @@
   color: #555;
 }
 
-.permList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.permRow {
-  display: grid;
-  grid-template-columns: 1fr 36px;
-  gap: 8px;
-  align-items: center;
-}
-
-.permRow > * {
-  margin-bottom: 0 !important;
-}
-
-.removeBtn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  background: none;
-  border: 1px solid #ddd;
+.permGroup {
+  margin-bottom: 12px;
+  border: 1px solid #eee;
   border-radius: 4px;
-  cursor: pointer;
-  color: #999;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
+  overflow: hidden;
 }
 
-.removeBtn:hover {
-  background-color: #fff0f0;
-  border-color: #dc3545;
-  color: #dc3545;
+.permGroupTitle {
+  padding: 8px 12px;
+  background-color: #f6f7f9;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #eee;
+}
+
+.permGroupBody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px;
+}
+
+.permCheckItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.permCheckItem input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
 }
 
 .emptyPerm {
@@ -66,4 +67,47 @@
   background-color: #fafafa;
   border-radius: 4px;
   border: 1px dashed #ddd;
+}
+
+.roleCard {
+  margin-top: 16px;
+}
+
+.roleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roleCheckItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.roleCheckItem:hover {
+  background-color: #f8f9fb;
+  border-color: #d0d4da;
+}
+
+.roleCheckItem input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.roleCheckName {
+  font-weight: 600;
+  color: #333;
+  min-width: 120px;
+}
+
+.roleCheckDesc {
+  font-size: 12px;
+  color: #777;
 }

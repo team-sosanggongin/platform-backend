@@ -1,49 +1,57 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { User } from '@/types';
+import { Role, User } from '@/types';
 import styles from './edit.module.css';
 import { Badge, Button, Card, DetailRow, Input } from '@/components';
 import { ConfirmModal } from '@/components/molecules/ConfirmModal/ConfirmModal';
 import { api, ApiError } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 export default function UserDetailPage() {
   const router = useRouter();
   const params = useParams();
   const userId = params.id as string;
+  const { me, loading } = useAuth();
 
   const [user, setUser] = useState<User | null>(null);
-  const [isRoot, setIsRoot] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '', phoneNumber: '' });
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [unlockSuccess, setUnlockSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
+
+  const [isEditingRoles, setIsEditingRoles] = useState(false);
+  const [editingRoleIds, setEditingRoleIds] = useState<Set<number>>(new Set());
+  const [roleSaving, setRoleSaving] = useState(false);
+
+  const loadUser = useCallback(async () => {
+    const data = await api.get<User>(`/api/account/${userId}`);
+    setUser(data);
+    setEditForm({
+      name: data.name,
+      email: data.email ?? '',
+      phoneNumber: data.phoneNumber ?? '',
+    });
+    return data;
+  }, [userId]);
 
   useEffect(() => {
-    api.get<User>('/api/account/me')
-      .then((me) => {
-        if (!me.root) {
-          router.push('/backoffice/users');
-          return;
-        }
-        setIsRoot(true);
-        return api.get<User>(`/api/account/${userId}`);
-      })
-      .then((data) => {
-        if (!data) return;
-        setUser(data);
-        setEditForm({
-          name: data.name,
-          email: data.email ?? '',
-          phoneNumber: data.phoneNumber ?? '',
-        });
-      })
-      .catch(console.error);
-  }, [userId]);
+    if (loading) return;
+    if (!me?.root) {
+      router.push('/backoffice');
+      return;
+    }
+    Promise.all([loadUser(), api.get<Role[]>('/api/role')])
+      .then(([, roles]) => setAllRoles(roles))
+      .catch((e) => {
+        if (e instanceof ApiError) setErrorMsg(e.message);
+      });
+  }, [me, loading, loadUser, router]);
 
   const handleUnlock = async () => {
     if (!user) return;
@@ -82,9 +90,65 @@ export default function UserDetailPage() {
     }
   };
 
+  const originalRoleIds = new Set((user?.roles ?? []).map((r) => r.id));
+
+  const handleStartEditRoles = () => {
+    setEditingRoleIds(new Set(originalRoleIds));
+    setIsEditingRoles(true);
+  };
+
+  const handleCancelEditRoles = () => {
+    setEditingRoleIds(new Set(originalRoleIds));
+    setIsEditingRoles(false);
+  };
+
+  const handleToggleEditingRole = (roleId: number) => {
+    setEditingRoleIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(roleId)) next.delete(roleId);
+      else next.add(roleId);
+      return next;
+    });
+  };
+
+  const handleSaveRoles = async () => {
+    const added = Array.from(editingRoleIds).filter((id) => !originalRoleIds.has(id));
+    const removed = Array.from(originalRoleIds).filter((id) => !editingRoleIds.has(id));
+
+    if (added.length === 0 && removed.length === 0) {
+      setIsEditingRoles(false);
+      return;
+    }
+
+    setRoleSaving(true);
+    try {
+      const requests: Promise<unknown>[] = [
+        ...added.map((roleId) => api.post(`/api/role/${roleId}/account/${userId}`)),
+        ...removed.map((roleId) => api.delete(`/api/role/${roleId}/account/${userId}`)),
+      ];
+      await Promise.all(requests);
+      await loadUser();
+      setIsEditingRoles(false);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrorMsg(e.message);
+      } else {
+        alert('역할 저장에 실패했습니다.');
+      }
+    } finally {
+      setRoleSaving(false);
+    }
+  };
+
   if (!user) {
     return <div className={styles.container}>로딩 중...</div>;
   }
+
+  const displayRoleIds = isEditingRoles ? editingRoleIds : originalRoleIds;
+  const hasRoleChanges = isEditingRoles && (
+    Array.from(editingRoleIds).some((id) => !originalRoleIds.has(id)) ||
+    Array.from(originalRoleIds).some((id) => !editingRoleIds.has(id))
+  );
 
   return (
     <div className={styles.container}>
@@ -108,7 +172,7 @@ export default function UserDetailPage() {
         <div className={styles.cardHeader}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h2 className={styles.cardTitle}>사용자 상세 정보</h2>
-            {isRoot && (
+            {me?.root && (
               <div style={{ display: 'flex', gap: '8px' }}>
                 {user.locked && (
                   <Button variant="danger" style={{ width: 'auto', padding: '0 16px', height: 36 }}
@@ -191,6 +255,85 @@ export default function UserDetailPage() {
                 onClick={() => router.push('/backoffice/users')}>
                 목록으로 돌아가기
               </Button>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <Card className={styles.formCard} style={{ marginTop: 16 }}>
+        <div className={styles.cardHeader}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h2 className={styles.cardTitle}>할당된 역할</h2>
+            {!user.root && allRoles.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {!isEditingRoles ? (
+                  <Button style={{ width: 'auto', padding: '0 16px', height: 36 }}
+                    onClick={handleStartEditRoles}>
+                    역할 편집
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="success" style={{ width: 'auto', padding: '0 16px', height: 36 }}
+                      onClick={handleSaveRoles}
+                      disabled={roleSaving || !hasRoleChanges}>
+                      {roleSaving ? '저장 중...' : '저장'}
+                    </Button>
+                    <Button variant="secondary" style={{ width: 'auto', padding: '0 16px', height: 36 }}
+                      onClick={handleCancelEditRoles}
+                      disabled={roleSaving}>
+                      취소
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className={styles.cardBody}>
+          {user.root ? (
+            <div style={{ padding: '16px', color: '#64748b', fontSize: '0.875rem' }}>
+              ROOT 계정은 모든 권한을 보유하므로 별도의 역할 할당이 필요하지 않습니다.
+            </div>
+          ) : allRoles.length === 0 ? (
+            <div style={{ padding: '16px', color: '#64748b', fontSize: '0.875rem' }}>
+              등록된 역할이 없습니다. 먼저 권한 관리 화면에서 역할을 생성하세요.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {allRoles.map((role) => {
+                const checked = displayRoleIds.has(role.id);
+                const disabled = !isEditingRoles || roleSaving;
+                return (
+                  <label
+                    key={role.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '10px 12px',
+                      border: `1px solid ${isEditingRoles && checked !== originalRoleIds.has(role.id) ? '#3b82f6' : '#eee'}`,
+                      borderRadius: 4,
+                      cursor: disabled ? 'default' : 'pointer',
+                      backgroundColor: isEditingRoles && checked !== originalRoleIds.has(role.id) ? '#eff6ff' : 'transparent',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={disabled}
+                      onChange={() => handleToggleEditingRole(role.id)}
+                      style={{ width: 16, height: 16, cursor: disabled ? 'default' : 'pointer' }}
+                    />
+                    <span style={{ fontWeight: 600, color: '#0f172a', minWidth: 140 }}>
+                      {role.roleName}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>
+                      {role.description ?? '-'}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           )}
         </div>

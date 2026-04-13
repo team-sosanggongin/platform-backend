@@ -120,4 +120,112 @@ class RoleApiTest {
         mockMvc.perform(get("/api/role"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("role-permission 매핑 정상 - 신규 생성")
+    void updatePermissions_createNew() throws Exception {
+        Long permId1 = createPermission("reg.perm.new.one", "regtest-new");
+        Long permId2 = createPermission("reg.perm.new.two", "regtest-new");
+        Long roleId = createRoleForTest("regression-role-new", "신규 매핑 회귀");
+
+        String body = objectMapper.writeValueAsString(
+                Map.of("permissionIds", List.of(permId1, permId2)));
+
+        mockMvc.perform(put("/api/role/" + roleId + "/permissions")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/role/" + roleId)
+                        .session(rootSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.permissions.length()").value(2));
+    }
+
+    @Test
+    @DisplayName("role-permission 매핑 정상 - 기존 권한 유지 + 신규 추가 (NonUniqueObjectException 회귀)")
+    void updatePermissions_keepExistingAndAdd() throws Exception {
+        Long permId1 = createPermission("reg.perm.keep.one", "regtest-keep");
+        Long permId2 = createPermission("reg.perm.keep.two", "regtest-keep");
+        Long permId3 = createPermission("reg.perm.keep.three", "regtest-keep");
+        Long roleId = createRoleForTest("regression-role-keep", "기존 유지 + 추가 회귀");
+
+        String firstBody = objectMapper.writeValueAsString(
+                Map.of("permissionIds", List.of(permId1, permId2)));
+        mockMvc.perform(put("/api/role/" + roleId + "/permissions")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(firstBody))
+                .andExpect(status().isOk());
+
+        String secondBody = objectMapper.writeValueAsString(
+                Map.of("permissionIds", List.of(permId1, permId2, permId3)));
+        mockMvc.perform(put("/api/role/" + roleId + "/permissions")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(secondBody))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/role/" + roleId)
+                        .session(rootSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.permissions.length()").value(3));
+    }
+
+    @Test
+    @DisplayName("role-permission 매핑 정상 - 일부 제거 + 일부 추가")
+    void updatePermissions_removeAndAdd() throws Exception {
+        Long permId1 = createPermission("reg.perm.swap.one", "regtest-swap");
+        Long permId2 = createPermission("reg.perm.swap.two", "regtest-swap");
+        Long permId3 = createPermission("reg.perm.swap.three", "regtest-swap");
+        Long roleId = createRoleForTest("regression-role-swap", "제거+추가 회귀");
+
+        String firstBody = objectMapper.writeValueAsString(
+                Map.of("permissionIds", List.of(permId1, permId2)));
+        mockMvc.perform(put("/api/role/" + roleId + "/permissions")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(firstBody))
+                .andExpect(status().isOk());
+
+        String secondBody = objectMapper.writeValueAsString(
+                Map.of("permissionIds", List.of(permId2, permId3)));
+        mockMvc.perform(put("/api/role/" + roleId + "/permissions")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(secondBody))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/role/" + roleId)
+                        .session(rootSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.permissions.length()").value(2));
+    }
+
+    private Long createPermission(String name, String domain) throws Exception {
+        String body = objectMapper.writeValueAsString(
+                Map.of("permissionName", name, "permDomain", domain));
+        MvcResult result = mockMvc.perform(post("/api/permission")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString())
+                .get("id").asLong();
+    }
+
+    private Long createRoleForTest(String name, String description) throws Exception {
+        String body = objectMapper.writeValueAsString(
+                Map.of("roleName", name, "description", description));
+        MvcResult result = mockMvc.perform(post("/api/role")
+                        .session(rootSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andReturn();
+        return objectMapper.readTree(result.getResponse().getContentAsString())
+                .get("id").asLong();
+    }
 }

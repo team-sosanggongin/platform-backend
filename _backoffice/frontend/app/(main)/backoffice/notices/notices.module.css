@@ -77,3 +77,35 @@
   color: #663c00;
   border-bottom-color: #ffd6a0;
 }
+
+/* 상세 보기 */
+.detailRow {
+  display: flex;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 12px;
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  min-width: 80px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.detailValue {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.detailContent {
+  font-size: 14px;
+  color: #0f172a;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Badge, Button, ListLayout, TableColumn } from '@/components';
 import { User } from '@/types';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 const getStatus = (user: User) => {
   if (user.locked) return { label: '잠금', variant: 'error' as const };
@@ -14,6 +15,7 @@ const getStatus = (user: User) => {
 
 export default function UserManagementPage() {
   const router = useRouter();
+  const { me, loading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [searchField, setSearchField] = useState('name');
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,24 +23,36 @@ export default function UserManagementPage() {
   const itemsPerPage = 10;
 
   useEffect(() => {
+    if (loading) return;
     api.get<User[]>('/api/account').then(setUsers).catch(console.error);
-  }, []);
+  }, [loading]);
 
   const filtered = users.filter((user) => {
     const value = user[searchField as keyof User]?.toString().toLowerCase() ?? '';
     return value.includes(searchQuery.toLowerCase());
   });
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const currentItems = filtered.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
+  const isRoot = me?.root ?? false;
+
   const columns: TableColumn<User>[] = [
     { header: '아이디', render: (user) => user.loginId, width: '120px' },
     { header: '이름', render: (user) => user.name },
     { header: '이메일', render: (user) => user.email ?? '-' },
+    {
+      header: '역할',
+      render: (user) => {
+        if (user.root) return <Badge variant="info">ROOT</Badge>;
+        const names = user.roles?.map((r) => r.roleName) ?? [];
+        return names.length > 0 ? names.join(', ') : '-';
+      },
+      width: '180px',
+    },
     {
       header: '상태',
       render: (user) => {
@@ -56,6 +70,8 @@ export default function UserManagementPage() {
     { value: 'email', label: '이메일' },
   ];
 
+  if (loading) return null;
+
   return (
     <ListLayout
       title="사용자 관리"
@@ -71,13 +87,15 @@ export default function UserManagementPage() {
         data: currentItems,
         rowKey: (user) => user.id,
         emptyMessage: '등록된 사용자가 없습니다.',
-        onRowClick: (user) => router.push(`/backoffice/users/${user.id}`),
+        onRowClick: isRoot ? (user) => router.push(`/backoffice/users/${user.id}`) : undefined,
       }}
       pagination={{ currentPage, totalPages, onPageChange: setCurrentPage }}
       extraActions={
-        <Button style={{ width: 'auto' }} onClick={() => router.push('/backoffice/users/new')}>
-          + 유저 등록
-        </Button>
+        isRoot ? (
+          <Button style={{ width: 'auto' }} onClick={() => router.push('/backoffice/users/new')}>
+            + 유저 등록
+          </Button>
+        ) : undefined
       }
     />
   );
