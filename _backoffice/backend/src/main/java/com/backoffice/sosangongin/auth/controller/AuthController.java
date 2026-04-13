@@ -1,10 +1,12 @@
 package com.backoffice.sosangongin.auth.controller;
 
+import com.backoffice.sosangongin.activitylog.service.ActivityLogService;
 import com.backoffice.sosangongin.auth.dto.LoginRequest;
 import com.backoffice.sosangongin.auth.dto.LoginResponse;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.auth.usecase.LoginUseCase;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,25 @@ public class AuthController {
 
     private final LoginUseCase loginUseCase;
     private final SessionManager sessionManager;
+    private final ActivityLogService activityLogService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginResponse response = loginUseCase.execute(request);
-        String role = response.isRoot() ? SessionManager.ROLE_ROOT : SessionManager.ROLE_BACKOFFICE_USER;
-        sessionManager.afterLogin(response.getId(), role, response.getName());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
+                                               HttpServletRequest httpRequest) {
+        String ip = httpRequest.getRemoteAddr();
+        String ua = httpRequest.getHeader("User-Agent");
+
+        try {
+            LoginResponse response = loginUseCase.execute(request);
+            String role = response.isRoot() ? SessionManager.ROLE_ROOT : SessionManager.ROLE_BACKOFFICE_USER;
+            sessionManager.afterLogin(response.getId(), role, response.getName());
+
+            activityLogService.saveLoginHistory(response.getId(), request.getLoginId(), ip, ua, true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            activityLogService.saveLoginHistory(null, request.getLoginId(), ip, ua, false);
+            throw e;
+        }
     }
 
     @PostMapping("/logout")

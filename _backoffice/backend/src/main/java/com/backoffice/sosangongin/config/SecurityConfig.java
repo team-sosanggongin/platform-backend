@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/permission/{id}").authenticated()
                         .requestMatchers("/api/permission/**").hasRole("ROOT")
                         .requestMatchers("/api/notice/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/activity-log/**").hasRole("ROOT")
                         .anyRequest().authenticated()
                 );
 

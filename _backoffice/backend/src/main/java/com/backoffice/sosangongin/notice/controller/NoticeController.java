@@ -1,6 +1,9 @@
 package com.backoffice.sosangongin.notice.controller;
 
+import com.backoffice.sosangongin.activitylog.domain.ActionType;
+import com.backoffice.sosangongin.activitylog.domain.ResourceDomain;
 import com.backoffice.sosangongin.auth.session.SessionManager;
+import com.backoffice.sosangongin.global.aop.AuditLog;
 import com.backoffice.sosangongin.global.aop.RequiresPermission;
 import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
 import com.backoffice.sosangongin.global.response.PageResponse;
@@ -40,6 +43,7 @@ public class NoticeController {
 
     @PostMapping
     @RequiresPermission("create.notice")
+    @AuditLog(action = ActionType.CREATE, domain = ResourceDomain.NOTICE)
     public ResponseEntity<NoticeResponse> create(@RequestBody NoticeCreateRequest request) {
         UUID createdBy = sessionManager.getAccountId()
                 .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
@@ -51,6 +55,7 @@ public class NoticeController {
 
     @PatchMapping("/{id}")
     @RequiresPermission("update.notice")
+    @AuditLog(action = ActionType.UPDATE, domain = ResourceDomain.NOTICE, resourceIdParam = "id")
     public ResponseEntity<NoticeResponse> update(@PathVariable Long id,
                                                  @RequestBody NoticeUpdateRequest request) {
         return ResponseEntity.ok(noticeUseCase.update(id, request));
@@ -58,6 +63,7 @@ public class NoticeController {
 
     @DeleteMapping("/{id}")
     @RequiresPermission("delete.notice")
+    @AuditLog(action = ActionType.DELETE, domain = ResourceDomain.NOTICE, resourceIdParam = "id")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         noticeUseCase.delete(id);
         return ResponseEntity.noContent().build();
@@ -65,6 +71,7 @@ public class NoticeController {
 
     @PatchMapping("/{id}/status")
     @RequiresPermission("update.notice")
+    @AuditLog(action = ActionType.STATUS_CHANGE, domain = ResourceDomain.NOTICE, resourceIdParam = "id")
     public ResponseEntity<Void> changeStatus(@PathVariable Long id,
                                              @RequestBody NoticeStatusRequest request) {
         noticeUseCase.changeStatus(id, request);

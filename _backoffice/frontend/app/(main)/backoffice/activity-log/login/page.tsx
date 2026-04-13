@@ -1,56 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { LoginHistory, PageResponse } from '@/types';
 import { ListLayout, TableColumn, Badge } from '@/components';
-
-interface LoginHistory {
-  id: number;
-  accountId: string;
-  ipAddress: string;
-  userAgent: string;
-  success: boolean;
-  createdAt: string;
-}
-
-const MOCK_LOGIN_HISTORIES: LoginHistory[] = [
-  {
-    id: 1,
-    accountId: '7331b320-06bd-4193-b675-96585cebd887',
-    ipAddress: '0:0:0:0:0:0:0:1',
-    userAgent: 'PostmanRuntime/7.53.0',
-    success: true,
-    createdAt: '2026-04-05 22:31:08',
-  },
-  {
-    id: 2,
-    accountId: '7331b320-06bd-4193-b675-96585cebd887',
-    ipAddress: '0:0:0:0:0:0:0:1',
-    userAgent: 'PostmanRuntime/7.53.0',
-    success: false,
-    createdAt: '2026-04-05 22:33:16',
-  },
-];
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 export default function LoginHistoryPage() {
+  const router = useRouter();
+  const { me, loading } = useAuth();
+  const [loginHistories, setLoginHistories] = useState<LoginHistory[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
   const [searchField, setSearchField] = useState('accountId');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
-  const filtered = MOCK_LOGIN_HISTORIES.filter((log) => {
-    const value = log[searchField as keyof LoginHistory]?.toString().toLowerCase() ?? '';
-    return value.includes(searchQuery.toLowerCase());
-  });
+  const fetchLoginHistories = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: String(currentPage - 1),
+        size: '10',
+      });
+      const res = await api.get<PageResponse<LoginHistory>>(`/api/activity-log/login?${params}`);
+      setLoginHistories(res.content);
+      setTotalPages(res.totalPages);
+    } catch (e) {
+      console.error('로그인 이력 조회 실패:', e);
+    }
+  }, [currentPage]);
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const currentItems = filtered.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  useEffect(() => {
+    if (loading) return;
+    if (!me?.root) {
+      router.push('/backoffice');
+      return;
+    }
+    fetchLoginHistories();
+  }, [loading, me, router, fetchLoginHistories]);
+
+  const filtered = searchQuery.trim()
+    ? loginHistories.filter((log) => {
+        const value = log[searchField as keyof LoginHistory]?.toString().toLowerCase() ?? '';
+        return value.includes(searchQuery.toLowerCase());
+      })
+    : loginHistories;
 
   const columns: TableColumn<LoginHistory>[] = [
     { header: 'No', render: (log) => log.id, width: '60px' },
-    { header: '계정ID', render: (log) => log.accountId },
+    { header: '계정ID', render: (log) => log.accountId ?? '-' },
+    { header: '로그인ID', render: (log) => log.loginId, width: '120px' },
     { header: 'IP주소', render: (log) => log.ipAddress, width: '160px' },
     { header: '브라우저', render: (log) => log.userAgent },
     {
@@ -62,11 +61,12 @@ export default function LoginHistoryPage() {
       ),
       width: '100px',
     },
-    { header: '등록일', render: (log) => log.createdAt, width: '160px' },
+    { header: '등록일', render: (log) => log.createdAt, width: '180px' },
   ];
 
   const searchOptions = [
     { value: 'accountId', label: '계정ID' },
+    { value: 'loginId', label: '로그인ID' },
     { value: 'success', label: '결과' },
   ];
 
@@ -82,7 +82,7 @@ export default function LoginHistoryPage() {
       }}
       table={{
         columns,
-        data: currentItems,
+        data: filtered,
         rowKey: (log) => String(log.id),
         emptyMessage: '로그인 이력이 없습니다.',
       }}

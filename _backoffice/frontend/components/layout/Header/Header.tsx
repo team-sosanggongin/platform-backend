@@ -10,7 +10,7 @@ import { NavigationItem } from '@/types';
 import { api } from '../../../lib/api';
 import { useAuth } from '@/lib/auth-context';
 
-const ROOT_ONLY_PATHS = new Set<string>();
+const ROOT_ONLY_PATHS = new Set(['/backoffice/activity-log/audit', '/backoffice/activity-log/login']);
 
 const allMenuItems: NavigationItem[] = [
   {

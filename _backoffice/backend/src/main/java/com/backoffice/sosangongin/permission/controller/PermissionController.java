@@ -1,5 +1,8 @@
 package com.backoffice.sosangongin.permission.controller;
 
+import com.backoffice.sosangongin.activitylog.domain.ActionType;
+import com.backoffice.sosangongin.activitylog.domain.ResourceDomain;
+import com.backoffice.sosangongin.global.aop.AuditLog;
 import com.backoffice.sosangongin.global.aop.RequiresRoot;
 import com.backoffice.sosangongin.permission.dto.*;
 import com.backoffice.sosangongin.permission.usecase.PermissionUseCase;
@@ -19,6 +22,7 @@ public class PermissionController {
 
     @PostMapping
     @RequiresRoot
+    @AuditLog(action = ActionType.CREATE, domain = ResourceDomain.PERMISSION)
     public ResponseEntity<PermissionResponse> create(@RequestBody PermissionRequest request) {
         return ResponseEntity.created(URI.create("/api/permission")).body(permissionUseCase.create(request));
     }
@@ -35,6 +39,7 @@ public class PermissionController {
 
     @PutMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.UPDATE, domain = ResourceDomain.PERMISSION, resourceIdParam = "id")
     public ResponseEntity<PermissionResponse> update(@PathVariable Long id,
                                                      @RequestBody PermissionRequest request) {
         return ResponseEntity.ok(permissionUseCase.update(id, request));
@@ -42,6 +47,7 @@ public class PermissionController {
 
     @DeleteMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.DELETE, domain = ResourceDomain.PERMISSION, resourceIdParam = "id")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         permissionUseCase.delete(id);
         return ResponseEntity.noContent().build();

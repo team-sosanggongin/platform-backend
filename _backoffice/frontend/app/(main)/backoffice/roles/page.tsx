@@ -5,6 +5,7 @@ import { Badge, Button, ListLayout, TableColumn } from '@/components';
 import { Role } from '@/types';
 import { api, ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { getPermissionLabel } from '@/lib/permission-labels';
 import { RoleFormModal, RoleFormPayload } from './RoleFormModal';
 
 const formatDateTime = (value?: string) => {
@@ -115,7 +116,7 @@ export default function RolesPage() {
       render: (r) => (
         <span style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
           {r.permissions.slice(0, 3).map((p) => (
-            <Badge key={p.id} variant="info">{p.permissionName}</Badge>
+            <Badge key={p.id} variant="info">{getPermissionLabel(p.permissionName)}</Badge>
           ))}
           {r.permissions.length > 3 && (
             <Badge variant="info">+{r.permissions.length - 3}</Badge>

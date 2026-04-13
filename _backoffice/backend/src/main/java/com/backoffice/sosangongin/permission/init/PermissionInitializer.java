@@ -24,9 +24,9 @@ public class PermissionInitializer implements ApplicationRunner {
                     PermissionBackoffice.builder().permissionName("create.notice").permDomain("notice").build(),
                     PermissionBackoffice.builder().permissionName("update.notice").permDomain("notice").build(),
                     PermissionBackoffice.builder().permissionName("delete.notice").permDomain("notice").build(),
-                    PermissionBackoffice.builder().permissionName("create.term").permDomain("term").build(),
-                    PermissionBackoffice.builder().permissionName("update.term").permDomain("term").build(),
-                    PermissionBackoffice.builder().permissionName("delete.term").permDomain("term").build()
+                    PermissionBackoffice.builder().permissionName("create.role").permDomain("role").build(),
+                    PermissionBackoffice.builder().permissionName("update.role").permDomain("role").build(),
+                    PermissionBackoffice.builder().permissionName("delete.role").permDomain("role").build()
             ));
         }
     }

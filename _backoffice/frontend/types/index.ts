@@ -61,6 +61,25 @@ export interface Notice {
   updatedAt?: string;
 }
 
+export interface AuditLog {
+  id: number;
+  accountId: string;
+  actionType: string;
+  resourceDomain: string;
+  resourceId: string | null;
+  createdAt: string;
+}
+
+export interface LoginHistory {
+  id: number;
+  accountId: string;
+  loginId: string;
+  ipAddress: string;
+  userAgent: string;
+  success: boolean;
+  createdAt: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   page: number;

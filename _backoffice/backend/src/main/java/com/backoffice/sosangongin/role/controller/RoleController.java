@@ -1,5 +1,8 @@
 package com.backoffice.sosangongin.role.controller;
 
+import com.backoffice.sosangongin.activitylog.domain.ActionType;
+import com.backoffice.sosangongin.activitylog.domain.ResourceDomain;
+import com.backoffice.sosangongin.global.aop.AuditLog;
 import com.backoffice.sosangongin.global.aop.RequiresRoot;
 import com.backoffice.sosangongin.auth.session.SessionManager;
 import com.backoffice.sosangongin.global.exception.InvalidCredentialsException;
@@ -23,6 +26,7 @@ public class RoleController {
 
     @PostMapping
     @RequiresRoot
+    @AuditLog(action = ActionType.CREATE, domain = ResourceDomain.ROLE)
     public ResponseEntity<RoleResponse> create(@RequestBody RoleRequest request) {
         UUID createdBy = sessionManager.getAccountId()
                 .orElseThrow(() -> new InvalidCredentialsException("인증 정보가 없습니다."));
@@ -41,12 +45,14 @@ public class RoleController {
 
     @PutMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.UPDATE, domain = ResourceDomain.ROLE, resourceIdParam = "id")
     public ResponseEntity<RoleResponse> update(@PathVariable Long id, @RequestBody RoleRequest request) {
         return ResponseEntity.ok(roleUseCase.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.DELETE, domain = ResourceDomain.ROLE, resourceIdParam = "id")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         roleUseCase.delete(id);
         return ResponseEntity.noContent().build();
@@ -54,6 +60,7 @@ public class RoleController {
 
     @PutMapping("/{id}/permissions")
     @RequiresRoot
+    @AuditLog(action = ActionType.UPDATE_PERMISSIONS, domain = ResourceDomain.ROLE, resourceIdParam = "id")
     public ResponseEntity<Void> updatePermissions(@PathVariable Long id,
                                                   @RequestBody RolePermissionRequest request) {
         roleUseCase.updatePermissions(id, request);
@@ -62,6 +69,7 @@ public class RoleController {
 
     @PostMapping("/{roleId}/account/{accountId}")
     @RequiresRoot
+    @AuditLog(action = ActionType.ASSIGN_ROLE, domain = ResourceDomain.ROLE, resourceIdParam = "roleId")
     public ResponseEntity<Void> assignRole(@PathVariable Long roleId,
                                            @PathVariable UUID accountId) {
         roleUseCase.assignRoleToAccount(accountId, roleId);
@@ -70,6 +78,7 @@ public class RoleController {
 
     @DeleteMapping("/{roleId}/account/{accountId}")
     @RequiresRoot
+    @AuditLog(action = ActionType.REMOVE_ROLE, domain = ResourceDomain.ROLE, resourceIdParam = "roleId")
     public ResponseEntity<Void> removeRole(@PathVariable Long roleId,
                                            @PathVariable UUID accountId) {
         roleUseCase.removeRoleFromAccount(accountId, roleId);

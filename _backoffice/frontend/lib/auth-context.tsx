@@ -22,6 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (!loading && me?.passwordExpired) {
+      window.location.href = '/login/change-password';
+    }
+  }, [loading, me]);
+
+  if (loading || me?.passwordExpired) {
+    return null;
+  }
+
   return (
     <AuthContext.Provider value={{ me, loading }}>
       {children}

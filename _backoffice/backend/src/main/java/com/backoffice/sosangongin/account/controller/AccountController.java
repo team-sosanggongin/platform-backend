@@ -5,7 +5,10 @@ import com.backoffice.sosangongin.account.dto.AccountResponse;
 import com.backoffice.sosangongin.account.dto.AccountUpdateRequest;
 import com.backoffice.sosangongin.account.dto.PasswordChangeRequest;
 import com.backoffice.sosangongin.account.usecase.AccountUseCase;
+import com.backoffice.sosangongin.activitylog.domain.ActionType;
+import com.backoffice.sosangongin.activitylog.domain.ResourceDomain;
 import com.backoffice.sosangongin.auth.session.SessionManager;
+import com.backoffice.sosangongin.global.aop.AuditLog;
 import com.backoffice.sosangongin.global.aop.RequiresRoot;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class AccountController {
 
     @PostMapping
     @RequiresRoot
+    @AuditLog(action = ActionType.CREATE, domain = ResourceDomain.ACCOUNT)
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountCreateRequest request) {
         return ResponseEntity.status(201).body(accountUseCase.create(request));
     }
@@ -48,6 +52,7 @@ public class AccountController {
 
     @PatchMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.UPDATE, domain = ResourceDomain.ACCOUNT, resourceIdParam = "id")
     public ResponseEntity<AccountResponse> update(@PathVariable UUID id,
                                                   @Valid @RequestBody AccountUpdateRequest request) {
         return ResponseEntity.ok(accountUseCase.update(id, request));
@@ -55,6 +60,7 @@ public class AccountController {
 
     @DeleteMapping("/{id}")
     @RequiresRoot
+    @AuditLog(action = ActionType.DELETE, domain = ResourceDomain.ACCOUNT, resourceIdParam = "id")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         accountUseCase.delete(id);
         return ResponseEntity.noContent().build();
@@ -62,6 +68,7 @@ public class AccountController {
 
     @PatchMapping("/{id}/unlock")
     @RequiresRoot
+    @AuditLog(action = ActionType.UNLOCK, domain = ResourceDomain.ACCOUNT, resourceIdParam = "id")
     public ResponseEntity<Void> unlock(@PathVariable UUID id) {
         accountUseCase.unlock(id);
         return ResponseEntity.ok().build();

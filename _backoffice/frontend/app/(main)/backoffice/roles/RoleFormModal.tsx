@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormModal, Input } from '@/components';
 import { Permission, Role } from '@/types';
 import { api, ApiError } from '@/lib/api';
+import { getPermissionLabel, getDomainLabel } from '@/lib/permission-labels';
 import styles from './roles.module.css';
 
 export interface RoleFormPayload {
@@ -138,7 +139,7 @@ export const RoleFormModal: React.FC<RoleFormModalProps> = ({
         ) : (
           grouped.map(([domain, perms]) => (
             <div key={domain} className={styles.permGroup}>
-              <div className={styles.permGroupTitle}>{domain}</div>
+              <div className={styles.permGroupTitle}>{getDomainLabel(domain)}</div>
               <div className={styles.permGroupBody}>
                 {perms.map((p) => (
                   <label key={p.id} className={styles.permCheckItem}>
@@ -147,7 +148,7 @@ export const RoleFormModal: React.FC<RoleFormModalProps> = ({
                       checked={selectedIds.has(p.id)}
                       onChange={() => togglePermission(p.id)}
                     />
-                    <span>{p.permissionName}</span>
+                    <span>{getPermissionLabel(p.permissionName)}</span>
                   </label>
                 ))}
               </div>
