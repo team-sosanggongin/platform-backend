@@ -9,8 +9,15 @@ import java.util.UUID;
 @Service
 @Profile({"test","local"})
 public class TestOauthServiceImpl implements OauthService{
+//    @Override
+//    public AuthResponse getAuth(SocialProvider provider, String code) {
+//        return new AuthResponse(provider, UUID.randomUUID().toString(), "testName","01000000000");
+//    }
+
+    private static final String TEST_PROVIDER_USER_ID = "test-user-001";
+
     @Override
     public AuthResponse getAuth(SocialProvider provider, String code) {
-        return new AuthResponse(provider, UUID.randomUUID().toString(), "testName","01000000000");
+        return new AuthResponse(provider, TEST_PROVIDER_USER_ID, "testName", "01000000000");
     }
 }
