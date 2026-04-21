@@ -6,6 +6,7 @@ import com.platform.sosangongin.domains.token.RefreshTokenRepository;
 import com.platform.sosangongin.domains.user.*;
 import com.platform.sosangongin.domains.user.social.UserSocialAuth;
 import com.platform.sosangongin.domains.user.social.UserSocialAuthRepository;
+import com.platform.sosangongin.services.codegen.CodeGeneratorService;
 import com.platform.sosangongin.services.jwt.JwtService;
 import com.platform.sosangongin.services.oauth.AuthResponse;
 import com.platform.sosangongin.services.oauth.OauthService;
@@ -29,6 +30,7 @@ public class LoginUsecase {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TimeGeneratorService timeGeneratorService;
+    private final CodeGeneratorService codeGeneratorService;
 
     @Transactional
     public LoginResult loginAfterSocialEvent(LoginRequest loginRequest) {
@@ -67,10 +69,13 @@ public class LoginUsecase {
     private LoginResult handleNewUserRegistration(AuthResponse authRes) {
         log.info("Creating new user for: {}", authRes.uniqueIdWithProvider());
 
+        String userCode = codeGeneratorService.generateCode().getCode();
+
         User newUser = userRepository.save(User.builder()
                 .name(authRes.userName())
                 .phoneNumber(authRes.phoneNumber())
                 .isPhoneVerified(false)
+                .userCode(userCode)
                 .build());
 
         saveSocialAuth(newUser, authRes);
